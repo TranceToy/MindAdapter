@@ -48,11 +48,11 @@ Drafted from the Q1 (a) answer; not yet confirmed.
 
 ## Open Questions
 
-These block turning the brief into a spec:
+These block turning the brief into a spec.
 
-1. **Platform.** Web app, desktop, or mobile? This decides the audio stack
-   (Web Audio API vs. native) and how assets are stored. Biggest branch — settle
-   it first.
+~~1. **Platform.**~~ Settled: browser web app. See
+ADR-0001 (`docs/adr/0001-web-app-as-the-session-platform.md`).
+
 2. **Script source.** Where do the word sequences come from — authored files
    checked into the repo, a library the user edits, or generated?
 3. **Pacing model.** Fixed words-per-minute, user-configurable, or ramping over
