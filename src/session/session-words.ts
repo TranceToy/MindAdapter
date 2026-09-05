@@ -7,3 +7,9 @@ export function sessionWords(segments: Segment[]): string[] {
   }
   return words;
 }
+
+export function wordCount(segments: Segment[]): number {
+  let words = 0;
+  for (const segment of segments) words += segment.words.length;
+  return words;
+}

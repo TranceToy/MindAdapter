@@ -1,6 +1,10 @@
+import type { Pool } from '../library/walk-library';
 import type { ScriptEntry } from '../script/validate-script';
 import type { SurfaceHost } from '../shell/surface-host';
 import { whenFullscreenLeft } from './fullscreen';
+import { createImageField } from './image-field';
+import { runImageLayer } from './image-layer';
+import type { ImageLayer } from './image-layer';
 import { startSessionAudio } from './session-audio';
 import type { SessionAudio } from './session-audio';
 import { anchorClock } from './session-clock';
@@ -20,7 +24,8 @@ export type LeaveSession = () => void;
 type Session = {
   entry: SessionEntry;
   audio: SessionAudio;
-  layer: WordLayer;
+  words: WordLayer;
+  imagery: ImageLayer;
   dismiss: () => void;
   unfollow: () => void;
   unwatch: () => void;
@@ -28,9 +33,14 @@ type Session = {
 
 const NOTHING = () => {};
 
-export function showStart(host: SurfaceHost, script: ScriptEntry, leave: LeaveSession): void {
+export function showStart(
+  host: SurfaceHost,
+  script: ScriptEntry,
+  pools: Pool[],
+  leave: LeaveSession,
+): void {
   function begin(): void {
-    void startSession(host, script, screen, leave);
+    void startSession(host, script, pools, screen, leave);
   }
 
   const screen = renderStart(script, begin, leave);
@@ -40,6 +50,7 @@ export function showStart(host: SurfaceHost, script: ScriptEntry, leave: LeaveSe
 async function startSession(
   host: SurfaceHost,
   script: ScriptEntry,
+  pools: Pool[],
   screen: StartScreen,
   leave: LeaveSession,
 ): Promise<void> {
@@ -48,25 +59,38 @@ async function startSession(
     screen.fail(FULLSCREEN_REFUSED);
     return;
   }
-  runSession(host, script, entry, leave);
+  runSession(host, script, pools, entry, leave);
 }
 
 function runSession(
   host: SurfaceHost,
   script: ScriptEntry,
+  pools: Pool[],
   entry: SessionEntry,
   leave: LeaveSession,
 ): void {
   const words = sessionWords(script.segments);
   const field = createWordField(words);
-  const stage = renderStage([field.element]);
+  const imagery = createImageField();
+  // Imagery first, so the words paint over it and the halo is the only thing
+  // between them.
+  const stage = renderStage([imagery.element, field.element]);
   const dismiss = host.raise(stage);
   const unfollow = followViewport(field);
   const startedAt = entry.context.currentTime;
   const audio = startSessionAudio(entry.context, script.segments, startedAt);
   const elapsed = anchorClock(entry.context, startedAt);
-  const layer = runWordLayer(field, words.length, elapsed, audio.end);
-  const session: Session = { entry, audio, layer, dismiss, unfollow, unwatch: NOTHING };
+  const wordLayer = runWordLayer(field, words.length, elapsed, audio.end);
+  const imageLayer = runImageLayer(imagery, script.segments, pools, elapsed);
+  const session: Session = {
+    entry,
+    audio,
+    words: wordLayer,
+    imagery: imageLayer,
+    dismiss,
+    unfollow,
+    unwatch: NOTHING,
+  };
   session.unwatch = whenFullscreenLeft(() => stopSession(session));
   // Selection renders now, behind the opaque stage, so leaving the session is a
   // single synchronous dismissal on the frame the exit gesture arrives.
@@ -78,6 +102,7 @@ function stopSession(session: Session): void {
   session.entry.wake.release();
   session.unwatch();
   session.unfollow();
-  session.layer.stop();
+  session.words.stop();
+  session.imagery.stop();
   session.audio.leave();
 }

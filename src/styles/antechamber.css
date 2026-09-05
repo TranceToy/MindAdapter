@@ -183,6 +183,22 @@ body {
   cursor: none;
 }
 
+.imagery {
+  position: absolute;
+  inset: 0;
+}
+
+/* Untouched and at full brightness: no dim, no scrim, no vignette. Legibility
+   is the word's halo and nothing else. The whole frame is shown at its own
+   aspect ratio, so what the ground shows around it is the black the layer
+   already falls back to. */
+.photograph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .field {
   position: absolute;
   inset: 0;
