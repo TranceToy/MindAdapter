@@ -20,6 +20,12 @@ export function actionHero(text: string, activate: () => void): HTMLElement {
   return button;
 }
 
+export function dimActionHero(text: string, activate: () => void): HTMLElement {
+  const button = actionHero(text, activate);
+  button.classList.add('hero--dim');
+  return button;
+}
+
 export function actionSecondary(text: string, activate: () => void): HTMLElement {
   const button = document.createElement('button');
   button.type = 'button';

@@ -1,7 +1,7 @@
 import { RELINK_LINE } from '../library/library-copy';
 import { actionSecondary, secondary, surface } from '../shell/antechamber';
 import { problemsLine } from './finding-copy';
-import { durationLabel, sessionSeconds } from './session-duration';
+import { durationText } from './session-duration';
 import { isPlayable } from './validate-script';
 import type { ScriptEntry } from './validate-script';
 
@@ -73,9 +73,4 @@ function renderMeta(script: ScriptEntry): HTMLElement {
 
 function problemCount(script: ScriptEntry): string {
   return problemsLine(script.findings.length);
-}
-
-function durationText(words: number): string {
-  const seconds = sessionSeconds(words);
-  return durationLabel(seconds);
 }

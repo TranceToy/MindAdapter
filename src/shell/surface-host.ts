@@ -1,5 +1,6 @@
 export type SurfaceHost = {
   show: (screen: HTMLElement) => void;
+  raise: (layer: HTMLElement) => () => void;
 };
 
 export function createSurfaceHost(root: HTMLElement): SurfaceHost {
@@ -13,7 +14,12 @@ export function createSurfaceHost(root: HTMLElement): SurfaceHost {
     if (leaving) fadeOut(leaving);
   }
 
-  return { show };
+  function raise(layer: HTMLElement): () => void {
+    root.append(layer);
+    return () => layer.remove();
+  }
+
+  return { show, raise };
 }
 
 function fadeOut(screen: HTMLElement): void {

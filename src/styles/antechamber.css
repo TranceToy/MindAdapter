@@ -166,3 +166,48 @@ body {
 .findings__back {
   margin-top: 44px;
 }
+
+.start__begin {
+  margin-top: 44px;
+}
+
+.start__failure:empty {
+  display: none;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--ground);
+  cursor: none;
+}
+
+.field {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* No transition, ever: a fading or blank word is a 3.67 Hz flicker. */
+.word {
+  color: var(--lit);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 0.05em #000,
+    0 0 0.14em #000e,
+    0 0 0.36em #000c,
+    0 0.02em 0.7em #000a;
+  white-space: nowrap;
+}
+
+.word--sample {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+}
