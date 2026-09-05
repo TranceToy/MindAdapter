@@ -1,4 +1,4 @@
-import { renderPlaceholder } from '../placeholder-screen';
+import { showSelection } from '../script/selection-step';
 import type { SurfaceHost } from '../shell/surface-host';
 import { renderLibrary } from './library-screen';
 import { chooseLibrary, reconnectLibrary, resolveLibrary } from './resolve-library';
@@ -24,10 +24,14 @@ function present(host: SurfaceHost, resolution: LibraryResolution): void {
 
 async function rescan(host: SurfaceHost, root: FileSystemDirectoryHandle): Promise<void> {
   const display = displayScanProgress(host);
-  await scanLibrary(root, display.report);
+  const library = await scanLibrary(root, display.report);
   display.stop();
-  const selection = renderPlaceholder('Selection');
-  host.show(selection);
+  showSelection(host, library, () => void relink(host));
+}
+
+async function relink(host: SurfaceHost): Promise<void> {
+  const resolution = await chooseLibrary();
+  present(host, resolution);
 }
 
 async function cure(host: SurfaceHost, resolution: CurableResolution): Promise<void> {

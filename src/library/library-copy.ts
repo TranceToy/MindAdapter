@@ -6,6 +6,7 @@ type LibraryCopy = {
 };
 
 export const SCANNING_LINE = 'measuring clips';
+export const RELINK_LINE = 'library';
 
 export const LIBRARY_COPY: Record<CurableState, LibraryCopy> = {
   'no-library': {

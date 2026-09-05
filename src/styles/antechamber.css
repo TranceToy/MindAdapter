@@ -40,10 +40,9 @@ body {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
   text-align: center;
   padding: 6vh 6vw;
+  overflow-y: auto;
   opacity: 0;
   transition: opacity var(--cross-fade) var(--easing);
 }
@@ -55,6 +54,7 @@ body {
 .surface__content {
   width: 100%;
   max-width: 900px;
+  margin: auto;
 }
 
 .hero {
@@ -91,6 +91,17 @@ body {
   text-transform: uppercase;
 }
 
+.secondary--action {
+  display: block;
+  width: 100%;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .prose {
   max-width: 460px;
   margin: 30px auto 0;
@@ -98,4 +109,45 @@ body {
   font-size: 13.5px;
   font-weight: 400;
   line-height: 1.7;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list__row {
+  padding: 14px 0;
+}
+
+.list__name {
+  display: block;
+  width: 100%;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--lit);
+  font-family: inherit;
+  font-size: clamp(20px, 3.4vw, 34px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.list__name--dim {
+  color: var(--dim);
+  cursor: default;
+}
+
+.list__meta {
+  margin-top: 8px;
+}
+
+.selection__library {
+  margin-top: 44px;
 }

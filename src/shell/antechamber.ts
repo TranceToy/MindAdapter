@@ -20,6 +20,15 @@ export function actionHero(text: string, activate: () => void): HTMLElement {
   return button;
 }
 
+export function actionSecondary(text: string, activate: () => void): HTMLElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'secondary secondary--action';
+  button.textContent = text;
+  button.addEventListener('click', activate);
+  return button;
+}
+
 export function prose(text: string): HTMLElement {
   const paragraph = document.createElement('p');
   paragraph.className = 'prose';

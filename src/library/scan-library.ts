@@ -4,6 +4,10 @@ import { loadClipRecords, pruneClipRecords, putClipRecord } from './clip-index';
 import { createDecoder, decodeClip } from './decode-clip';
 import { CLIPS_FOLDER, IMAGES_FOLDER } from './library-root';
 import { measureClip } from './clip-measurement';
+import { poolInventory } from './pool-inventory';
+import { readScripts } from '../script/read-scripts';
+import { validateScripts } from '../script/validate-script';
+import type { ScriptEntry } from '../script/validate-script';
 import { walkSection } from './walk-library';
 import type { LibraryFile, Pool } from './walk-library';
 
@@ -22,6 +26,7 @@ export type ClipPool = {
 export type Library = {
   images: Pool[];
   clips: ClipPool[];
+  scripts: ScriptEntry[];
 };
 
 export async function scanLibrary(
@@ -35,7 +40,10 @@ export async function scanLibrary(
   const clips = await measurePlans(plans, report);
   const walked = clipPaths(pools);
   await pruneClipRecords(walked);
-  return { images, clips };
+  const files = await readScripts(root);
+  const inventory = poolInventory(images, clips);
+  const scripts = validateScripts(files, inventory);
+  return { images, clips, scripts };
 }
 
 async function measurePlans(plans: ClipPlan[], report: ReportProgress): Promise<ClipPool[]> {

@@ -1,7 +1,8 @@
+export const SCRIPTS_FOLDER = 'scripts';
 export const IMAGES_FOLDER = 'images';
 export const CLIPS_FOLDER = 'clips';
 
-const SUBFOLDER_NAMES = ['scripts', IMAGES_FOLDER, CLIPS_FOLDER];
+const SUBFOLDER_NAMES = [SCRIPTS_FOLDER, IMAGES_FOLDER, CLIPS_FOLDER];
 const READWRITE: FileSystemPermissionMode = 'readwrite';
 
 export async function pickLibraryRoot(): Promise<FileSystemDirectoryHandle | null> {
