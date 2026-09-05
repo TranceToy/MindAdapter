@@ -1,6 +1,8 @@
 import type { ScriptEntry } from '../script/validate-script';
 import type { SurfaceHost } from '../shell/surface-host';
 import { whenFullscreenLeft } from './fullscreen';
+import { startSessionAudio } from './session-audio';
+import type { SessionAudio } from './session-audio';
 import { anchorClock } from './session-clock';
 import { FULLSCREEN_REFUSED } from './session-copy';
 import { renderStage } from './session-screen';
@@ -17,6 +19,7 @@ export type LeaveSession = () => void;
 
 type Session = {
   entry: SessionEntry;
+  audio: SessionAudio;
   layer: WordLayer;
   dismiss: () => void;
   unfollow: () => void;
@@ -59,8 +62,11 @@ function runSession(
   const stage = renderStage([field.element]);
   const dismiss = host.raise(stage);
   const unfollow = followViewport(field);
-  const layer = runWordLayer(field, words.length, anchorClock(entry.context));
-  const session: Session = { entry, layer, dismiss, unfollow, unwatch: NOTHING };
+  const startedAt = entry.context.currentTime;
+  const audio = startSessionAudio(entry.context, script.segments, startedAt);
+  const elapsed = anchorClock(entry.context, startedAt);
+  const layer = runWordLayer(field, words.length, elapsed, audio.end);
+  const session: Session = { entry, audio, layer, dismiss, unfollow, unwatch: NOTHING };
   session.unwatch = whenFullscreenLeft(() => stopSession(session));
   // Selection renders now, behind the opaque stage, so leaving the session is a
   // single synchronous dismissal on the frame the exit gesture arrives.
@@ -73,5 +79,5 @@ function stopSession(session: Session): void {
   session.unwatch();
   session.unfollow();
   session.layer.stop();
-  void session.entry.context.close();
+  session.audio.leave();
 }

@@ -1,8 +1,13 @@
-import { BED_KEY, VOICE_KEY, readBedPair, readTagList } from './declaration-values';
+import {
+  BED_KEY,
+  DEFAULT_BED,
+  VOICE_KEY,
+  readBedPair,
+  readTagList,
+} from './declaration-values';
 import type { BedPair } from './declaration-values';
 import type { DeclarationBlock, ParsedScript } from './parse-script';
 
-const DEFAULT_BED: BedPair = { carrier: 150, beat: 6 };
 const NO_VOICE: string[] = [];
 
 export type Segment = {

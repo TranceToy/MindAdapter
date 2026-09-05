@@ -14,6 +14,10 @@ export type BedPair = {
   beat: number;
 };
 
+// The bed layer is never absent, so a script declaring nothing runs on these:
+// a 150 Hz carrier with a 6 Hz theta offset.
+export const DEFAULT_BED: BedPair = { carrier: 150, beat: 6 };
+
 export function readBedPair(value: string): BedPair | null {
   const pair = BED_PAIR.exec(value);
   if (!pair) return null;

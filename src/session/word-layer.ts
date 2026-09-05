@@ -7,7 +7,14 @@ export type WordLayer = {
   stop: () => void;
 };
 
-export function runWordLayer(field: WordField, words: number, elapsed: Elapsed): WordLayer {
+export type LastWord = () => void;
+
+export function runWordLayer(
+  field: WordField,
+  words: number,
+  elapsed: Elapsed,
+  ended: LastWord,
+): WordLayer {
   let frame = 0;
   let shown = -1;
 
@@ -31,6 +38,7 @@ export function runWordLayer(field: WordField, words: number, elapsed: Elapsed):
   function end(): void {
     field.retire();
     stop();
+    ended();
   }
 
   function stop(): void {
