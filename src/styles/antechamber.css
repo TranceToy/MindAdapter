@@ -141,7 +141,6 @@ body {
 
 .list__name--dim {
   color: var(--dim);
-  cursor: default;
 }
 
 .list__meta {
@@ -149,5 +148,21 @@ body {
 }
 
 .selection__library {
+  margin-top: 44px;
+}
+
+.findings {
+  margin-top: 34px;
+}
+
+.findings__line {
+  margin-top: 14px;
+}
+
+.findings__line:first-child {
+  margin-top: 0;
+}
+
+.findings__back {
   margin-top: 44px;
 }
