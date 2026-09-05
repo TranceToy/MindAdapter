@@ -5,6 +5,8 @@ type LibraryCopy = {
   cure: string;
 };
 
+export const SCANNING_LINE = 'measuring clips';
+
 export const LIBRARY_COPY: Record<CurableState, LibraryCopy> = {
   'no-library': {
     hero: 'Choose folder',

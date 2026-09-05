@@ -4,6 +4,8 @@ import { renderLibrary } from './library-screen';
 import { chooseLibrary, reconnectLibrary, resolveLibrary } from './resolve-library';
 import type { CurableResolution, LibraryResolution } from './resolve-library';
 import { requestPersistentIndex } from './root-handle-store';
+import { displayScanProgress } from './scan-progress';
+import { scanLibrary } from './scan-library';
 
 export async function runLibraryStep(host: SurfaceHost): Promise<void> {
   requestPersistentIndex();
@@ -13,12 +15,19 @@ export async function runLibraryStep(host: SurfaceHost): Promise<void> {
 
 function present(host: SurfaceHost, resolution: LibraryResolution): void {
   if (resolution.state === 'healthy') {
-    const scanning = renderPlaceholder('Scanning');
-    host.show(scanning);
+    void rescan(host, resolution.root);
     return;
   }
   const screen = renderLibrary(resolution.state, () => void cure(host, resolution));
   host.show(screen);
+}
+
+async function rescan(host: SurfaceHost, root: FileSystemDirectoryHandle): Promise<void> {
+  const display = displayScanProgress(host);
+  await scanLibrary(root, display.report);
+  display.stop();
+  const selection = renderPlaceholder('Selection');
+  host.show(selection);
 }
 
 async function cure(host: SurfaceHost, resolution: CurableResolution): Promise<void> {
