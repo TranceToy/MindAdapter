@@ -4,6 +4,7 @@ import type { ClipPool } from '../library/scan-library';
 import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Gap } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import type { Word } from '../script/tokenise-prose';
 import { beatSeconds } from '../script/word-times';
 import type { Roll } from './clip-bag';
 import { voiceDeadline, voiceFirings } from './voice-schedule';
@@ -27,6 +28,8 @@ function pool(tag: string, clips: MeasuredClip[]): ClipPool {
 
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
 
+const WORD: Word = { text: 'down', marked: false };
+
 function segment(voice: string[], words: number, gap: Gap = DEFAULT_GAP): Segment {
   return {
     tags: [],
@@ -35,7 +38,7 @@ function segment(voice: string[], words: number, gap: Gap = DEFAULT_GAP): Segmen
     pace: DEFAULT_PACE,
     gap,
     spirals: [],
-    words: new Array(words).fill('down'),
+    words: new Array(words).fill(WORD),
   };
 }
 

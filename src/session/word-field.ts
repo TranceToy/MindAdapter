@@ -1,5 +1,8 @@
+import type { Word } from '../script/tokenise-prose';
 import { SAMPLE_SIZE, fittedSize, widestWord } from './word-size';
 import type { Viewport } from './word-size';
+
+const MARKED_CLASS = 'word--marked';
 
 export type WordField = {
   element: HTMLElement;
@@ -8,7 +11,8 @@ export type WordField = {
   retire: () => void;
 };
 
-export function createWordField(words: string[]): WordField {
+export function createWordField(words: Word[]): WordField {
+  const texts = wordTexts(words);
   const word = createWord();
   const sample = createSample();
   const element = document.createElement('div');
@@ -24,17 +28,20 @@ export function createWordField(words: string[]): WordField {
 
   function fit(): void {
     if (retired) return;
-    if (widest === null) widest = widestWord(words, measure);
+    if (widest === null) widest = widestWord(texts, measure);
     const size = fittedSize(measure(widest), viewport());
     word.style.fontSize = `${size}px`;
   }
 
   // The only write to the field, and it only ever writes a word: a blank frame
-  // between two words would make the layer a 3.67 Hz full-contrast flicker.
+  // between two words would make the layer a 3.67 Hz full-contrast flicker. A
+  // marked word is the same word in another colour, so the mark rides the same
+  // write rather than adding one of its own.
   function show(index: number): void {
-    const text = words[index];
-    if (text === undefined) return;
-    word.textContent = text;
+    const shown = words[index];
+    if (shown === undefined) return;
+    word.textContent = shown.text;
+    word.classList.toggle(MARKED_CLASS, shown.marked);
   }
 
   function retire(): void {
@@ -51,6 +58,14 @@ export function followViewport(field: WordField): () => void {
   void document.fonts.ready.then(refit);
   window.addEventListener('resize', refit);
   return () => window.removeEventListener('resize', refit);
+}
+
+// The size the field is fitted to is the widest word it will ever hold, and a
+// mark changes the colour of a word and never its width.
+function wordTexts(words: Word[]): string[] {
+  const texts: string[] = [];
+  for (const word of words) texts.push(word.text);
+  return texts;
 }
 
 function viewport(): Viewport {

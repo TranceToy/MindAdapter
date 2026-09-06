@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { LibraryFile, Pool } from '../library/walk-library';
 import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import type { Word } from '../script/tokenise-prose';
 import { WORDS_PER_IMAGE, imageSlots, slotAfter } from './image-schedule';
 
 function file(path: string): LibraryFile {
@@ -12,6 +13,8 @@ function pool(tag: string, paths: string[]): Pool {
   return { tag, files: paths.map(file) };
 }
 
+const WORD: Word = { text: 'down', marked: false };
+
 function segment(tags: string[], words: number): Segment {
   return {
     tags,
@@ -20,7 +23,7 @@ function segment(tags: string[], words: number): Segment {
     pace: DEFAULT_PACE,
     gap: DEFAULT_GAP,
     spirals: [],
-    words: new Array(words).fill('down'),
+    words: new Array(words).fill(WORD),
   };
 }
 

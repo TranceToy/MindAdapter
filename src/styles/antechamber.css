@@ -9,6 +9,7 @@
 :root {
   --ground: #000;
   --lit: #fff;
+  --marked: #ffb020;
   --dim: #3a3a40;
   --prose: #6e6e74;
   --halo:
@@ -288,6 +289,14 @@ body {
   text-transform: uppercase;
   text-shadow: var(--halo);
   white-space: nowrap;
+}
+
+/* A marked word takes a colour and nothing else: the same face at the same
+   size on the same beat, so the reading is unbroken and only the hue says the
+   word was set apart. Amber holds its hue against a photograph where a paler
+   one would read as the white going dim. */
+.word--marked {
+  color: var(--marked);
 }
 
 .word--sample {

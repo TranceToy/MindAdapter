@@ -30,7 +30,7 @@ spiral: 3, -1/0.06
 
 # ocean, deep water
 
-The water is warm and heavy on your skin. Nothing to hold, nothing
+The water is warm and *heavy* on your skin. Nothing to hold, nothing
 to hold on to.
 
 # void
@@ -65,6 +65,20 @@ declarations belong and the script does not run.
 Everything after that first blank line is prose to the end of the segment,
 including further blank lines and any line that happens to hold a colon.
 
+## Marks
+
+An asterisk in the prose marks the words after it, and the next asterisk stops
+marking them: `*heavy*` marks one word, `*down and further down*` marks four.
+Marked words are shown in the marked colour instead of white — a trigger word
+the session should carry differently from the prose around it. The colour is the
+app's, not the script's: a mark says which words, and nothing about which
+colour.
+
+The asterisks are never shown, and they are read before punctuation is stripped,
+so `"*heavier,*"` marks `HEAVIER` with its quotes and comma gone. A mark that is
+never closed marks the rest of its segment and stops at the segment's end — no
+mark crosses a segment header.
+
 ## Declarations
 
 A declaration is `key: value`, one to a line. Five keys exist; anything else is
@@ -90,7 +104,9 @@ field blank.
 token is stripped. Line breaks in the file mean nothing to the reading. One word
 is shown per beat, and the beat is the pace in force where that word sits — so
 the duration on the selection screen is built segment by segment, not from a word
-count.
+count. A marked word is that same word in the marked colour: the same face at
+the same size on the same beat, since a mark that also changed the weight or the
+timing would be a second layer of instruction rather than a colour.
 
 **Imagery.** A new photograph every eight words, drawn at random from the
 segment's pools and never repeating the one on screen. Several tags on a header

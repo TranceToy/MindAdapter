@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Depth, Spiral } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import type { Word } from '../script/tokenise-prose';
 import { beatSeconds } from '../script/word-times';
 import { spiralAt, spiralTurns } from './spiral-schedule';
 
@@ -20,6 +21,8 @@ const NONE: Spiral[] = [];
 
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
 
+const WORD: Word = { text: 'down', marked: false };
+
 function segment(spirals: Spiral[], words: number, pace = DEFAULT_PACE): Segment {
   return {
     tags: [],
@@ -28,7 +31,7 @@ function segment(spirals: Spiral[], words: number, pace = DEFAULT_PACE): Segment
     pace,
     gap: DEFAULT_GAP,
     spirals,
-    words: new Array(words).fill('down'),
+    words: new Array(words).fill(WORD),
   };
 }
 

@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_BED, DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import type { Word } from '../script/tokenise-prose';
 import { beatSeconds, wordTimes } from '../script/word-times';
 import { cueAt, wordAt } from './word-clock';
 
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
 const SLOW_PACE = 120;
 const SLOW_BEAT = beatSeconds(SLOW_PACE);
+
+const WORD: Word = { text: 'down', marked: false };
 
 function segment(words: number, pace = DEFAULT_PACE): Segment {
   return {
@@ -16,7 +19,7 @@ function segment(words: number, pace = DEFAULT_PACE): Segment {
     pace,
     gap: DEFAULT_GAP,
     spirals: [],
-    words: new Array(words).fill('down'),
+    words: new Array(words).fill(WORD),
   };
 }
 

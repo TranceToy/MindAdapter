@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { BedPair } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import type { Word } from '../script/tokenise-prose';
 import { beatSeconds } from '../script/word-times';
 import { bedGlides, leftFrequency, rightFrequency } from './bed-schedule';
 
@@ -9,6 +10,8 @@ const DEEPER: BedPair = { carrier: 200, beat: 4 };
 const DEEPEST: BedPair = { carrier: 90, beat: 2 };
 
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
+
+const WORD: Word = { text: 'down', marked: false };
 
 function segment(bed: BedPair, words: number, pace = DEFAULT_PACE): Segment {
   return {
@@ -18,7 +21,7 @@ function segment(bed: BedPair, words: number, pace = DEFAULT_PACE): Segment {
     pace,
     gap: DEFAULT_GAP,
     spirals: [],
-    words: new Array(words).fill('down'),
+    words: new Array(words).fill(WORD),
   };
 }
 

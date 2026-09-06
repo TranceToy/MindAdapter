@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { countWords, parseScript } from './parse-script';
+import type { Word } from './tokenise-prose';
 
 const SCRIPT = `bed: 150/6
 voice: obedience
@@ -18,6 +19,10 @@ voice:
 
 Only this.
 `;
+
+function plain(texts: string[]): Word[] {
+  return texts.map((text) => ({ text, marked: false }));
+}
 
 describe('parseScript', () => {
   it('reads head declarations with their line numbers', () => {
@@ -41,7 +46,7 @@ describe('parseScript', () => {
     expect(second?.block).toEqual([
       { kind: 'declaration', key: 'bed', value: '140/4', line: 9 },
     ]);
-    expect(second?.words).toEqual(['Nothing', 'above', 'you', 'Nothing', 'below']);
+    expect(second?.words).toEqual(plain(['Nothing', 'above', 'you', 'Nothing', 'below']));
   });
 
   it('keeps an empty voice value as a declaration', () => {
@@ -56,7 +61,7 @@ describe('parseScript', () => {
     const script = parseScript('# void\n\nlisten to this: nothing.\n');
     const segment = script.segments[0];
     expect(segment?.block).toEqual([]);
-    expect(segment?.words).toEqual(['listen', 'to', 'this', 'nothing']);
+    expect(segment?.words).toEqual(plain(['listen', 'to', 'this', 'nothing']));
   });
 
   it('marks a line that is not a declaration where declarations belong', () => {

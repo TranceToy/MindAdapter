@@ -1,5 +1,6 @@
 import { readTagList } from './declaration-values';
 import { tokeniseProse } from './tokenise-prose';
+import type { Word } from './tokenise-prose';
 
 export type DeclarationEntry = {
   kind: 'declaration';
@@ -21,7 +22,7 @@ export type ParsedSegment = {
   line: number;
   tags: string[];
   block: DeclarationBlock;
-  words: string[];
+  words: Word[];
 };
 
 export type ParsedScript = {

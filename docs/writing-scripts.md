@@ -57,7 +57,7 @@ every other. That single fact governs the prose:
   does "consequently". Weight the sentences toward words that carry an image.
 - **Punctuation does no work.** Commas and full stops vanish before the words
   are shown, so the rhythm is the pace and the pace alone. Build cadence from
-  word count — short runs, then longer ones — not from marks.
+  word count — short runs, then longer ones — not from commas.
 - **Write what is, in the present tense, in the second person.** "Your arms are
   heavy" plays; "you will begin to feel that your arms may be getting heavier"
   spends nine beats before it says anything.
@@ -71,6 +71,12 @@ every other. That single fact governs the prose:
   cannot. Open a segment with the verifiable and close it with the intended.
 - **Avoid numerals and abbreviations.** They tokenise oddly and read as
   instructions to think rather than words to follow. Write counts as words.
+- **Mark the few words the session turns on.** `*heavy*` is the one colour a
+  session has, and it works by being rare: a handful of trigger words across a
+  whole script reads as the session pointing at something, while a marked word
+  every other line reads as a second voice running under the prose. Mark the
+  same word every time it returns, so the colour is heard as the same
+  instruction rather than as this one occurrence being different.
 
 ## Setting the other layers
 
@@ -105,4 +111,5 @@ near the length of a segment makes the segment breathe once.
 - Does the last segment return — pace up, spiral stopped, voice silent?
 - Does every segment header name pools that exist and hold files?
 - Is anything said only once that should have been said three times?
+- Are the marked words few enough to be heard, and marked every time?
 - Are there long words where the beat needs a short one?

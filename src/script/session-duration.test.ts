@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_BED, DEFAULT_GAP, DEFAULT_PACE } from './declaration-values';
 import type { Segment } from './resolve-script';
 import { durationLabel, durationText } from './session-duration';
+import type { Word } from './tokenise-prose';
+
+const WORD: Word = { text: 'down', marked: false };
 
 function segment(words: number, pace = DEFAULT_PACE): Segment {
   return {
@@ -11,7 +14,7 @@ function segment(words: number, pace = DEFAULT_PACE): Segment {
     pace,
     gap: DEFAULT_GAP,
     spirals: [],
-    words: new Array(words).fill('down'),
+    words: new Array(words).fill(WORD),
   };
 }
 

@@ -98,6 +98,14 @@ A file authored outside the app that supplies a session's words and its segment
 structure.
 _Avoid_: text, transcript, session file, program
 
+**Mark**:
+What a script puts round a word, or a run of words, to have it shown in the
+marked colour rather than white for the beats it is on — a trigger word set
+apart from the prose it sits in. The script says which words; the colour is the
+app's, and a mark changes nothing else about the word, neither its size nor its
+beat.
+_Avoid_: highlight, emphasis, bold, keyword, tag (which belongs to the pools)
+
 **Segment**:
 A named stretch of a script that carries its own imagery tag and may declare its
 own carrier, beat frequency, pace and gap.

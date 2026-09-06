@@ -15,6 +15,7 @@ import {
 } from './declaration-values';
 import type { BedPair, Gap, Spiral } from './declaration-values';
 import type { DeclarationBlock, ParsedScript } from './parse-script';
+import type { Word } from './tokenise-prose';
 
 const NO_VOICE: string[] = [];
 const NO_SPIRAL: Spiral[] = [];
@@ -33,7 +34,7 @@ export type Segment = {
   pace: number;
   gap: Gap;
   spirals: Spiral[];
-  words: string[];
+  words: Word[];
 };
 
 export function resolveSegments(script: ParsedScript): Segment[] {
