@@ -134,7 +134,7 @@ function fireWithin(
 // Uniform between its bounds, never exponential: an exponential gap clumps by
 // construction, and two near-touching suggestions read as a malfunction rather
 // than as chance.
-function gapSeconds(roll: Roll): number {
+export function gapSeconds(roll: Roll): number {
   return GAP_LOW + roll() * (GAP_HIGH - GAP_LOW);
 }
 

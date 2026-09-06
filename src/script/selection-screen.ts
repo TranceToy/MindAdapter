@@ -1,3 +1,4 @@
+import { CALIBRATION_LINE } from '../calibration/calibration-copy';
 import { RELINK_LINE } from '../library/library-copy';
 import { actionSecondary, secondary, surface } from '../shell/antechamber';
 import { problemsLine } from './finding-copy';
@@ -11,25 +12,30 @@ export type OpenFindings = (script: ScriptEntry) => void;
 
 export type RelinkLibrary = () => void;
 
-export function renderSelection(
-  scripts: ScriptEntry[],
-  start: StartScript,
-  open: OpenFindings,
-  relink: RelinkLibrary,
-): HTMLElement {
+export type ReachCalibration = () => void;
+
+export type SelectionActions = {
+  start: StartScript;
+  open: OpenFindings;
+  calibrate: ReachCalibration;
+  relink: RelinkLibrary;
+};
+
+export function renderSelection(scripts: ScriptEntry[], actions: SelectionActions): HTMLElement {
   const list = document.createElement('ul');
   list.className = 'list';
   for (const script of scripts) {
-    const row = renderRow(script, start, open);
+    const row = renderRow(script, actions.start, actions.open);
     list.append(row);
   }
-  const library = renderRelink(relink);
-  return surface([list, library]);
+  const calibration = renderAside(CALIBRATION_LINE, actions.calibrate);
+  const library = renderAside(RELINK_LINE, actions.relink);
+  return surface([list, calibration, library]);
 }
 
-function renderRelink(relink: RelinkLibrary): HTMLElement {
-  const line = actionSecondary(RELINK_LINE, relink);
-  line.classList.add('selection__library');
+function renderAside(text: string, reach: () => void): HTMLElement {
+  const line = actionSecondary(text, reach);
+  line.classList.add('selection__aside');
   return line;
 }
 

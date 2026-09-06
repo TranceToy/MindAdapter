@@ -147,8 +147,42 @@ body {
   margin-top: 8px;
 }
 
-.selection__library {
+.selection__aside {
   margin-top: 44px;
+}
+
+.selection__aside + .selection__aside {
+  margin-top: 18px;
+}
+
+/* A hairline and a dot, and the block around them is the grab area: one pixel
+   is a line to read, not a thing to catch. */
+.track {
+  max-width: 460px;
+  margin: 54px auto 0;
+  padding: 20px 0 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.track__rail {
+  position: relative;
+  height: 1px;
+  background: var(--dim);
+}
+
+.track__dot {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--lit);
+}
+
+.track__label {
+  margin-top: 20px;
 }
 
 .findings {

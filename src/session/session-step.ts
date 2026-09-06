@@ -1,3 +1,4 @@
+import type { Calibration } from '../calibration/calibration';
 import type { Library } from '../library/scan-library';
 import type { ScriptEntry } from '../script/validate-script';
 import type { SurfaceHost } from '../shell/surface-host';
@@ -40,10 +41,11 @@ export function showStart(
   host: SurfaceHost,
   script: ScriptEntry,
   library: Library,
+  calibration: Calibration,
   leave: LeaveSession,
 ): void {
   function begin(): void {
-    void startSession(host, script, library, screen, leave);
+    void startSession(host, script, library, calibration, screen, leave);
   }
 
   const screen = renderStart(script, begin, leave);
@@ -54,6 +56,7 @@ async function startSession(
   host: SurfaceHost,
   script: ScriptEntry,
   library: Library,
+  calibration: Calibration,
   screen: StartScreen,
   leave: LeaveSession,
 ): Promise<void> {
@@ -62,13 +65,14 @@ async function startSession(
     screen.fail(FULLSCREEN_REFUSED);
     return;
   }
-  runSession(host, script, library, entry, leave);
+  runSession(host, script, library, calibration, entry, leave);
 }
 
 function runSession(
   host: SurfaceHost,
   script: ScriptEntry,
   library: Library,
+  calibration: Calibration,
   entry: SessionEntry,
   leave: LeaveSession,
 ): void {
@@ -81,7 +85,7 @@ function runSession(
   const dismiss = host.raise(stage);
   const unfollow = followViewport(field);
   const startedAt = entry.context.currentTime;
-  const audio = startSessionAudio(entry.context, script.segments, startedAt);
+  const audio = startSessionAudio(entry.context, script.segments, calibration, startedAt);
   const elapsed = anchorClock(entry.context, startedAt);
   const wordLayer = runWordLayer(field, words.length, elapsed, audio.end);
   const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed);

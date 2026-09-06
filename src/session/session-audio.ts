@@ -1,3 +1,5 @@
+import { bedLevel, voiceLevel } from '../calibration/calibration';
+import type { Calibration } from '../calibration/calibration';
 import type { Segment } from '../script/resolve-script';
 import { createAudioGraph } from './audio-graph';
 import type { AudioGraph } from './audio-graph';
@@ -17,19 +19,6 @@ export const NATURAL_END_SECONDS = 10;
 // by someone already feeling.
 export const EXIT_SECONDS = 0.3;
 
-// Headroom by construction. An oscillator is a full-scale sine, so an unscaled
-// bed leaves the output no room at all and a suggestion summing onto it drives
-// the mix past the ceiling, where the tone turns to buzz and takes the voice
-// with it. The two levels together cannot reach full scale: a clip is capped at
-// a 0.99 peak by its own scan, and 0.6 + 0.3 x 0.99 leaves the ending fade
-// something to fade.
-export const BED_LEVEL = 0.6;
-
-// A suggestion belongs under the bed rather than over it: near-continuous
-// underlay, not punctuation, and a voice at the level of the words it plays
-// beneath is one the user listens to instead of hears.
-export const VOICE_LEVEL = 0.3;
-
 export type SessionAudio = {
   voice: GainNode;
   end: () => void;
@@ -39,23 +28,23 @@ export type SessionAudio = {
 export function startSessionAudio(
   context: AudioContext,
   segments: Segment[],
+  calibration: Calibration,
   from: number,
 ): SessionAudio {
   const graph = createAudioGraph(context);
   warnIfMono(context.destination);
   const bed = runBed(context, graph.merger, bedGlides(segments), from);
-  setLevels(graph, from);
+  setLevels(graph, calibration, from);
   leadIn(graph.master.gain, from);
   return stops(context, graph, bed);
 }
 
-// Written once at the start and never again, the bed's least of all: a bed
-// dipping under every clip would make itself an event and train the user to
-// anticipate suggestions — no ducking, ever. These are the levels the
-// calibration step will come to own.
-function setLevels(graph: AudioGraph, from: number): void {
-  graph.bed.gain.setValueAtTime(BED_LEVEL, from);
-  graph.voice.gain.setValueAtTime(VOICE_LEVEL, from);
+// The levels the user set by ear, written once at the start and never again,
+// the bed's least of all: a bed dipping under every clip would make itself an
+// event and train the user to anticipate suggestions — no ducking, ever.
+function setLevels(graph: AudioGraph, calibration: Calibration, from: number): void {
+  graph.bed.gain.setValueAtTime(bedLevel(calibration), from);
+  graph.voice.gain.setValueAtTime(voiceLevel(calibration), from);
 }
 
 // masterGain rests at 1 and the lead-in is the one place it climbs.
