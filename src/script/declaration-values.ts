@@ -1,6 +1,7 @@
 export const BED_KEY = 'bed';
 export const VOICE_KEY = 'voice';
 export const PACE_KEY = 'pace';
+export const GAP_KEY = 'gap';
 export const SPIRAL_KEY = 'spiral';
 
 export const CARRIER_LOW = 50;
@@ -33,6 +34,13 @@ export const DEPTH_HIGH = 1;
 // the high one it never comes round inside a session.
 export const SWELL_LOW = 10;
 export const SWELL_HIGH = 600;
+// A bound on the silence rather than on how often a suggestion comes, since a
+// long clip under a short gap is still a slow cadence. Under the low bound the
+// silence stops reading as a gap and two suggestions run together as one
+// utterance; past the high one a suggestion may not be heard in a session at
+// all, which is the voice layer declared away rather than declared slow.
+export const GAP_SHORTEST = 3;
+export const GAP_LONGEST = 180;
 
 const NUMBER = String.raw`\d+(?:\.\d+)?`;
 const BED_PAIR = new RegExp(`^(${NUMBER})/(${NUMBER})$`);
@@ -40,6 +48,9 @@ const PACE_NUMBER = new RegExp(`^${NUMBER}$`);
 // A rate, a rate over a still depth, or a rate over a depth that swells between
 // two bounds and takes so many seconds to travel out and back.
 const SPIRAL_VALUE = new RegExp(`^(-?${NUMBER})(?:/(${NUMBER})(?:-(${NUMBER})/(${NUMBER}))?)?$`);
+// One number for a gap that always lasts as long, or the two bounds it is
+// drawn between.
+const GAP_VALUE = new RegExp(`^(${NUMBER})(?:-(${NUMBER}))?$`);
 const LIST_SEPARATOR = ',';
 
 export type BedPair = {
@@ -126,6 +137,26 @@ function readDepth(declared: RegExpExecArray): Depth {
 
 function stillDepth(depth: number): Depth {
   return { from: depth, to: depth, seconds: 0 };
+}
+
+// The silence between one clip ending and the next beginning. A fixed gap is
+// the two bounds alike, the way a still depth is.
+export type Gap = {
+  low: number;
+  high: number;
+};
+
+// The voice layer's cadence when a script says nothing about it, which is the
+// one every script ran at when the gap was the app's to fix.
+export const DEFAULT_GAP: Gap = { low: 7, high: 15 };
+
+export function readGap(value: string): Gap | null {
+  const declared = GAP_VALUE.exec(value);
+  if (!declared) return null;
+  const low = Number(declared[1]);
+  const high = declared[2];
+  if (high === undefined) return { low, high: low };
+  return { low, high: Number(high) };
 }
 
 export function readTagList(value: string): string[] {

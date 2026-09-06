@@ -22,6 +22,7 @@ name without its extension is the name the selection screen lists.
 bed: 141.5/7.83
 voice: obedience
 pace: 200
+gap: 9-18
 spiral: 3, -1/0.06
 
 # ocean, deep water
@@ -32,6 +33,7 @@ to hold on to.
 # void
 bed: 140/4
 pace: 120
+gap: 25
 spiral: -1.5/0.1-0.4/40
 
 Nothing above you. Nothing below.
@@ -62,7 +64,7 @@ including further blank lines and any line that happens to hold a colon.
 
 ## Declarations
 
-A declaration is `key: value`, one to a line. Four keys exist; anything else is
+A declaration is `key: value`, one to a line. Five keys exist; anything else is
 a finding, as is the same key twice in one block.
 
 | Key | Value | Default |
@@ -70,9 +72,10 @@ a finding, as is the same key twice in one block.
 | `bed` | `carrier/beat` in Hz, decimals allowed | `150/6` |
 | `voice` | comma-separated clip pool tags, or empty for silence | none |
 | `pace` | words per minute, decimals allowed | `220` |
+| `gap` | seconds of silence between clips: `low-high`, or one number for a silence that never varies | `7-15` |
 | `spiral` | one or two spirals: `rate`, `rate/depth`, `rate/from-to/seconds`, or empty | no spiral |
 
-`bed`, `voice`, `pace` and `spiral` are declared in the head for the whole
+`bed`, `voice`, `pace`, `gap` and `spiral` are declared in the head for the whole
 session and again on any segment that should differ, and each holds from there
 until another segment changes it. Imagery tags never inherit: a segment header
 is the whole truth about what is on screen under it, and a bare `#` leaves the
@@ -93,11 +96,17 @@ are one flat union, so a 200-file pool and a 5-file pool named together make one
 first word.
 
 **Voice.** Clips are drawn from the pools the running `voice` names, one at a
-time, separated by a gap drawn uniformly between 7 and 15 seconds and measured
-from the end of one clip to the start of the next — so clips never overlap. A
-clip that would still be speaking after the last word is not started. `voice:`
-with no tags silences the layer, and a later `voice:` with tags starts its
-cadence fresh rather than resuming mid-gap.
+time, separated by a gap drawn uniformly between the bounds `gap` declares and
+measured from the end of one clip to the start of the next — so clips never
+overlap, and how often a suggestion is heard is the gap and the length of the
+clips together. A clip that would still be speaking after the last word is not
+started. `voice:` with no tags silences the layer, and a later `voice:` with tags
+starts its cadence fresh rather than resuming mid-gap.
+
+The gap is drawn where the silence begins, so a segment that changes only `gap`
+changes nothing about which suggestion is heard next: the clip already speaking
+finishes, and the first silence to open under the new bounds is the first drawn
+between them.
 
 **Bed.** The two tones glide to a new pair on the first word of the segment that
 declares it. The carrier is the left ear; the right ear carries the carrier plus
@@ -139,6 +148,12 @@ its range would play a session the author did not write.
   word layer's own: above the high one the eight-word image slot passes half a
   hertz of full-screen luminance change, and below the low one a word is held so
   long the session reads as stopped rather than slow
+- a `gap` bound outside 3–180 seconds, a pair of bounds written the long way
+  round, or a value that is neither a number of seconds nor a `low-high` pair of
+  them. Under three seconds the silence stops reading as a gap and two
+  suggestions run together as one utterance; past three minutes a suggestion may
+  not be heard in a session at all, which is a voice layer declared away rather
+  than declared slow
 - a spiral `rate` outside 0.5–12 turns per minute in either direction, a depth
   bound outside 0–1, a swell outside 10–600 seconds, or a value that is none of
   a rate, a `rate/depth` pair and a `rate/from-to/seconds` swell. The high rate

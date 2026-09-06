@@ -1,7 +1,7 @@
 import type { MeasuredClip } from '../library/clip-reconcile';
 import { decodeClip } from '../library/decode-clip';
 import type { ClipPool } from '../library/scan-library';
-import { DEFAULT_BED } from '../script/declaration-values';
+import { DEFAULT_BED, DEFAULT_GAP } from '../script/declaration-values';
 import { createAudioGraph } from '../session/audio-graph';
 import { runBed } from '../session/bed-layer';
 import { fillBag } from '../session/clip-bag';
@@ -56,7 +56,7 @@ export function startPreview(pools: ClipPool[], opening: Calibration): Calibrati
       if (!running) return;
       if (buffer) speak(context, graph.voice, buffer, clip.rmsScalar);
       const spoken = buffer ? buffer.duration : 0;
-      await rest(spoken + gapSeconds(Math.random));
+      await rest(spoken + gapSeconds(DEFAULT_GAP, Math.random));
     }
   }
 

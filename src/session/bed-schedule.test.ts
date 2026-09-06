@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_PACE } from '../script/declaration-values';
+import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { BedPair } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import { beatSeconds } from '../script/word-times';
@@ -11,7 +11,15 @@ const DEEPEST: BedPair = { carrier: 90, beat: 2 };
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
 
 function segment(bed: BedPair, words: number, pace = DEFAULT_PACE): Segment {
-  return { tags: [], bed, voice: [], pace, spirals: [], words: new Array(words).fill('down') };
+  return {
+    tags: [],
+    bed,
+    voice: [],
+    pace,
+    gap: DEFAULT_GAP,
+    spirals: [],
+    words: new Array(words).fill('down'),
+  };
 }
 
 describe('bedGlides', () => {

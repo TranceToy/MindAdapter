@@ -98,6 +98,28 @@ describe('formatFindings', () => {
     expect(high).toEqual(['pace 400 outside 40–240 words per minute']);
   });
 
+  it('accepts a gap in seconds, and a pair of bounds to draw one between', () => {
+    const findings = findingsOf('gap: 12\n\n# ocean\ngap: 6-20\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
+  it('rejects a gap that is neither a number nor a pair of them', () => {
+    const messages = messagesOf('gap: often\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['gap often is not a number of seconds or a low-high pair of them']);
+  });
+
+  it('rejects a gap bound outside its range rather than clamping it', () => {
+    const short = messagesOf('gap: 1-15\n\n# ocean\n\nOnly this.\n');
+    const long = messagesOf('gap: 400\n\n# ocean\n\nOnly this.\n');
+    expect(short).toEqual(['gap 1 outside 3–180 seconds']);
+    expect(long).toEqual(['gap 400 outside 3–180 seconds']);
+  });
+
+  it('rejects a pair of bounds written the long way round', () => {
+    const messages = messagesOf('gap: 15-7\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['gap 15-7 names its bounds the long way round']);
+  });
+
   it('accepts a spiral rate alone, and a rate with a depth', () => {
     const findings = findingsOf('spiral: 3\n\n# ocean\nspiral: 1.5/0.3\n\nOnly this.\n');
     expect(findings).toEqual([]);

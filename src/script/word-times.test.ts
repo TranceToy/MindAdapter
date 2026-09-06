@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_BED, DEFAULT_PACE } from './declaration-values';
+import { DEFAULT_BED, DEFAULT_GAP, DEFAULT_PACE } from './declaration-values';
 import type { Segment } from './resolve-script';
 import { beatSeconds, onsetSeconds, sessionSeconds, wordBySecond, wordTimes } from './word-times';
 
@@ -13,6 +13,7 @@ function segment(words: number, pace = DEFAULT_PACE): Segment {
     bed: DEFAULT_BED,
     voice: [],
     pace,
+    gap: DEFAULT_GAP,
     spirals: [],
     words: new Array(words).fill('down'),
   };

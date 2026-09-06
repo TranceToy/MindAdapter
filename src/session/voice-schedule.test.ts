@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { MeasuredClip } from '../library/clip-reconcile';
 import type { ClipPool } from '../library/scan-library';
-import { DEFAULT_PACE } from '../script/declaration-values';
+import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
+import type { Gap } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import { beatSeconds } from '../script/word-times';
 import type { Roll } from './clip-bag';
-import { GAP_HIGH, GAP_LOW, voiceDeadline, voiceFirings } from './voice-schedule';
+import { voiceDeadline, voiceFirings } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
 
 function clip(path: string, duration: number): MeasuredClip {
@@ -26,12 +27,13 @@ function pool(tag: string, clips: MeasuredClip[]): ClipPool {
 
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
 
-function segment(voice: string[], words: number): Segment {
+function segment(voice: string[], words: number, gap: Gap = DEFAULT_GAP): Segment {
   return {
     tags: [],
     bed: { carrier: 150, beat: 6 },
     voice,
     pace: DEFAULT_PACE,
+    gap,
     spirals: [],
     words: new Array(words).fill('down'),
   };
@@ -47,7 +49,11 @@ const LONGER = clip('clips/obedience/b.mp3', 6);
 const SPOKEN = clip('clips/submission/c.mp3', 5);
 const POOLS = [pool('obedience', [SHORTER, LONGER]), pool('submission', [SPOKEN])];
 
+const GAP_LOW = DEFAULT_GAP.low;
+const GAP_HIGH = DEFAULT_GAP.high;
 const FIRST_FIRING = GAP_LOW;
+const FIXED: Gap = { low: 4, high: 4 };
+const WIDE: Gap = { low: 20, high: 30 };
 const ROUNDING = 1e-9;
 const SILENT_AT = 121;
 const CHANGE_SECONDS = SILENT_AT * BEAT_SECONDS;
@@ -73,6 +79,34 @@ describe('voiceFirings', () => {
     const middle = voiceFirings([segment(['obedience'], 4000)], POOLS, rolling(0.5));
     expect(late[0]?.at).toBe(GAP_HIGH);
     expect(middle[0]?.at).toBe((GAP_LOW + GAP_HIGH) / 2);
+  });
+
+  it('draws the gap between the bounds a script declares', () => {
+    const early = voiceFirings([segment(['obedience'], 4000, WIDE)], POOLS, rolling());
+    const late = voiceFirings([segment(['obedience'], 4000, WIDE)], POOLS, rolling(1));
+    expect(early[0]?.at).toBe(WIDE.low);
+    expect(late[0]?.at).toBe(WIDE.high);
+  });
+
+  it('holds a silence that never varies where the bounds are alike', () => {
+    const firings = voiceFirings([segment(['obedience'], 4000, FIXED)], POOLS, Math.random);
+    const gaps = gapsOf(firings);
+    expect(gaps).not.toEqual([]);
+    expect(gaps.every((gap) => Math.abs(gap - FIXED.low) < ROUNDING)).toBe(true);
+  });
+
+  it('takes up a cadence a later segment declares at the next silence', () => {
+    const segments = [segment(['obedience'], SILENT_AT), segment(['obedience'], 4000, FIXED)];
+    const gaps = gapsOf(voiceFirings(segments, POOLS, rolling()));
+    expect(gaps.slice(0, 4)).toEqual([GAP_LOW, GAP_LOW, FIXED.low, FIXED.low]);
+  });
+
+  it('never repeats a clip across a segment that changes only the cadence', () => {
+    const tags = ['obedience', 'submission'];
+    const segments = [segment(tags, SILENT_AT), segment(tags, 4000, FIXED)];
+    const heard = voiceFirings(segments, POOLS, Math.random).map((firing) => firing.clip.path);
+    const repeats = heard.filter((path, at) => path === heard[at - 1]);
+    expect(repeats).toEqual([]);
   });
 
   it('measures the gap from the end of the clip before it', () => {

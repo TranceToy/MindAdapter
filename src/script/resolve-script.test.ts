@@ -93,10 +93,18 @@ describe('resolveSegments', () => {
     expect(segments[1]?.spirals).toEqual([]);
   });
 
+  it('holds the declared gap until a segment declares its own', () => {
+    const script = parseScript('gap: 12\n\n# ocean\n\nOne.\n\n# void\ngap: 4-9\n\nTwo.\n');
+    const segments = resolveSegments(script);
+    expect(segments[0]?.gap).toEqual({ low: 12, high: 12 });
+    expect(segments[1]?.gap).toEqual({ low: 4, high: 9 });
+  });
+
   it('falls back to the app defaults when a script declares no bed or pace', () => {
     const segments = resolveSegments(parseScript('# ocean\n\nOnly this.\n'));
     expect(segments[0]?.bed).toEqual({ carrier: 150, beat: 6 });
     expect(segments[0]?.voice).toEqual([]);
     expect(segments[0]?.pace).toBe(220);
+    expect(segments[0]?.gap).toEqual({ low: 7, high: 15 });
   });
 });

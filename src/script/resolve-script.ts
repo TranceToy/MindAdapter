@@ -1,16 +1,19 @@
 import {
   BED_KEY,
   DEFAULT_BED,
+  DEFAULT_GAP,
   DEFAULT_PACE,
+  GAP_KEY,
   PACE_KEY,
   SPIRAL_KEY,
   VOICE_KEY,
   readBedPair,
+  readGap,
   readPace,
   readSpirals,
   readTagList,
 } from './declaration-values';
-import type { BedPair, Spiral } from './declaration-values';
+import type { BedPair, Gap, Spiral } from './declaration-values';
 import type { DeclarationBlock, ParsedScript } from './parse-script';
 
 const NO_VOICE: string[] = [];
@@ -28,6 +31,7 @@ export type Segment = {
   bed: BedPair;
   voice: string[];
   pace: number;
+  gap: Gap;
   spirals: Spiral[];
   words: string[];
 };
@@ -36,18 +40,20 @@ export function resolveSegments(script: ParsedScript): Segment[] {
   let bed = declaredBed(script.head) ?? DEFAULT_BED;
   let voice = declaredVoice(script.head) ?? NO_VOICE;
   let pace = declaredPace(script.head) ?? DEFAULT_PACE;
+  let gap = declaredGap(script.head) ?? DEFAULT_GAP;
   let spirals = declaredSpirals(script.head)?.spirals ?? NO_SPIRAL;
   const segments: Segment[] = [];
   for (const parsed of script.segments) {
     bed = declaredBed(parsed.block) ?? bed;
     voice = declaredVoice(parsed.block) ?? voice;
     pace = declaredPace(parsed.block) ?? pace;
-    // Not a ?? like the three above it, because the value a spiral declaration
+    gap = declaredGap(parsed.block) ?? gap;
+    // Not a ?? like the four above it, because the value a spiral declaration
     // holds may itself be nothing, and that nothing is a stop rather than an
     // inheritance.
     const held = declaredSpirals(parsed.block);
     if (held) spirals = held.spirals;
-    const segment = { tags: parsed.tags, bed, voice, pace, spirals, words: parsed.words };
+    const segment = { tags: parsed.tags, bed, voice, pace, gap, spirals, words: parsed.words };
     segments.push(segment);
   }
   return segments;
@@ -65,6 +71,14 @@ function declaredPace(block: DeclarationBlock): number | null {
   for (const entry of block) {
     if (entry.kind !== 'declaration' || entry.key !== PACE_KEY) continue;
     return readPace(entry.value);
+  }
+  return null;
+}
+
+function declaredGap(block: DeclarationBlock): Gap | null {
+  for (const entry of block) {
+    if (entry.kind !== 'declaration' || entry.key !== GAP_KEY) continue;
+    return readGap(entry.value);
   }
   return null;
 }

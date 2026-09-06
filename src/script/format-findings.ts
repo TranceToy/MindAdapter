@@ -5,6 +5,9 @@ import {
   CARRIER_LOW,
   DEPTH_HIGH,
   DEPTH_LOW,
+  GAP_KEY,
+  GAP_LONGEST,
+  GAP_SHORTEST,
   PACE_HIGH,
   PACE_KEY,
   PACE_LOW,
@@ -16,11 +19,12 @@ import {
   SWELL_LOW,
   VOICE_KEY,
   readBedPair,
+  readGap,
   readPace,
   readSpirals,
   swells,
 } from './declaration-values';
-import type { Depth, Spiral } from './declaration-values';
+import type { Depth, Gap, Spiral } from './declaration-values';
 import { fileFinding } from './finding';
 import type { Finding } from './finding';
 import {
@@ -32,7 +36,10 @@ import {
   carrierOutOfRangeLine,
   depthOutOfRangeLine,
   duplicateKeyLine,
+  gapBackwardsLine,
+  gapOutOfRangeLine,
   malformedBedLine,
+  malformedGapLine,
   malformedPaceLine,
   malformedSpiralLine,
   paceOutOfRangeLine,
@@ -99,6 +106,7 @@ function declarationFindings(entry: DeclarationEntry): Finding[] {
   if (entry.key === VOICE_KEY) return [];
   if (entry.key === BED_KEY) return bedFindings(entry);
   if (entry.key === PACE_KEY) return paceFindings(entry);
+  if (entry.key === GAP_KEY) return gapFindings(entry);
   if (entry.key === SPIRAL_KEY) return spiralFindings(entry);
   const message = unknownKeyLine(entry.key);
   const unknown = fileFinding(entry.line, message);
@@ -118,6 +126,37 @@ function paceFindings(entry: DeclarationEntry): Finding[] {
     return [outside];
   }
   return [];
+}
+
+// A fixed gap is one bound reported once rather than the same number twice,
+// and it can hardly run backwards.
+function gapFindings(entry: DeclarationEntry): Finding[] {
+  const gap = readGap(entry.value);
+  if (!gap) {
+    const message = malformedGapLine(entry.value);
+    const malformed = fileFinding(entry.line, message);
+    return [malformed];
+  }
+  const findings = boundFindings(entry, gap);
+  if (gap.low > gap.high) {
+    const message = gapBackwardsLine(gap.low, gap.high);
+    const backwards = fileFinding(entry.line, message);
+    findings.push(backwards);
+  }
+  return findings;
+}
+
+function boundFindings(entry: DeclarationEntry, gap: Gap): Finding[] {
+  const findings: Finding[] = [];
+  const bounds = gap.low === gap.high ? [gap.low] : [gap.low, gap.high];
+  for (const bound of bounds) {
+    if (bound < GAP_SHORTEST || bound > GAP_LONGEST) {
+      const message = gapOutOfRangeLine(bound);
+      const outside = fileFinding(entry.line, message);
+      findings.push(outside);
+    }
+  }
+  return findings;
 }
 
 // An empty value is the author asking for no spiral, the way an empty voice

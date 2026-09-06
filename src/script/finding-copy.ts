@@ -5,6 +5,8 @@ import {
   CARRIER_LOW,
   DEPTH_HIGH,
   DEPTH_LOW,
+  GAP_LONGEST,
+  GAP_SHORTEST,
   PACE_HIGH,
   PACE_LOW,
   RATE_HIGH,
@@ -46,6 +48,18 @@ export function malformedPaceLine(value: string): string {
 
 export function paceOutOfRangeLine(pace: number): string {
   return `pace ${pace} outside ${PACE_LOW}–${PACE_HIGH} words per minute`;
+}
+
+export function malformedGapLine(value: string): string {
+  return `gap ${value} is not a number of seconds or a low-high pair of them`;
+}
+
+export function gapOutOfRangeLine(seconds: number): string {
+  return `gap ${seconds} outside ${GAP_SHORTEST}–${GAP_LONGEST} seconds`;
+}
+
+export function gapBackwardsLine(low: number, high: number): string {
+  return `gap ${low}-${high} names its bounds the long way round`;
 }
 
 export function malformedSpiralLine(value: string): string {

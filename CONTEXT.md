@@ -68,10 +68,15 @@ announces the end.
 _Avoid_: outro screen, end screen, session summary, results
 
 **Gap**:
-The silence between one clip ending and the next beginning — drawn at random
-between seven and fifteen seconds, and the only thing that governs how often a
-suggestion is heard. Clips never overlap, because the gap is measured from the
-end of one to the start of the next.
+The silence between one clip ending and the next beginning, and the only thing
+besides the length of the clips that governs how often a suggestion is heard. A
+script declares the two bounds it is drawn between, in its head and on any
+segment that should speak at a cadence of its own; a script that declares none
+is drawn between seven and fifteen seconds. Declared as one number it never
+varies. It is drawn where the silence begins, so a segment that changes only the
+gap leaves the clip already speaking and the bag it was drawn from alone. Clips
+never overlap, because the gap is measured from the end of one to the start of
+the next.
 _Avoid_: interval, delay, cooldown, frequency
 
 **Pause**:
@@ -95,7 +100,7 @@ _Avoid_: text, transcript, session file, program
 
 **Segment**:
 A named stretch of a script that carries its own imagery tag and may declare its
-own carrier, beat frequency and pace.
+own carrier, beat frequency, pace and gap.
 _Avoid_: section, block, scene, chapter
 
 **Pool**:
