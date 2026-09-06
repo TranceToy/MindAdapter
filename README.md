@@ -32,7 +32,7 @@ to hold on to.
 # void
 bed: 140/4
 pace: 120
-spiral: 1.5/0.3
+spiral: -1.5/0.1-0.4/40
 
 Nothing above you. Nothing below.
 
@@ -70,7 +70,7 @@ a finding, as is the same key twice in one block.
 | `bed` | `carrier/beat` in Hz, decimals allowed | `150/6` |
 | `voice` | comma-separated clip pool tags, or empty for silence | none |
 | `pace` | words per minute, decimals allowed | `220` |
-| `spiral` | `rate` or `rate/depth`, or empty for no spiral | no spiral |
+| `spiral` | `rate`, `rate/depth` or `rate/from-to/seconds`, or empty for none | no spiral |
 
 `bed`, `voice`, `pace` and `spiral` are declared in the head for the whole
 session and again on any segment that should differ, and each holds from there
@@ -106,11 +106,19 @@ the beat frequency.
 **Spiral.** A two-armed spiral turns between the photograph and the words, at
 the rate in force where the session has got to, and takes the depth beside it —
 `0.15` where only a rate is declared, `1` for a spiral the photograph does not
-show through at all. The angle is carried across a change of rate, so a new
-declaration changes the speed and never jumps the spiral; `spiral:` with no
-value stops it where it stands, and a later rate takes the angle up from there.
-It is the one layer a script may leave out entirely, and it stands still for the
-hold the session ends in.
+show through at all. A rate below zero turns it the other way; the bounds are on
+the number and not on the direction. The angle is carried across a change of
+rate, so a new declaration changes the speed and never jumps the spiral — a
+reversal turns back from where the spiral had got to rather than from the top.
+`spiral:` with no value stops it where it stands, and a later rate takes the
+angle up from there. It is the one layer a script may leave out entirely, and
+it stands still for the hold the session ends in.
+
+A depth written as two bounds and a number of seconds swells rather than stands:
+`0.1-0.4/40` travels from a tenth of the frame to four tenths and back every
+forty seconds. The swell is measured from the start of the session rather than
+from the segment that declares it, so a segment that changes only the rate moves
+the speed without stepping the depth.
 
 ## What makes a script unplayable
 
@@ -124,10 +132,13 @@ its range would play a session the author did not write.
   word layer's own: above the high one the eight-word image slot passes half a
   hertz of full-screen luminance change, and below the low one a word is held so
   long the session reads as stopped rather than slow
-- a spiral `rate` outside 0.5–12 turns per minute, a `depth` outside 0–1, or a
-  value that is neither a rate nor a `rate/depth` pair. The high rate bound is
-  the imagery layer's: two arms passing a point at 12 turns a minute is 0.4 Hz
-  of luminance change, just under what a new photograph every eight words makes
+- a spiral `rate` outside 0.5–12 turns per minute in either direction, a depth
+  bound outside 0–1, a swell outside 10–600 seconds, or a value that is none of
+  a rate, a `rate/depth` pair and a `rate/from-to/seconds` swell. The high rate
+  bound is the imagery layer's: two arms passing a point at 12 turns a minute is
+  0.4 Hz of luminance change, just under what a new photograph every eight words
+  makes, and the low swell bound holds one pass out and back at a quarter of
+  that
 - an unknown declaration key, or one declared twice in a single block
 - prose in the head, or prose in a segment without the blank line before it
 - no segment header anywhere, or no words left once punctuation is stripped

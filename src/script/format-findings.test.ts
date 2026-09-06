@@ -103,26 +103,62 @@ describe('formatFindings', () => {
     expect(findings).toEqual([]);
   });
 
+  it('accepts a rate below zero as the same turn the other way round', () => {
+    const findings = findingsOf('spiral: -3\n\n# ocean\nspiral: -1.5/0.3\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
+  it('accepts a depth that swells between two bounds over its seconds', () => {
+    const findings = findingsOf('spiral: 3/0.05-0.3/40\n\n# ocean\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
   it('accepts an empty spiral value as the way to stop it', () => {
     const findings = findingsOf('spiral: 3\n\n# ocean\nspiral:\n\nOnly this.\n');
     expect(findings).toEqual([]);
   });
 
-  it('rejects a spiral that is neither a rate nor a rate/depth pair', () => {
+  it('rejects a spiral that is none of the three shapes it may take', () => {
     const messages = messagesOf('spiral: slow/deep\n\n# ocean\n\nOnly this.\n');
-    expect(messages).toEqual(['spiral slow/deep is not a rate, or a rate/depth pair']);
+    expect(messages).toEqual([
+      'spiral slow/deep is not a rate, a rate/depth pair, or a rate/from-to/seconds swell',
+    ]);
+  });
+
+  it('rejects a swell missing the seconds it takes to travel', () => {
+    const messages = messagesOf('spiral: 3/0.05-0.3\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual([
+      'spiral 3/0.05-0.3 is not a rate, a rate/depth pair, or a rate/from-to/seconds swell',
+    ]);
   });
 
   it('rejects a spiral rate outside its range rather than clamping it', () => {
     const low = messagesOf('spiral: 0.2\n\n# ocean\n\nOnly this.\n');
     const high = messagesOf('spiral: 20\n\n# ocean\n\nOnly this.\n');
-    expect(low).toEqual(['spiral 0.2 outside 0.5–12 turns per minute']);
-    expect(high).toEqual(['spiral 20 outside 0.5–12 turns per minute']);
+    expect(low).toEqual(['spiral 0.2 outside 0.5–12 turns per minute in either direction']);
+    expect(high).toEqual(['spiral 20 outside 0.5–12 turns per minute in either direction']);
+  });
+
+  it('bounds a rate below zero by the same numbers as one above it', () => {
+    const messages = messagesOf('spiral: -20\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spiral -20 outside 0.5–12 turns per minute in either direction']);
   });
 
   it('rejects a depth past the whole of the frame', () => {
     const messages = messagesOf('spiral: 3/1.5\n\n# ocean\n\nOnly this.\n');
     expect(messages).toEqual(['spiral depth 1.5 outside 0–1']);
+  });
+
+  it('reports each bound of a swell that runs past the frame', () => {
+    const messages = messagesOf('spiral: 3/2-1.5/40\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spiral depth 2 outside 0–1', 'spiral depth 1.5 outside 0–1']);
+  });
+
+  it('rejects a swell that would pass as a pulse, or never come round', () => {
+    const quick = messagesOf('spiral: 3/0.05-0.3/2\n\n# ocean\n\nOnly this.\n');
+    const slow = messagesOf('spiral: 3/0.05-0.3/900\n\n# ocean\n\nOnly this.\n');
+    expect(quick).toEqual(['spiral swell 2 outside 10–600 seconds']);
+    expect(slow).toEqual(['spiral swell 900 outside 10–600 seconds']);
   });
 
   it('reports every finding rather than the first', () => {

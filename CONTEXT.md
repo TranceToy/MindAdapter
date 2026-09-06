@@ -33,13 +33,22 @@ _Avoid_: vortex, wheel, overlay, animation
 How fast the spiral turns, in turns per minute — the spiral's word for it, as
 pace is the word layer's. A script declares it in its head and on any segment
 that should turn at a rate of its own, and it is never the user's to adjust
-during a session.
+during a session. A rate below zero turns the spiral the other way round: how
+fast it turns is bounded, which way it turns is not.
 _Avoid_: speed, rpm, spin, pace (which belongs to the word layer)
 
 **Depth**:
 How much of the photograph the spiral takes, from none of it to all of it. It
-rides on the rate declaration and defaults to a fifteenth.
+rides on the rate declaration and defaults to a fifteenth. Declared as one
+number it stands; declared as two bounds it swells between them.
 _Avoid_: opacity, alpha, strength, intensity
+
+**Swell**:
+A depth that moves rather than stands: the two bounds it travels between and the
+seconds one pass out to the far bound and back takes. It is read off the start
+of the session rather than off the segment that declares it, so a change of rate
+under an unchanged swell moves the speed without stepping the depth.
+_Avoid_: pulse, breathing, oscillation, fade, animation
 
 **Pace**:
 The rate at which words are displayed, one word per beat, in words per minute.

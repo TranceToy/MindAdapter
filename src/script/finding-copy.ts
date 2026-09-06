@@ -9,6 +9,8 @@ import {
   PACE_LOW,
   RATE_HIGH,
   RATE_LOW,
+  SWELL_HIGH,
+  SWELL_LOW,
 } from './declaration-values';
 import type { Finding, Locus } from './finding';
 
@@ -46,15 +48,19 @@ export function paceOutOfRangeLine(pace: number): string {
 }
 
 export function malformedSpiralLine(value: string): string {
-  return `spiral ${value} is not a rate, or a rate/depth pair`;
+  return `spiral ${value} is not a rate, a rate/depth pair, or a rate/from-to/seconds swell`;
 }
 
 export function rateOutOfRangeLine(rate: number): string {
-  return `spiral ${rate} outside ${RATE_LOW}–${RATE_HIGH} turns per minute`;
+  return `spiral ${rate} outside ${RATE_LOW}–${RATE_HIGH} turns per minute in either direction`;
 }
 
 export function depthOutOfRangeLine(depth: number): string {
   return `spiral depth ${depth} outside ${DEPTH_LOW}–${DEPTH_HIGH}`;
+}
+
+export function swellOutOfRangeLine(seconds: number): string {
+  return `spiral swell ${seconds} outside ${SWELL_LOW}–${SWELL_HIGH} seconds`;
 }
 
 export function missingImagePoolLine(tag: string, line: number): string {

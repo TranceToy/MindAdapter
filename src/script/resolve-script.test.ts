@@ -59,8 +59,15 @@ describe('resolveSegments', () => {
   it('holds a declared spiral until a segment declares its own', () => {
     const script = parseScript('spiral: 3\n\n# ocean\n\nOne.\n\n# void\nspiral: 1.5/0.4\n\nTwo.\n');
     const segments = resolveSegments(script);
-    expect(segments[0]?.spiral).toEqual({ rate: 3, depth: 0.15 });
-    expect(segments[1]?.spiral).toEqual({ rate: 1.5, depth: 0.4 });
+    expect(segments[0]?.spiral).toEqual({ rate: 3, depth: { from: 0.15, to: 0.15, seconds: 0 } });
+    expect(segments[1]?.spiral).toEqual({ rate: 1.5, depth: { from: 0.4, to: 0.4, seconds: 0 } });
+  });
+
+  it('holds a spiral declared to turn backwards, and one declared to swell', () => {
+    const declared = 'spiral: -3\n\n# ocean\n\nOne.\n\n# void\nspiral: 2/0.1-0.5/30\n\nTwo.\n';
+    const segments = resolveSegments(parseScript(declared));
+    expect(segments[0]?.spiral).toEqual({ rate: -3, depth: { from: 0.15, to: 0.15, seconds: 0 } });
+    expect(segments[1]?.spiral).toEqual({ rate: 2, depth: { from: 0.1, to: 0.5, seconds: 30 } });
   });
 
   it('stops the spiral on an empty value rather than inheriting', () => {

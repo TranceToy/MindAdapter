@@ -1,10 +1,12 @@
-import type { Spiral } from '../script/declaration-values';
+import { swells } from '../script/declaration-values';
+import type { Depth, Spiral } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import { onsetSeconds, wordTimes } from '../script/word-times';
 import type { WordTimes } from '../script/word-times';
 
 const SECONDS_PER_MINUTE = 60;
 const DEGREES_PER_TURN = 360;
+const FULL_SWELL = Math.PI * 2;
 
 // One stretch turned at a single rate, or not turned at all: the second it
 // opens on and the spiral in force from there.
@@ -14,7 +16,7 @@ export type SpiralTurn = {
 };
 
 // Where the spiral stands: how far it has come round since the session began,
-// and how much of the photograph it takes.
+// and how much of the photograph it takes at this second.
 export type SpiralPhase = {
   angle: number;
   depth: number;
@@ -51,12 +53,26 @@ export function spiralAt(turns: SpiralTurn[], elapsed: number): SpiralPhase | nu
   }
   if (!held?.spiral) return null;
   angle += sweep(held.spiral, elapsed - held.at);
-  return { angle, depth: held.spiral.depth };
+  const depth = depthAt(held.spiral.depth, elapsed);
+  return { angle, depth };
 }
 
+// A rate below zero sweeps backwards, which is why the angle is signed and
+// nothing else here reads it: a reversal is a rate passing through zero, not a
+// state the schedule holds.
 function sweep(spiral: Spiral | null, seconds: number): number {
   if (!spiral) return 0;
   return (spiral.rate * DEGREES_PER_TURN * seconds) / SECONDS_PER_MINUTE;
+}
+
+// The swell rides the session's own clock rather than the turn that declared
+// it, so a change of rate under an unchanged swell moves the speed without
+// stepping the depth. It is a cosine and not a sawtooth, so the depth turns
+// round at its far bound rather than snapping back to the near one.
+function depthAt(depth: Depth, elapsed: number): number {
+  if (!swells(depth)) return depth.from;
+  const swept = (1 - Math.cos((elapsed / depth.seconds) * FULL_SWELL)) / 2;
+  return depth.from + (depth.to - depth.from) * swept;
 }
 
 function turnAt(times: WordTimes, word: number, spiral: Spiral | null): SpiralTurn {
@@ -65,5 +81,9 @@ function turnAt(times: WordTimes, word: number, spiral: Spiral | null): SpiralTu
 
 function sameSpiral(left: Spiral | null, right: Spiral | null): boolean {
   if (!left || !right) return left === right;
-  return left.rate === right.rate && left.depth === right.depth;
+  return left.rate === right.rate && sameDepth(left.depth, right.depth);
+}
+
+function sameDepth(left: Depth, right: Depth): boolean {
+  return left.from === right.from && left.to === right.to && left.seconds === right.seconds;
 }

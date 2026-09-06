@@ -15,15 +15,26 @@ export const PACE_HIGH = 240;
 // A two-armed spiral passes an arm over any one point twice a turn, so the high
 // bound holds that passage at 0.4 Hz — just under the 0.46 Hz the image layer
 // already runs at, and nowhere near the word layer's. Below the low one the
-// turn reads as a still picture rather than a slow one.
+// turn reads as a still picture rather than a slow one. The bounds are on the
+// number and not the direction: a rate below zero turns the other way and
+// passes a point exactly as often.
 export const RATE_LOW = 0.5;
 export const RATE_HIGH = 12;
 export const DEPTH_LOW = 0;
 export const DEPTH_HIGH = 1;
+// One pass out and back at the low bound is 0.1 Hz, a quarter of what the
+// imagery layer already runs at, and it moves part of the depth rather than the
+// whole screen. Below it the depth reads as a pulse rather than a swell; above
+// the high one it never comes round inside a session.
+export const SWELL_LOW = 10;
+export const SWELL_HIGH = 600;
 
-const BED_PAIR = /^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/;
-const PACE_NUMBER = /^\d+(?:\.\d+)?$/;
-const SPIRAL_PAIR = /^(\d+(?:\.\d+)?)(?:\/(\d+(?:\.\d+)?))?$/;
+const NUMBER = String.raw`\d+(?:\.\d+)?`;
+const BED_PAIR = new RegExp(`^(${NUMBER})/(${NUMBER})$`);
+const PACE_NUMBER = new RegExp(`^${NUMBER}$`);
+// A rate, a rate over a still depth, or a rate over a depth that swells between
+// two bounds and takes so many seconds to travel out and back.
+const SPIRAL_VALUE = new RegExp(`^(-?${NUMBER})(?:/(${NUMBER})(?:-(${NUMBER})/(${NUMBER}))?)?$`);
 const TAG_SEPARATOR = ',';
 
 export type BedPair = {
@@ -58,19 +69,44 @@ export function readPace(value: string): number | null {
 // only a rate takes this much.
 export const DEFAULT_DEPTH = 0.15;
 
+// A still depth is the two bounds alike; a swelling one travels from the first
+// to the second and back over its seconds.
+export type Depth = {
+  from: number;
+  to: number;
+  seconds: number;
+};
+
 export type Spiral = {
   rate: number;
-  depth: number;
+  depth: Depth;
 };
 
 // Empty is the author asking for no spiral, which reads the same as malformed
 // here and is told apart from it where the findings are written.
 export function readSpiral(value: string): Spiral | null {
-  const pair = SPIRAL_PAIR.exec(value);
-  if (!pair) return null;
-  const rate = Number(pair[1]);
-  const depth = pair[2] === undefined ? DEFAULT_DEPTH : Number(pair[2]);
+  const declared = SPIRAL_VALUE.exec(value);
+  if (!declared) return null;
+  const rate = Number(declared[1]);
+  const depth = readDepth(declared);
   return { rate, depth };
+}
+
+export function swells(depth: Depth): boolean {
+  return depth.from !== depth.to;
+}
+
+function readDepth(declared: RegExpExecArray): Depth {
+  const from = declared[2];
+  if (from === undefined) return stillDepth(DEFAULT_DEPTH);
+  const to = declared[3];
+  if (to === undefined) return stillDepth(Number(from));
+  const seconds = Number(declared[4]);
+  return { from: Number(from), to: Number(to), seconds };
+}
+
+function stillDepth(depth: number): Depth {
+  return { from: depth, to: depth, seconds: 0 };
 }
 
 export function readTagList(value: string): string[] {

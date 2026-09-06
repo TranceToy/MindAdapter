@@ -11,11 +11,15 @@ import {
   RATE_HIGH,
   RATE_LOW,
   SPIRAL_KEY,
+  SWELL_HIGH,
+  SWELL_LOW,
   VOICE_KEY,
   readBedPair,
   readPace,
   readSpiral,
+  swells,
 } from './declaration-values';
+import type { Depth } from './declaration-values';
 import { fileFinding } from './finding';
 import type { Finding } from './finding';
 import {
@@ -32,6 +36,7 @@ import {
   malformedSpiralLine,
   paceOutOfRangeLine,
   rateOutOfRangeLine,
+  swellOutOfRangeLine,
   unknownKeyLine,
 } from './finding-copy';
 import { countWords } from './parse-script';
@@ -121,16 +126,41 @@ function spiralFindings(entry: DeclarationEntry): Finding[] {
     const malformed = fileFinding(entry.line, message);
     return [malformed];
   }
-  const findings: Finding[] = [];
-  if (spiral.rate < RATE_LOW || spiral.rate > RATE_HIGH) {
-    const message = rateOutOfRangeLine(spiral.rate);
-    const rate = fileFinding(entry.line, message);
-    findings.push(rate);
+  const findings = rateFindings(entry, spiral.rate);
+  const depth = depthFindings(entry, spiral.depth);
+  findings.push(...depth);
+  return findings;
+}
+
+// How fast it turns is bounded and which way it turns is not, so the bounds are
+// read off the rate without its sign.
+function rateFindings(entry: DeclarationEntry, rate: number): Finding[] {
+  const turning = Math.abs(rate);
+  if (turning < RATE_LOW || turning > RATE_HIGH) {
+    const message = rateOutOfRangeLine(rate);
+    const outside = fileFinding(entry.line, message);
+    return [outside];
   }
-  if (spiral.depth < DEPTH_LOW || spiral.depth > DEPTH_HIGH) {
-    const message = depthOutOfRangeLine(spiral.depth);
-    const depth = fileFinding(entry.line, message);
-    findings.push(depth);
+  return [];
+}
+
+// A still depth is one bound reported once rather than the same number twice,
+// and it has no seconds to be outside anything.
+function depthFindings(entry: DeclarationEntry, depth: Depth): Finding[] {
+  const findings: Finding[] = [];
+  const swelling = swells(depth);
+  const bounds = swelling ? [depth.from, depth.to] : [depth.from];
+  for (const bound of bounds) {
+    if (bound < DEPTH_LOW || bound > DEPTH_HIGH) {
+      const message = depthOutOfRangeLine(bound);
+      const outside = fileFinding(entry.line, message);
+      findings.push(outside);
+    }
+  }
+  if (swelling && (depth.seconds < SWELL_LOW || depth.seconds > SWELL_HIGH)) {
+    const message = swellOutOfRangeLine(depth.seconds);
+    const outside = fileFinding(entry.line, message);
+    findings.push(outside);
   }
   return findings;
 }
