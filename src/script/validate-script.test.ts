@@ -11,12 +11,12 @@ const INVENTORY: Inventory = {
 const CLEAN = '# ocean\nvoice: obedience\n\nThe water is warm and heavy.\n';
 
 describe('validateScript', () => {
-  it('reports a playable script with its word count and segments', () => {
+  it('reports a playable script with its resolved segments', () => {
     const file: ScriptFile = { name: 'Deep water', text: CLEAN };
     const entry = validateScript(file, INVENTORY);
     expect(isPlayable(entry)).toBe(true);
-    expect(entry.words).toBe(6);
     expect(entry.segments).toHaveLength(1);
+    expect(entry.segments[0]?.words).toHaveLength(6);
   });
 
   it('suppresses asset findings while the format is broken', () => {

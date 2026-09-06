@@ -1,4 +1,11 @@
-import { BEAT_HIGH, BEAT_LOW, CARRIER_HIGH, CARRIER_LOW } from './declaration-values';
+import {
+  BEAT_HIGH,
+  BEAT_LOW,
+  CARRIER_HIGH,
+  CARRIER_LOW,
+  PACE_HIGH,
+  PACE_LOW,
+} from './declaration-values';
 import type { Finding, Locus } from './finding';
 
 export const PROSE_IN_HEAD = 'prose before the first segment, where only declarations belong';
@@ -24,6 +31,14 @@ export function carrierOutOfRangeLine(carrier: number): string {
 
 export function beatOutOfRangeLine(beat: number): string {
   return `beat ${beat} Hz outside ${BEAT_LOW}–${BEAT_HIGH} Hz`;
+}
+
+export function malformedPaceLine(value: string): string {
+  return `pace ${value} is not a number of words per minute`;
+}
+
+export function paceOutOfRangeLine(pace: number): string {
+  return `pace ${pace} outside ${PACE_LOW}–${PACE_HIGH} words per minute`;
 }
 
 export function missingImagePoolLine(tag: string, line: number): string {

@@ -1,6 +1,7 @@
 import type { Calibration } from '../calibration/calibration';
 import type { Library } from '../library/scan-library';
 import type { ScriptEntry } from '../script/validate-script';
+import { wordTimes } from '../script/word-times';
 import type { SurfaceHost } from '../shell/surface-host';
 import { leaveFullscreen, whenFullscreenLeft } from './fullscreen';
 import { createImageField } from './image-field';
@@ -82,6 +83,7 @@ function runSession(
   leave: LeaveSession,
 ): void {
   const words = sessionWords(script.segments);
+  const times = wordTimes(script.segments);
   const field = createWordField(words);
   const imagery = createImageField();
   // Imagery first, so the words paint over it and the halo is the only thing
@@ -99,7 +101,7 @@ function runSession(
     session.pause.stop();
   }
 
-  const wordLayer = runWordLayer(field, words.length, elapsed, hold);
+  const wordLayer = runWordLayer(field, times, elapsed, hold);
   const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed);
   const voiceLayer = runVoiceLayer(
     entry.context,

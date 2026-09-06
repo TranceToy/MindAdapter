@@ -2,7 +2,7 @@ import { assetFindings } from './asset-findings';
 import type { Inventory } from './asset-findings';
 import type { Finding } from './finding';
 import { formatFindings } from './format-findings';
-import { countWords, parseScript } from './parse-script';
+import { parseScript } from './parse-script';
 import { resolveSegments } from './resolve-script';
 import type { Segment } from './resolve-script';
 
@@ -13,7 +13,6 @@ export type ScriptFile = {
 
 export type ScriptEntry = {
   name: string;
-  words: number;
   segments: Segment[];
   findings: Finding[];
 };
@@ -34,8 +33,7 @@ export function validateScript(file: ScriptFile, inventory: Inventory): ScriptEn
   const assets = assetFindings(parsed, inventory);
   if (assets.length > 0) return unplayable(file.name, assets);
   const segments = resolveSegments(parsed);
-  const words = countWords(parsed);
-  return { name: file.name, words, segments, findings: [] };
+  return { name: file.name, segments, findings: [] };
 }
 
 export function isPlayable(entry: ScriptEntry): boolean {
@@ -43,7 +41,7 @@ export function isPlayable(entry: ScriptEntry): boolean {
 }
 
 function unplayable(name: string, findings: Finding[]): ScriptEntry {
-  return { name, words: 0, segments: [], findings };
+  return { name, segments: [], findings };
 }
 
 function byName(left: ScriptEntry, right: ScriptEntry): number {

@@ -81,6 +81,23 @@ describe('formatFindings', () => {
     expect(findings).toEqual([]);
   });
 
+  it('accepts a pace in words per minute, in the head or on a segment', () => {
+    const findings = findingsOf('pace: 180\n\n# ocean\npace: 120.5\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
+  it('rejects a pace that is not a number', () => {
+    const messages = messagesOf('pace: slow\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['pace slow is not a number of words per minute']);
+  });
+
+  it('rejects a pace outside its range rather than clamping it', () => {
+    const low = messagesOf('pace: 20\n\n# ocean\n\nOnly this.\n');
+    const high = messagesOf('pace: 400\n\n# ocean\n\nOnly this.\n');
+    expect(low).toEqual(['pace 20 outside 40–240 words per minute']);
+    expect(high).toEqual(['pace 400 outside 40–240 words per minute']);
+  });
+
   it('reports every finding rather than the first', () => {
     const script = 'the water is warm\nimges: ocean\n\n# ocean\nbed: 150\nbed: 150/600\n\nOnly this.\n';
     const findings = findingsOf(script);

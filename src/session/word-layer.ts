@@ -1,3 +1,4 @@
+import type { WordTimes } from '../script/word-times';
 import type { Elapsed } from './session-clock';
 import { cueAt } from './word-clock';
 import type { WordCue } from './word-clock';
@@ -11,7 +12,7 @@ export type LastWord = () => void;
 
 export function runWordLayer(
   field: WordField,
-  words: number,
+  times: WordTimes,
   elapsed: Elapsed,
   ended: LastWord,
 ): WordLayer {
@@ -20,7 +21,7 @@ export function runWordLayer(
 
   function tick(): void {
     frame = requestAnimationFrame(tick);
-    const cue = cueAt(elapsed(), words);
+    const cue = cueAt(times, elapsed());
     follow(cue);
   }
 

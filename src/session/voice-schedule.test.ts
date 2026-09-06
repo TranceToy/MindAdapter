@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { MeasuredClip } from '../library/clip-reconcile';
 import type { ClipPool } from '../library/scan-library';
+import { DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
-import { BEAT_SECONDS } from '../script/session-duration';
+import { beatSeconds } from '../script/word-times';
 import type { Roll } from './clip-bag';
 import { GAP_HIGH, GAP_LOW, voiceDeadline, voiceFirings } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
@@ -23,11 +24,14 @@ function pool(tag: string, clips: MeasuredClip[]): ClipPool {
   return { tag, clips };
 }
 
+const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
+
 function segment(voice: string[], words: number): Segment {
   return {
     tags: [],
     bed: { carrier: 150, beat: 6 },
     voice,
+    pace: DEFAULT_PACE,
     words: new Array(words).fill('down'),
   };
 }

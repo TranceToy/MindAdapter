@@ -3,8 +3,12 @@ import {
   BED_KEY,
   CARRIER_HIGH,
   CARRIER_LOW,
+  PACE_HIGH,
+  PACE_KEY,
+  PACE_LOW,
   VOICE_KEY,
   readBedPair,
+  readPace,
 } from './declaration-values';
 import { fileFinding } from './finding';
 import type { Finding } from './finding';
@@ -17,6 +21,8 @@ import {
   carrierOutOfRangeLine,
   duplicateKeyLine,
   malformedBedLine,
+  malformedPaceLine,
+  paceOutOfRangeLine,
   unknownKeyLine,
 } from './finding-copy';
 import { countWords } from './parse-script';
@@ -73,12 +79,26 @@ function entryFindings(entry: BlockEntry, strayMessage: string, declared: Set<st
 
 function declarationFindings(entry: DeclarationEntry): Finding[] {
   if (entry.key === VOICE_KEY) return [];
-  if (entry.key !== BED_KEY) {
-    const message = unknownKeyLine(entry.key);
-    const unknown = fileFinding(entry.line, message);
-    return [unknown];
+  if (entry.key === BED_KEY) return bedFindings(entry);
+  if (entry.key === PACE_KEY) return paceFindings(entry);
+  const message = unknownKeyLine(entry.key);
+  const unknown = fileFinding(entry.line, message);
+  return [unknown];
+}
+
+function paceFindings(entry: DeclarationEntry): Finding[] {
+  const pace = readPace(entry.value);
+  if (pace === null) {
+    const message = malformedPaceLine(entry.value);
+    const malformed = fileFinding(entry.line, message);
+    return [malformed];
   }
-  return bedFindings(entry);
+  if (pace < PACE_LOW || pace > PACE_HIGH) {
+    const message = paceOutOfRangeLine(pace);
+    const outside = fileFinding(entry.line, message);
+    return [outside];
+  }
+  return [];
 }
 
 function bedFindings(entry: DeclarationEntry): Finding[] {

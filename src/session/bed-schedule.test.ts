@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_PACE } from '../script/declaration-values';
 import type { BedPair } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
-import { BEAT_SECONDS } from '../script/session-duration';
+import { beatSeconds } from '../script/word-times';
 import { bedGlides, leftFrequency, rightFrequency } from './bed-schedule';
 
 const DEEPER: BedPair = { carrier: 200, beat: 4 };
 const DEEPEST: BedPair = { carrier: 90, beat: 2 };
 
-function segment(bed: BedPair, words: number): Segment {
-  return { tags: [], bed, voice: [], words: new Array(words).fill('down') };
+const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
+
+function segment(bed: BedPair, words: number, pace = DEFAULT_PACE): Segment {
+  return { tags: [], bed, voice: [], pace, words: new Array(words).fill('down') };
 }
 
 describe('bedGlides', () => {
@@ -30,6 +33,14 @@ describe('bedGlides', () => {
     expect(bedGlides(segments)).toEqual([
       { at: 0, bed: DEEPER },
       { at: 4 * BEAT_SECONDS, bed: DEEPEST },
+    ]);
+  });
+
+  it('lands a pair on a beat the segments before it were paced by', () => {
+    const segments = [segment(DEEPER, 4, 120), segment(DEEPEST, 4)];
+    expect(bedGlides(segments)).toEqual([
+      { at: 0, bed: DEEPER },
+      { at: 4 * beatSeconds(120), bed: DEEPEST },
     ]);
   });
 

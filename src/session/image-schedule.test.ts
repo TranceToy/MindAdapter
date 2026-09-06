@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LibraryFile, Pool } from '../library/walk-library';
+import { DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import { WORDS_PER_IMAGE, imageSlots, slotAfter } from './image-schedule';
 
@@ -12,7 +13,13 @@ function pool(tag: string, paths: string[]): Pool {
 }
 
 function segment(tags: string[], words: number): Segment {
-  return { tags, bed: { carrier: 150, beat: 6 }, voice: [], words: new Array(words).fill('down') };
+  return {
+    tags,
+    bed: { carrier: 150, beat: 6 },
+    voice: [],
+    pace: DEFAULT_PACE,
+    words: new Array(words).fill('down'),
+  };
 }
 
 const OCEAN = pool('ocean', ['images/ocean/a.jpg', 'images/ocean/b.jpg']);

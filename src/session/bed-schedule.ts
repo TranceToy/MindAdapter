@@ -1,7 +1,8 @@
 import { DEFAULT_BED } from '../script/declaration-values';
 import type { BedPair } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
-import { BEAT_SECONDS } from '../script/session-duration';
+import { onsetSeconds, wordTimes } from '../script/word-times';
+import type { WordTimes } from '../script/word-times';
 
 export type BedGlide = {
   at: number;
@@ -15,12 +16,13 @@ export type Ear = (bed: BedPair) => number;
 // word; every later pair lands on the beat of the first word of the segment that
 // declares it.
 export function bedGlides(segments: Segment[]): BedGlide[] {
+  const times = wordTimes(segments);
   const opening = segments[0]?.bed ?? DEFAULT_BED;
   const glides: BedGlide[] = [{ at: 0, bed: opening }];
   let running = opening;
   let words = 0;
   for (const segment of segments) {
-    if (!samePair(segment.bed, running)) glides.push(glideAt(words, segment.bed));
+    if (!samePair(segment.bed, running)) glides.push(glideAt(times, words, segment.bed));
     running = segment.bed;
     words += segment.words.length;
   }
@@ -37,8 +39,8 @@ export function rightFrequency(bed: BedPair): number {
   return bed.carrier + bed.beat;
 }
 
-function glideAt(word: number, bed: BedPair): BedGlide {
-  return { at: word * BEAT_SECONDS, bed };
+function glideAt(times: WordTimes, word: number, bed: BedPair): BedGlide {
+  return { at: onsetSeconds(times, word), bed };
 }
 
 function samePair(left: BedPair, right: BedPair): boolean {

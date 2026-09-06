@@ -1,12 +1,12 @@
 import type { Pool } from '../library/walk-library';
 import type { Segment } from '../script/resolve-script';
+import { wordTimes } from '../script/word-times';
 import type { ImageField } from './image-field';
 import { imageSlots, slotAfter } from './image-schedule';
 import type { ImageSlot } from './image-schedule';
 import { drawPhotograph } from './image-source';
 import type { Photograph } from './image-source';
 import type { Elapsed } from './session-clock';
-import { wordCount } from './session-words';
 import { followWords } from './word-cursor';
 
 export type ImageLayer = {
@@ -20,7 +20,7 @@ export function runImageLayer(
   elapsed: Elapsed,
 ): ImageLayer {
   const slots = imageSlots(segments, pools);
-  const cursor = followWords(elapsed, wordCount(segments));
+  const cursor = followWords(elapsed, wordTimes(segments));
   let previous: string | null = null;
   let running = true;
 

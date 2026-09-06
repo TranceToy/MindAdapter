@@ -71,7 +71,7 @@ function nameButton(name: string): HTMLButtonElement {
 }
 
 function renderMeta(script: ScriptEntry): HTMLElement {
-  const text = isPlayable(script) ? durationText(script.words) : problemCount(script);
+  const text = isPlayable(script) ? durationText(script.segments) : problemCount(script);
   const meta = secondary(text);
   meta.classList.add('list__meta');
   return meta;

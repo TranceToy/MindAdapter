@@ -1,11 +1,7 @@
-const WORDS_PER_MINUTE = 220;
+import type { Segment } from './resolve-script';
+import { sessionSeconds, wordTimes } from './word-times';
+
 const SECONDS_PER_MINUTE = 60;
-
-export const BEAT_SECONDS = SECONDS_PER_MINUTE / WORDS_PER_MINUTE;
-
-export function sessionSeconds(words: number): number {
-  return (words * SECONDS_PER_MINUTE) / WORDS_PER_MINUTE;
-}
 
 export function durationLabel(seconds: number): string {
   const whole = Math.round(seconds);
@@ -15,7 +11,8 @@ export function durationLabel(seconds: number): string {
   return `${minutes}:${padded}`;
 }
 
-export function durationText(words: number): string {
-  const seconds = sessionSeconds(words);
+export function durationText(segments: Segment[]): string {
+  const times = wordTimes(segments);
+  const seconds = sessionSeconds(times);
   return durationLabel(seconds);
 }

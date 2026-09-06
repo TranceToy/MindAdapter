@@ -21,8 +21,10 @@ bed. Layers share a clock and a start gesture; none can play alone.
 _Avoid_: track, channel, stream
 
 **Pace**:
-The constant rate at which words are displayed, one word per beat, identical for
-every script and not user-adjustable.
+The rate at which words are displayed, one word per beat, in words per minute.
+A script declares it, in its head for the whole session and on any segment that
+should run at a rate of its own; a script that declares none runs at 220. It is
+never the user's to adjust during a session.
 _Avoid_: speed, wpm setting, tempo
 
 **Hold**:
@@ -59,7 +61,7 @@ _Avoid_: text, transcript, session file, program
 
 **Segment**:
 A named stretch of a script that carries its own imagery tag and may declare its
-own carrier and beat frequency.
+own carrier, beat frequency and pace.
 _Avoid_: section, block, scene, chapter
 
 **Pool**:

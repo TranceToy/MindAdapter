@@ -4,6 +4,7 @@ import { resolveSegments } from './resolve-script';
 
 const SCRIPT = `bed: 150/6
 voice: obedience
+pace: 180
 
 # ocean
 
@@ -37,6 +38,12 @@ describe('resolveSegments', () => {
     expect(segments[2]?.voice).toEqual([]);
   });
 
+  it('holds the declared pace until a segment declares its own', () => {
+    const script = parseScript('pace: 180\n\n# ocean\n\nOne.\n\n# void\npace: 120\n\nTwo.\n');
+    const segments = resolveSegments(script);
+    expect(segments.map((segment) => segment.pace)).toEqual([180, 120]);
+  });
+
   it('holds a declared pair until the next declaration', () => {
     const script = parseScript('# ocean\nbed: 140/4\n\nOne.\n\n# void\n\nTwo.\n');
     const segments = resolveSegments(script);
@@ -44,9 +51,10 @@ describe('resolveSegments', () => {
     expect(segments[1]?.bed).toEqual({ carrier: 140, beat: 4 });
   });
 
-  it('falls back to the app defaults when a script declares no bed', () => {
+  it('falls back to the app defaults when a script declares no bed or pace', () => {
     const segments = resolveSegments(parseScript('# ocean\n\nOnly this.\n'));
     expect(segments[0]?.bed).toEqual({ carrier: 150, beat: 6 });
     expect(segments[0]?.voice).toEqual([]);
+    expect(segments[0]?.pace).toBe(220);
   });
 });

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
-import { sessionWords, wordCount } from './session-words';
+import { sessionWords } from './session-words';
 
 function segment(words: string[]): Segment {
-  return { tags: [], bed: { carrier: 150, beat: 6 }, voice: [], words };
+  return { tags: [], bed: { carrier: 150, beat: 6 }, voice: [], pace: DEFAULT_PACE, words };
 }
 
 describe('sessionWords', () => {
@@ -14,16 +15,5 @@ describe('sessionWords', () => {
 
   it('is empty without segments', () => {
     expect(sessionWords([])).toEqual([]);
-  });
-});
-
-describe('wordCount', () => {
-  it('is every segment length, summed', () => {
-    const segments = [segment(['down', 'softer']), segment(['down'])];
-    expect(wordCount(segments)).toBe(3);
-  });
-
-  it('is nothing without segments', () => {
-    expect(wordCount([])).toBe(0);
   });
 });

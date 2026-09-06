@@ -18,7 +18,7 @@ export function renderStart(
   leave: LeaveStart,
 ): StartScreen {
   const name = dimActionHero(script.name, leave);
-  const duration = secondary(durationText(script.words));
+  const duration = secondary(durationText(script.segments));
   const start = renderBegin(begin);
   const failure = renderFailure();
   const element = surface([name, duration, start, failure]);
