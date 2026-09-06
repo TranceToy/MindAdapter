@@ -9,6 +9,9 @@ written or not played at all.
 Scripts live in the library, in `scripts/`, as `.md` or `.txt` files. The file
 name without its extension is the name the selection screen lists.
 
+What the format allows is below; what to do with it is in
+`docs/writing-scripts.md`.
+
 ```
 <library>/
   scripts/    the scripts
