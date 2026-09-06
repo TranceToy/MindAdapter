@@ -24,12 +24,13 @@ export function runImageLayer(
   let previous: string | null = null;
   let running = true;
 
-  // The next photograph is drawn the moment the current one is on screen, so
-  // its decode spends the whole hold. Awaiting it after the slot has been
+  // The opening slot is taken as it stands, since the words no longer wait for
+  // it; every later one is drawn the moment the current photograph is on screen,
+  // so its decode spends the whole hold. Awaiting it after the slot has been
   // reached is what holds a late one: the current frame stays until it lands,
   // and the slot it lands in is the one the words have got to by then.
   async function run(): Promise<void> {
-    let slot = slotAfter(slots, cursor.now());
+    let slot: ImageSlot | null = slots[0] ?? null;
     let drawing = draw(slot);
     while (slot) {
       const reached = await cursor.reach(slot.at);

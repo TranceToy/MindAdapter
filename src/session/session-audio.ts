@@ -9,7 +9,6 @@ import { bedGlides } from './bed-schedule';
 import { enterRunning, suspendQuietly } from './context-state';
 import { rampGain, riseGain } from './gain-ramp';
 import { warnIfMono } from './output-check';
-import { LEAD_IN_SECONDS } from './word-clock';
 
 // The image is held against this one, so the ending is ten seconds of a still
 // frame going quiet rather than a cut.
@@ -21,8 +20,9 @@ export const NATURAL_END_SECONDS = 10;
 export const EXIT_SECONDS = 0.3;
 
 // Long enough that the bed arrives rather than lands, and short enough that the
-// words it comes back under are still the ones the pause was taken from.
-export const RE_ENTRY_SECONDS = 5;
+// words it comes in under are still the ones it was meant for — the opening word
+// as much as the one a pause was taken from.
+export const ENTRY_SECONDS = 5;
 
 export type SessionAudio = {
   voice: GainNode;
@@ -43,7 +43,7 @@ export function startSessionAudio(
   warnIfMono(context.destination);
   const bed = runBed(context, graph.merger, bedGlides(segments), from);
   setLevels(graph, calibration, from);
-  leadIn(graph.master.gain, from);
+  enter(graph.master.gain, from);
   return stops(context, graph, bed);
 }
 
@@ -55,10 +55,10 @@ function setLevels(graph: AudioGraph, calibration: Calibration, from: number): v
   graph.voice.gain.setValueAtTime(voiceLevel(calibration), from);
 }
 
-// masterGain rests at 1 and climbs to it from silence twice: here, and on the
-// way back in from a pause.
-function leadIn(master: AudioParam, from: number): void {
-  riseGain(master, LEAD_IN_SECONDS, from);
+// masterGain rests at 1 and climbs to it from silence twice: here, under the
+// first word, and on the way back in from a pause.
+function enter(master: AudioParam, from: number): void {
+  riseGain(master, ENTRY_SECONDS, from);
 }
 
 function stops(context: AudioContext, graph: AudioGraph, bed: BedLayer): SessionAudio {
@@ -88,7 +88,7 @@ function stops(context: AudioContext, graph: AudioGraph, bed: BedLayer): Session
 
   async function reEnter(): Promise<void> {
     await enterRunning(context);
-    riseGain(graph.master.gain, RE_ENTRY_SECONDS, context.currentTime);
+    riseGain(graph.master.gain, ENTRY_SECONDS, context.currentTime);
   }
 
   // Nothing to fade: the context has been silent since the pause took it, so the

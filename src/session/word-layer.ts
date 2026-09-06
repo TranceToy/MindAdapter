@@ -25,7 +25,6 @@ export function runWordLayer(
   }
 
   function follow(cue: WordCue): void {
-    if (cue.kind === 'lead-in') return;
     if (cue.kind === 'ended') {
       end();
       return;

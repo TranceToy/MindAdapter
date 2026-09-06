@@ -3,7 +3,6 @@ import type { BedPair } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import { BEAT_SECONDS } from '../script/session-duration';
 import { bedGlides, leftFrequency, rightFrequency } from './bed-schedule';
-import { LEAD_IN_SECONDS } from './word-clock';
 
 const DEEPER: BedPair = { carrier: 200, beat: 4 };
 const DEEPEST: BedPair = { carrier: 90, beat: 2 };
@@ -30,7 +29,7 @@ describe('bedGlides', () => {
     const segments = [segment(DEEPER, 4), segment(DEEPEST, 4)];
     expect(bedGlides(segments)).toEqual([
       { at: 0, bed: DEEPER },
-      { at: LEAD_IN_SECONDS + 4 * BEAT_SECONDS, bed: DEEPEST },
+      { at: 4 * BEAT_SECONDS, bed: DEEPEST },
     ]);
   });
 

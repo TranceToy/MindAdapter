@@ -6,7 +6,6 @@ import { fillBag } from './clip-bag';
 import type { ClipBag, Roll } from './clip-bag';
 import { wordCount } from './session-words';
 import { bindClips } from './voice-pools';
-import { LEAD_IN_SECONDS } from './word-clock';
 
 // A floor rather than an average, so minimum spacing is a property of the
 // cadence: two near-touching suggestions read as a malfunction however rarely
@@ -139,7 +138,7 @@ export function gapSeconds(roll: Roll): number {
 }
 
 function onsetSeconds(word: number): number {
-  return LEAD_IN_SECONDS + word * BEAT_SECONDS;
+  return word * BEAT_SECONDS;
 }
 
 function sameTags(one: string[], other: string[]): boolean {

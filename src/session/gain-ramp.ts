@@ -23,7 +23,8 @@ export function rampGain(gain: GainRamp, to: number, seconds: number, now: numbe
 }
 
 // The one shape a level climbs in: from silence to the resting value over a
-// stated stretch, whether that is the lead-in or the way back in from a pause.
+// stated stretch, whether that is the way in at the start or back in from a
+// pause.
 export function riseGain(gain: GainRamp, seconds: number, now: number): void {
   gain.cancelScheduledValues(now);
   gain.setValueAtTime(0, now);

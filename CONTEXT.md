@@ -25,11 +25,6 @@ The constant rate at which words are displayed, one word per beat, identical for
 every script and not user-adjustable.
 _Avoid_: speed, wpm setting, tempo
 
-**Lead-in**:
-The ten seconds after the start gesture in which the bed alone fades up on a
-black screen, before the first word.
-_Avoid_: intro, countdown, warm-up, preroll
-
 **Hold**:
 The state a session ends in: the final image left on screen in silence,
 indefinitely, until the user's exit gesture leaves it. There is no screen that

@@ -2,7 +2,6 @@ import { DEFAULT_BED } from '../script/declaration-values';
 import type { BedPair } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import { BEAT_SECONDS } from '../script/session-duration';
-import { LEAD_IN_SECONDS } from './word-clock';
 
 export type BedGlide = {
   at: number;
@@ -12,9 +11,9 @@ export type BedGlide = {
 export type Ear = (bed: BedPair) => number;
 
 // The whole session's bed is known before a word is shown, so it is a schedule
-// rather than a state machine. The opening pair is already sounding through the
-// lead-in and so lands at zero; every later pair lands on the beat of the first
-// word of the segment that declares it.
+// rather than a state machine. The opening pair lands at zero, under the first
+// word; every later pair lands on the beat of the first word of the segment that
+// declares it.
 export function bedGlides(segments: Segment[]): BedGlide[] {
   const opening = segments[0]?.bed ?? DEFAULT_BED;
   const glides: BedGlide[] = [{ at: 0, bed: opening }];
@@ -39,7 +38,7 @@ export function rightFrequency(bed: BedPair): number {
 }
 
 function glideAt(word: number, bed: BedPair): BedGlide {
-  return { at: LEAD_IN_SECONDS + word * BEAT_SECONDS, bed };
+  return { at: word * BEAT_SECONDS, bed };
 }
 
 function samePair(left: BedPair, right: BedPair): boolean {

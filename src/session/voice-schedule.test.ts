@@ -6,7 +6,6 @@ import { BEAT_SECONDS } from '../script/session-duration';
 import type { Roll } from './clip-bag';
 import { GAP_HIGH, GAP_LOW, voiceDeadline, voiceFirings } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
-import { LEAD_IN_SECONDS } from './word-clock';
 
 function clip(path: string, duration: number): MeasuredClip {
   return {
@@ -43,10 +42,10 @@ const LONGER = clip('clips/obedience/b.mp3', 6);
 const SPOKEN = clip('clips/submission/c.mp3', 5);
 const POOLS = [pool('obedience', [SHORTER, LONGER]), pool('submission', [SPOKEN])];
 
-const FIRST_FIRING = LEAD_IN_SECONDS + GAP_LOW;
+const FIRST_FIRING = GAP_LOW;
 const ROUNDING = 1e-9;
 const SILENT_AT = 121;
-const CHANGE_SECONDS = LEAD_IN_SECONDS + SILENT_AT * BEAT_SECONDS;
+const CHANGE_SECONDS = SILENT_AT * BEAT_SECONDS;
 
 function gapsOf(firings: VoiceFiring[]): number[] {
   const gaps: number[] = [];
@@ -67,8 +66,8 @@ describe('voiceFirings', () => {
   it('draws the gap uniformly between its bounds', () => {
     const late = voiceFirings([segment(['obedience'], 4000)], POOLS, rolling(1));
     const middle = voiceFirings([segment(['obedience'], 4000)], POOLS, rolling(0.5));
-    expect(late[0]?.at).toBe(LEAD_IN_SECONDS + GAP_HIGH);
-    expect(middle[0]?.at).toBe(LEAD_IN_SECONDS + (GAP_LOW + GAP_HIGH) / 2);
+    expect(late[0]?.at).toBe(GAP_HIGH);
+    expect(middle[0]?.at).toBe((GAP_LOW + GAP_HIGH) / 2);
   });
 
   it('measures the gap from the end of the clip before it', () => {
@@ -124,7 +123,7 @@ describe('voiceFirings', () => {
       segment(['obedience'], 4000),
     ];
     const firings = voiceFirings(segments, POOLS, rolling());
-    const speaking = LEAD_IN_SECONDS + (SILENT_AT + 400) * BEAT_SECONDS;
+    const speaking = (SILENT_AT + 400) * BEAT_SECONDS;
     expect(firings[3]?.at).toBeCloseTo(speaking + GAP_LOW);
   });
 
