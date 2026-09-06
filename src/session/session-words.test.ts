@@ -4,7 +4,14 @@ import type { Segment } from '../script/resolve-script';
 import { sessionWords } from './session-words';
 
 function segment(words: string[]): Segment {
-  return { tags: [], bed: { carrier: 150, beat: 6 }, voice: [], pace: DEFAULT_PACE, words };
+  return {
+    tags: [],
+    bed: { carrier: 150, beat: 6 },
+    voice: [],
+    pace: DEFAULT_PACE,
+    spiral: null,
+    words,
+  };
 }
 
 describe('sessionWords', () => {

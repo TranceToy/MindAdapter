@@ -4,7 +4,14 @@ import type { Segment } from './resolve-script';
 import { durationLabel, durationText } from './session-duration';
 
 function segment(words: number, pace = DEFAULT_PACE): Segment {
-  return { tags: [], bed: DEFAULT_BED, voice: [], pace, words: new Array(words).fill('down') };
+  return {
+    tags: [],
+    bed: DEFAULT_BED,
+    voice: [],
+    pace,
+    spiral: null,
+    words: new Array(words).fill('down'),
+  };
 }
 
 describe('durationLabel', () => {

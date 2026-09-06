@@ -6,7 +6,7 @@ export const INSTALL_LINE = 'install for a window of its own';
 let dismissed = false;
 
 // Installation buys a window without browser chrome and nothing else: a tab
-// runs all four layers. So this is a line to dismiss, never a screen to get
+// runs every layer. So this is a line to dismiss, never a screen to get
 // past, and once dismissed it stays gone for the rest of the launch.
 export function installNudge(): HTMLElement | null {
   if (dismissed) return null;

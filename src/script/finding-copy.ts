@@ -3,8 +3,12 @@ import {
   BEAT_LOW,
   CARRIER_HIGH,
   CARRIER_LOW,
+  DEPTH_HIGH,
+  DEPTH_LOW,
   PACE_HIGH,
   PACE_LOW,
+  RATE_HIGH,
+  RATE_LOW,
 } from './declaration-values';
 import type { Finding, Locus } from './finding';
 
@@ -39,6 +43,18 @@ export function malformedPaceLine(value: string): string {
 
 export function paceOutOfRangeLine(pace: number): string {
   return `pace ${pace} outside ${PACE_LOW}–${PACE_HIGH} words per minute`;
+}
+
+export function malformedSpiralLine(value: string): string {
+  return `spiral ${value} is not a rate, or a rate/depth pair`;
+}
+
+export function rateOutOfRangeLine(rate: number): string {
+  return `spiral ${rate} outside ${RATE_LOW}–${RATE_HIGH} turns per minute`;
+}
+
+export function depthOutOfRangeLine(depth: number): string {
+  return `spiral depth ${depth} outside ${DEPTH_LOW}–${DEPTH_HIGH}`;
 }
 
 export function missingImagePoolLine(tag: string, line: number): string {

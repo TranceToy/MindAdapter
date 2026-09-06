@@ -1,8 +1,8 @@
 # The script format
 
 A script is the one file an author writes. It supplies a session's words and its
-segment structure, and from its declarations the other three layers — imagery,
-voice and bed — take everything they play. Nothing about a session is set in the
+segment structure, and from its declarations the other layers — imagery, voice,
+bed and spiral — take everything they play. Nothing about a session is set in the
 app: what is not declared runs on a default, and what is declared is played as
 written or not played at all.
 
@@ -22,6 +22,7 @@ name without its extension is the name the selection screen lists.
 bed: 141.5/7.83
 voice: obedience
 pace: 200
+spiral: 3
 
 # ocean, deep water
 
@@ -31,12 +32,14 @@ to hold on to.
 # void
 bed: 140/4
 pace: 120
+spiral: 1.5/0.3
 
 Nothing above you. Nothing below.
 
 # surface
 voice:
 pace: 220
+spiral:
 
 Up, and awake, and back in the room.
 ```
@@ -59,7 +62,7 @@ including further blank lines and any line that happens to hold a colon.
 
 ## Declarations
 
-A declaration is `key: value`, one to a line. Three keys exist; anything else is
+A declaration is `key: value`, one to a line. Four keys exist; anything else is
 a finding, as is the same key twice in one block.
 
 | Key | Value | Default |
@@ -67,11 +70,13 @@ a finding, as is the same key twice in one block.
 | `bed` | `carrier/beat` in Hz, decimals allowed | `150/6` |
 | `voice` | comma-separated clip pool tags, or empty for silence | none |
 | `pace` | words per minute, decimals allowed | `220` |
+| `spiral` | `rate` or `rate/depth`, or empty for no spiral | no spiral |
 
-`bed`, `voice` and `pace` are declared in the head for the whole session and
-again on any segment that should differ, and each holds from there until another
-segment changes it. Imagery tags never inherit: a segment header is the whole
-truth about what is on screen under it, and a bare `#` leaves the field blank.
+`bed`, `voice`, `pace` and `spiral` are declared in the head for the whole
+session and again on any segment that should differ, and each holds from there
+until another segment changes it. Imagery tags never inherit: a segment header
+is the whole truth about what is on screen under it, and a bare `#` leaves the
+field blank.
 
 ## What the layers do with it
 
@@ -98,6 +103,15 @@ cadence fresh rather than resuming mid-gap.
 declares it. The carrier is the left ear; the right ear carries the carrier plus
 the beat frequency.
 
+**Spiral.** A two-armed spiral turns between the photograph and the words, at
+the rate in force where the session has got to, and takes the depth beside it —
+`0.15` where only a rate is declared, `1` for a spiral the photograph does not
+show through at all. The angle is carried across a change of rate, so a new
+declaration changes the speed and never jumps the spiral; `spiral:` with no
+value stops it where it stands, and a later rate takes the angle up from there.
+It is the one layer a script may leave out entirely, and it stands still for the
+hold the session ends in.
+
 ## What makes a script unplayable
 
 A script with any finding is listed dim, with its count of problems, and opens
@@ -110,6 +124,10 @@ its range would play a session the author did not write.
   word layer's own: above the high one the eight-word image slot passes half a
   hertz of full-screen luminance change, and below the low one a word is held so
   long the session reads as stopped rather than slow
+- a spiral `rate` outside 0.5–12 turns per minute, a `depth` outside 0–1, or a
+  value that is neither a rate nor a `rate/depth` pair. The high rate bound is
+  the imagery layer's: two arms passing a point at 12 turns a minute is 0.4 Hz
+  of luminance change, just under what a new photograph every eight words makes
 - an unknown declaration key, or one declared twice in a single block
 - prose in the head, or prose in a segment without the blank line before it
 - no segment header anywhere, or no words left once punctuation is stripped

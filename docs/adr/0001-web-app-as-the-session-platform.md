@@ -1,5 +1,9 @@
 # Web app as the session platform
 
+_A fifth layer, the spiral, was added later and is drawn by the app rather than
+taken from the library; see ADR 0003. The four below are the ones this decision
+was made for._
+
 A session runs four concurrent layers — word display, background imagery,
 suggestion voice and binaural bed — and the platform choice decides the audio
 stack and how assets are stored. We chose a browser web app: the Web Audio API

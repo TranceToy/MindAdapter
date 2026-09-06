@@ -10,7 +10,7 @@ export const GATE_COPY: Record<Diagnosis, GateCopy> = {
   'no-audio': {
     hero: 'No audio',
     cure:
-      'This browser has no Web Audio. All four layers are timed against it and the bed is '
+      'This browser has no Web Audio. Every layer is timed against it and the bed is '
       + 'generated in it, so there is nothing here that can run without it.',
     reopen: false,
   },

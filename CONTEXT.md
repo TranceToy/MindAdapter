@@ -2,7 +2,8 @@
 
 A self-administered trance session player: one browser app that runs four
 concurrent layers — paced words, background imagery, spoken suggestion and a
-binaural bed — from content the user owns and authors outside the app.
+binaural bed — from content the user owns and authors outside the app, with a
+fifth, the spiral, that turns only where a script asks for it.
 
 The language below is fixed by the wayfinder map at
 `.scratch/adapting-the-mind/map.md` and by `docs/adr/`.
@@ -12,18 +13,38 @@ The language below is fixed by the wayfinder map at
 ### The session
 
 **Session**:
-One uninterrupted run of a script with all four layers playing together.
+One uninterrupted run of a script with all four layers playing together, and the
+spiral turning wherever it is declared.
 _Avoid_: run, playback, trance, experience
 
 **Layer**:
-One of the four concurrent streams a session is made of — word, image, voice,
-bed. Layers share a clock and a start gesture; none can play alone.
+One of the concurrent streams a session is made of — word, image, voice, bed and
+spiral. Layers share a clock and a start gesture; none can play alone. Four of
+them are in every session; the spiral is the one a script may leave out.
 _Avoid_: track, channel, stream
+
+**Spiral**:
+The turning geometry between the imagery and the words, drawn by the app rather
+than taken from the library. It is the only layer a session can run without: a
+script that declares no rate for it shows none at all.
+_Avoid_: vortex, wheel, overlay, animation
+
+**Rate**:
+How fast the spiral turns, in turns per minute — the spiral's word for it, as
+pace is the word layer's. A script declares it in its head and on any segment
+that should turn at a rate of its own, and it is never the user's to adjust
+during a session.
+_Avoid_: speed, rpm, spin, pace (which belongs to the word layer)
+
+**Depth**:
+How much of the photograph the spiral takes, from none of it to all of it. It
+rides on the rate declaration and defaults to a fifteenth.
+_Avoid_: opacity, alpha, strength, intensity
 
 **Pace**:
 The rate at which words are displayed, one word per beat, in words per minute.
 A script declares it, in its head for the whole session and on any segment that
-should run at a rate of its own; a script that declares none runs at 220. It is
+should run at a pace of its own; a script that declares none runs at 220. It is
 never the user's to adjust during a session.
 _Avoid_: speed, wpm setting, tempo
 

@@ -16,6 +16,9 @@ import { runPause } from './session-pause';
 import type { PausedSession, SessionPause } from './session-pause';
 import { renderStage } from './session-screen';
 import { sessionWords } from './session-words';
+import { createSpiralField } from './spiral-field';
+import { runSpiralLayer } from './spiral-layer';
+import type { SpiralLayer } from './spiral-layer';
 import { enterSession } from './start-activation';
 import type { SessionEntry } from './start-activation';
 import { renderStart } from './start-screen';
@@ -32,6 +35,7 @@ type Session = {
   entry: SessionEntry;
   audio: SessionAudio;
   words: WordLayer;
+  spiral: SpiralLayer;
   imagery: ImageLayer;
   voice: VoiceLayer;
   pause: SessionPause;
@@ -87,9 +91,11 @@ function runSession(
   const times = wordTimes(script.segments);
   const field = createWordField(words);
   const imagery = createImageField();
-  // Imagery first, so the words paint over it and the halo is the only thing
-  // between them.
-  const stage = renderStage([imagery.element, field.element]);
+  const spiral = createSpiralField();
+  // Imagery first and the words last, so the spiral turns over the photograph
+  // and under the word, and the halo is the only thing between the word and
+  // both of them.
+  const stage = renderStage([imagery.element, spiral.element, field.element]);
   const dismiss = host.raise(stage);
   const unfollow = followViewport(field);
   const startedAt = entry.context.currentTime;
@@ -99,10 +105,12 @@ function runSession(
   // still, so there is nothing left in it to protect.
   function hold(): void {
     audio.end();
+    session.spiral.stop();
     session.pause.stop();
   }
 
   const wordLayer = runWordLayer(field, times, elapsed, hold);
+  const spiralLayer = runSpiralLayer(spiral, script.segments, elapsed);
   const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed);
   const voiceLayer = runVoiceLayer(
     entry.context,
@@ -116,6 +124,7 @@ function runSession(
     entry,
     audio,
     words: wordLayer,
+    spiral: spiralLayer,
     imagery: imageLayer,
     voice: voiceLayer,
     pause: NEVER_PAUSED,
@@ -165,6 +174,7 @@ function leaveSession(session: Session, quit: () => void): void {
   session.unwatch();
   session.unfollow();
   session.words.stop();
+  session.spiral.stop();
   session.imagery.stop();
   session.voice.stop();
   quit();

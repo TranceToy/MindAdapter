@@ -3,12 +3,18 @@ import {
   BED_KEY,
   CARRIER_HIGH,
   CARRIER_LOW,
+  DEPTH_HIGH,
+  DEPTH_LOW,
   PACE_HIGH,
   PACE_KEY,
   PACE_LOW,
+  RATE_HIGH,
+  RATE_LOW,
+  SPIRAL_KEY,
   VOICE_KEY,
   readBedPair,
   readPace,
+  readSpiral,
 } from './declaration-values';
 import { fileFinding } from './finding';
 import type { Finding } from './finding';
@@ -19,10 +25,13 @@ import {
   PROSE_IN_SEGMENT,
   beatOutOfRangeLine,
   carrierOutOfRangeLine,
+  depthOutOfRangeLine,
   duplicateKeyLine,
   malformedBedLine,
   malformedPaceLine,
+  malformedSpiralLine,
   paceOutOfRangeLine,
+  rateOutOfRangeLine,
   unknownKeyLine,
 } from './finding-copy';
 import { countWords } from './parse-script';
@@ -81,6 +90,7 @@ function declarationFindings(entry: DeclarationEntry): Finding[] {
   if (entry.key === VOICE_KEY) return [];
   if (entry.key === BED_KEY) return bedFindings(entry);
   if (entry.key === PACE_KEY) return paceFindings(entry);
+  if (entry.key === SPIRAL_KEY) return spiralFindings(entry);
   const message = unknownKeyLine(entry.key);
   const unknown = fileFinding(entry.line, message);
   return [unknown];
@@ -99,6 +109,30 @@ function paceFindings(entry: DeclarationEntry): Finding[] {
     return [outside];
   }
   return [];
+}
+
+// An empty value is the author asking for no spiral, the way an empty voice
+// list asks for silence, so it is read before the value is read at all.
+function spiralFindings(entry: DeclarationEntry): Finding[] {
+  if (entry.value === '') return [];
+  const spiral = readSpiral(entry.value);
+  if (!spiral) {
+    const message = malformedSpiralLine(entry.value);
+    const malformed = fileFinding(entry.line, message);
+    return [malformed];
+  }
+  const findings: Finding[] = [];
+  if (spiral.rate < RATE_LOW || spiral.rate > RATE_HIGH) {
+    const message = rateOutOfRangeLine(spiral.rate);
+    const rate = fileFinding(entry.line, message);
+    findings.push(rate);
+  }
+  if (spiral.depth < DEPTH_LOW || spiral.depth > DEPTH_HIGH) {
+    const message = depthOutOfRangeLine(spiral.depth);
+    const depth = fileFinding(entry.line, message);
+    findings.push(depth);
+  }
+  return findings;
 }
 
 function bedFindings(entry: DeclarationEntry): Finding[] {

@@ -13,7 +13,7 @@ export type BedLayer = {
 };
 
 // Two oscillators hard-panned by the merger, never a panner, and present for the
-// whole session: a session is always four layers.
+// whole session: the bed is one of the four layers no session is without.
 export function runBed(
   context: AudioContext,
   merger: ChannelMergerNode,

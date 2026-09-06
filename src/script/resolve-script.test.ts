@@ -51,6 +51,24 @@ describe('resolveSegments', () => {
     expect(segments[1]?.bed).toEqual({ carrier: 140, beat: 4 });
   });
 
+  it('shows no spiral where a script declares none', () => {
+    const segments = resolveSegments(parseScript(SCRIPT));
+    expect(segments[0]?.spiral).toBeNull();
+  });
+
+  it('holds a declared spiral until a segment declares its own', () => {
+    const script = parseScript('spiral: 3\n\n# ocean\n\nOne.\n\n# void\nspiral: 1.5/0.4\n\nTwo.\n');
+    const segments = resolveSegments(script);
+    expect(segments[0]?.spiral).toEqual({ rate: 3, depth: 0.15 });
+    expect(segments[1]?.spiral).toEqual({ rate: 1.5, depth: 0.4 });
+  });
+
+  it('stops the spiral on an empty value rather than inheriting', () => {
+    const script = parseScript('spiral: 3\n\n# ocean\n\nOne.\n\n# void\nspiral:\n\nTwo.\n');
+    const segments = resolveSegments(script);
+    expect(segments[1]?.spiral).toBeNull();
+  });
+
   it('falls back to the app defaults when a script declares no bed or pace', () => {
     const segments = resolveSegments(parseScript('# ocean\n\nOnly this.\n'));
     expect(segments[0]?.bed).toEqual({ carrier: 150, beat: 6 });

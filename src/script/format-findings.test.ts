@@ -98,6 +98,33 @@ describe('formatFindings', () => {
     expect(high).toEqual(['pace 400 outside 40–240 words per minute']);
   });
 
+  it('accepts a spiral rate alone, and a rate with a depth', () => {
+    const findings = findingsOf('spiral: 3\n\n# ocean\nspiral: 1.5/0.3\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
+  it('accepts an empty spiral value as the way to stop it', () => {
+    const findings = findingsOf('spiral: 3\n\n# ocean\nspiral:\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
+  it('rejects a spiral that is neither a rate nor a rate/depth pair', () => {
+    const messages = messagesOf('spiral: slow/deep\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spiral slow/deep is not a rate, or a rate/depth pair']);
+  });
+
+  it('rejects a spiral rate outside its range rather than clamping it', () => {
+    const low = messagesOf('spiral: 0.2\n\n# ocean\n\nOnly this.\n');
+    const high = messagesOf('spiral: 20\n\n# ocean\n\nOnly this.\n');
+    expect(low).toEqual(['spiral 0.2 outside 0.5–12 turns per minute']);
+    expect(high).toEqual(['spiral 20 outside 0.5–12 turns per minute']);
+  });
+
+  it('rejects a depth past the whole of the frame', () => {
+    const messages = messagesOf('spiral: 3/1.5\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spiral depth 1.5 outside 0–1']);
+  });
+
   it('reports every finding rather than the first', () => {
     const script = 'the water is warm\nimges: ocean\n\n# ocean\nbed: 150\nbed: 150/600\n\nOnly this.\n';
     const findings = findingsOf(script);

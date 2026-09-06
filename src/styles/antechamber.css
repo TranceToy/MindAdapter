@@ -232,6 +232,25 @@ body {
   inset: 0;
 }
 
+/* Between the photograph and the word: the depth a script declares is the whole
+   of the blend, so the layer is white geometry at that opacity and no filter,
+   scrim or blend mode of its own. The box holds still over the whole screen and
+   the arms turn inside it, so the clip is the screen edge at every angle and
+   nothing about the turn reflows the frame. */
+.spiral {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--lit);
+  pointer-events: none;
+}
+
+.spiral__arms {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 /* Untouched and at full brightness: no dim, no scrim, no vignette. Legibility
    is the word's halo and nothing else. The whole frame is shown at its own
    aspect ratio, so what the ground shows around it is the black the layer
