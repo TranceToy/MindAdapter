@@ -11,6 +11,11 @@
   --lit: #fff;
   --dim: #3a3a40;
   --prose: #6e6e74;
+  --halo:
+    0 0 0.05em #000,
+    0 0 0.14em #000e,
+    0 0 0.36em #000c,
+    0 0.02em 0.7em #000a;
   --cross-fade: 200ms;
   --easing: ease;
   color-scheme: dark;
@@ -247,11 +252,7 @@ body {
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  text-shadow:
-    0 0 0.05em #000,
-    0 0 0.14em #000e,
-    0 0 0.36em #000c,
-    0 0.02em 0.7em #000a;
+  text-shadow: var(--halo);
   white-space: nowrap;
 }
 
@@ -260,4 +261,37 @@ body {
   left: -9999px;
   top: 0;
   visibility: hidden;
+}
+
+/* A cut, never a fade: everything during a session is immediate. The frozen
+   frame is dimmed and nothing else — a backdrop blur is an effect the language
+   otherwise has none of — so the two words sit over imagery and take the halo
+   the word layer wears. */
+.pause {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  text-align: center;
+  padding: 6vh 6vw;
+  overflow-y: auto;
+  background: #000a;
+}
+
+.pause__content {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+}
+
+.pause__word {
+  text-shadow: var(--halo);
+}
+
+.pause__word + .pause__word {
+  margin-top: 30px;
+}
+
+.pause__mono {
+  text-shadow: var(--halo);
 }

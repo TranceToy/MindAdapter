@@ -7,7 +7,13 @@ import { voiceFirings } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
 
 export type VoiceLayer = {
+  drop: () => void;
   stop: () => void;
+};
+
+type Sounding = {
+  source: AudioBufferSourceNode;
+  at: number;
 };
 
 export function runVoiceLayer(
@@ -20,6 +26,7 @@ export function runVoiceLayer(
 ): VoiceLayer {
   const firings = voiceFirings(segments, pools, Math.random);
   const cursor = followPosition(elapsed);
+  const sounding = new Set<Sounding>();
   let running = true;
 
   // A clip is read while the one before it is speaking and scheduled the
@@ -60,8 +67,26 @@ export function runVoiceLayer(
     level.gain.value = firing.clip.rmsScalar;
     source.connect(level);
     level.connect(voice);
-    source.onended = () => level.disconnect();
-    source.start(from + firing.at);
+    const held = { source, at: from + firing.at };
+    sounding.add(held);
+    source.onended = () => {
+      sounding.delete(held);
+      level.disconnect();
+    };
+    source.start(held.at);
+  }
+
+  // The one place a firing decision is revoked, and only for a clip already
+  // speaking: resuming it mid-syllable under the re-entry ramp would deliver a
+  // fragment as a whole thought. A clip scheduled but not yet begun is left
+  // where it is, since its start is written in the context time the pause froze.
+  function drop(): void {
+    const now = context.currentTime;
+    for (const held of sounding) {
+      if (held.at > now) continue;
+      held.source.stop();
+      sounding.delete(held);
+    }
   }
 
   // Nothing sounding is stopped here. The exit ramp is already running over it
@@ -72,5 +97,5 @@ export function runVoiceLayer(
   }
 
   void run();
-  return { stop };
+  return { drop, stop };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DECLICK_SECONDS, rampGain } from './gain-ramp';
+import { DECLICK_SECONDS, rampGain, riseGain } from './gain-ramp';
 import type { GainRamp } from './gain-ramp';
 
 type Scheduled = {
@@ -38,5 +38,17 @@ describe('rampGain', () => {
   it('never stops faster than the declick floor', () => {
     const { gain } = recordingGain(1);
     expect(rampGain(gain, 0, 0, 2)).toBeCloseTo(2 + DECLICK_SECONDS);
+  });
+});
+
+describe('riseGain', () => {
+  it('climbs from silence to the resting value over the stated stretch', () => {
+    const { gain, scheduled } = recordingGain(1);
+    riseGain(gain, 5, 8);
+    expect(scheduled).toEqual([
+      { kind: 'cancel', value: 1, at: 8 },
+      { kind: 'set', value: 0, at: 8 },
+      { kind: 'ramp', value: 1, at: 13 },
+    ]);
   });
 });

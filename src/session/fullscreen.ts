@@ -9,6 +9,13 @@ export async function enterFullscreen(): Promise<boolean> {
   }
 }
 
+// The one place the app leaves fullscreen by hand: every other route out is a
+// gesture the app is listening to rather than making.
+export function leaveFullscreen(): void {
+  if (!document.fullscreenElement) return;
+  void document.exitFullscreen();
+}
+
 export function whenFullscreenLeft(leave: LeaveFullscreen): () => void {
   function watch(): void {
     if (document.fullscreenElement) return;

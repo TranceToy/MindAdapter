@@ -2,7 +2,7 @@ import type { Calibration } from '../calibration/calibration';
 import type { Library } from '../library/scan-library';
 import type { ScriptEntry } from '../script/validate-script';
 import type { SurfaceHost } from '../shell/surface-host';
-import { whenFullscreenLeft } from './fullscreen';
+import { leaveFullscreen, whenFullscreenLeft } from './fullscreen';
 import { createImageField } from './image-field';
 import { runImageLayer } from './image-layer';
 import type { ImageLayer } from './image-layer';
@@ -10,6 +10,8 @@ import { startSessionAudio } from './session-audio';
 import type { SessionAudio } from './session-audio';
 import { anchorClock } from './session-clock';
 import { FULLSCREEN_REFUSED } from './session-copy';
+import { runPause } from './session-pause';
+import type { PausedSession, SessionPause } from './session-pause';
 import { renderStage } from './session-screen';
 import { sessionWords } from './session-words';
 import { enterSession } from './start-activation';
@@ -30,12 +32,15 @@ type Session = {
   words: WordLayer;
   imagery: ImageLayer;
   voice: VoiceLayer;
+  pause: SessionPause;
   dismiss: () => void;
   unfollow: () => void;
   unwatch: () => void;
 };
 
 const NOTHING = () => {};
+
+const NEVER_PAUSED: SessionPause = { paused: () => false, stop: NOTHING };
 
 export function showStart(
   host: SurfaceHost,
@@ -87,7 +92,14 @@ function runSession(
   const startedAt = entry.context.currentTime;
   const audio = startSessionAudio(entry.context, script.segments, calibration, startedAt);
   const elapsed = anchorClock(entry.context, startedAt);
-  const wordLayer = runWordLayer(field, words.length, elapsed, audio.end);
+  // The triggers belong to a running session: the terminal hold is silent and
+  // still, so there is nothing left in it to protect.
+  function hold(): void {
+    audio.end();
+    session.pause.stop();
+  }
+
+  const wordLayer = runWordLayer(field, words.length, elapsed, hold);
   const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed);
   const voiceLayer = runVoiceLayer(
     entry.context,
@@ -103,17 +115,41 @@ function runSession(
     words: wordLayer,
     imagery: imageLayer,
     voice: voiceLayer,
+    pause: NEVER_PAUSED,
     dismiss,
     unfollow,
     unwatch: NOTHING,
   };
+  const interruptible: PausedSession = {
+    context: entry.context,
+    audio,
+    voice: voiceLayer,
+    wake: entry.wake,
+  };
+  session.pause = runPause(interruptible, host, () => endSession(session));
   session.unwatch = whenFullscreenLeft(() => stopSession(session));
   // Selection renders now, behind the opaque stage, so leaving the session is a
   // single synchronous dismissal on the frame the exit gesture arrives.
   leave();
 }
 
+// A fullscreen loss over the overlay is the same ending the overlay's own End
+// is, because the context it would fade is already suspended.
 function stopSession(session: Session): void {
+  if (session.pause.paused()) {
+    endSession(session);
+    return;
+  }
+  leaveSession(session, session.audio.leave);
+}
+
+function endSession(session: Session): void {
+  leaveSession(session, session.audio.halt);
+  leaveFullscreen();
+}
+
+function leaveSession(session: Session, quit: () => void): void {
+  session.pause.stop();
   session.dismiss();
   session.entry.wake.release();
   session.unwatch();
@@ -121,5 +157,5 @@ function stopSession(session: Session): void {
   session.words.stop();
   session.imagery.stop();
   session.voice.stop();
-  session.audio.leave();
+  quit();
 }

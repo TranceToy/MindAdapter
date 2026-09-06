@@ -1,3 +1,4 @@
+import { resumeQuietly } from './context-state';
 import { enterFullscreen } from './fullscreen';
 import { holdScreenAwake } from './screen-wake';
 import type { ScreenWake } from './screen-wake';
@@ -18,12 +19,4 @@ export async function enterSession(): Promise<SessionEntry | null> {
   const wake = await holdScreenAwake();
   await resumeQuietly(context);
   return { context, wake };
-}
-
-async function resumeQuietly(context: AudioContext): Promise<void> {
-  try {
-    await context.resume();
-  } catch {
-    // A failed resume is recoverable, so it does not refuse the click.
-  }
 }

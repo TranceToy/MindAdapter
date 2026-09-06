@@ -1,4 +1,5 @@
 export type ScreenWake = {
+  renew: () => void;
   release: () => void;
 };
 
@@ -16,20 +17,20 @@ export async function holdScreenAwake(): Promise<ScreenWake> {
     else void fresh?.release();
   }
 
-  function watch(): void {
+  function renew(): void {
     void reacquire();
   }
 
   function release(): void {
     if (!held) return;
     held = false;
-    document.removeEventListener('visibilitychange', watch);
+    document.removeEventListener('visibilitychange', renew);
     void sentinel?.release();
     sentinel = null;
   }
 
-  document.addEventListener('visibilitychange', watch);
-  return { release };
+  document.addEventListener('visibilitychange', renew);
+  return { renew, release };
 }
 
 async function requestWake(): Promise<WakeLockSentinel | null> {

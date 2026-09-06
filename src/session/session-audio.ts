@@ -6,7 +6,8 @@ import type { AudioGraph } from './audio-graph';
 import { runBed } from './bed-layer';
 import type { BedLayer } from './bed-layer';
 import { bedGlides } from './bed-schedule';
-import { rampGain } from './gain-ramp';
+import { enterRunning, suspendQuietly } from './context-state';
+import { rampGain, riseGain } from './gain-ramp';
 import { warnIfMono } from './output-check';
 import { LEAD_IN_SECONDS } from './word-clock';
 
@@ -19,10 +20,17 @@ export const NATURAL_END_SECONDS = 10;
 // by someone already feeling.
 export const EXIT_SECONDS = 0.3;
 
+// Long enough that the bed arrives rather than lands, and short enough that the
+// words it comes back under are still the ones the pause was taken from.
+export const RE_ENTRY_SECONDS = 5;
+
 export type SessionAudio = {
   voice: GainNode;
   end: () => void;
   leave: () => void;
+  suspend: () => void;
+  reEnter: () => Promise<void>;
+  halt: () => void;
 };
 
 export function startSessionAudio(
@@ -47,10 +55,10 @@ function setLevels(graph: AudioGraph, calibration: Calibration, from: number): v
   graph.voice.gain.setValueAtTime(voiceLevel(calibration), from);
 }
 
-// masterGain rests at 1 and the lead-in is the one place it climbs.
+// masterGain rests at 1 and climbs to it from silence twice: here, and on the
+// way back in from a pause.
 function leadIn(master: AudioParam, from: number): void {
-  master.setValueAtTime(0, from);
-  master.linearRampToValueAtTime(1, from + LEAD_IN_SECONDS);
+  riseGain(master, LEAD_IN_SECONDS, from);
 }
 
 function stops(context: AudioContext, graph: AudioGraph, bed: BedLayer): SessionAudio {
@@ -71,7 +79,26 @@ function stops(context: AudioContext, graph: AudioGraph, bed: BedLayer): Session
     closeAfter(context, done - context.currentTime);
   }
 
-  return { voice: graph.voice, end, leave };
+  // Suspending stops currentTime, which is the whole freeze: the bed's glides,
+  // the clips already scheduled and the word clock are all written against it,
+  // so none of them can drift from the others while the session is held.
+  function suspend(): void {
+    void suspendQuietly(context);
+  }
+
+  async function reEnter(): Promise<void> {
+    await enterRunning(context);
+    riseGain(graph.master.gain, RE_ENTRY_SECONDS, context.currentTime);
+  }
+
+  // Nothing to fade: the context has been silent since the pause took it, so the
+  // teardown is the whole of this ending.
+  function halt(): void {
+    bed.stop(context.currentTime);
+    void context.close();
+  }
+
+  return { voice: graph.voice, end, leave, suspend, reEnter, halt };
 }
 
 const SECOND = 1000;
