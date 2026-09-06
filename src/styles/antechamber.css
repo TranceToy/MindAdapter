@@ -160,6 +160,11 @@ body {
   margin-top: 18px;
 }
 
+.nudge {
+  margin-top: 44px;
+  color: var(--prose);
+}
+
 /* A hairline and a dot, and the block around them is the grab area: one pixel
    is a line to read, not a thing to catch. */
 .track {

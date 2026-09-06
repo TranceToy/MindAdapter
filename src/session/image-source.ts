@@ -1,3 +1,4 @@
+import type { FileSource } from '../library/library-source';
 import type { LibraryFile } from '../library/walk-library';
 import { drawImage } from './image-draw';
 
@@ -31,7 +32,7 @@ async function readPhotograph(file: LibraryFile): Promise<Photograph | null> {
   return decodePhotograph(file.path, blob);
 }
 
-async function openFile(handle: FileSystemFileHandle): Promise<File | null> {
+async function openFile(handle: FileSource): Promise<File | null> {
   try {
     return await handle.getFile();
   } catch {

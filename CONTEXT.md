@@ -116,6 +116,15 @@ during a session. They persist in the index and are revisited only on demand.
 _Avoid_: volume settings, mixer, levels screen
 
 **Precondition gate**:
-The checklist shown before anything else, stating whether this browser and this
-installation can run a session at all.
-_Avoid_: splash, compatibility warning, onboarding
+The refusal shown in place of the app, and only for the two things nothing falls
+back to: no Web Audio, or no way at all to read a folder. Everything else a
+browser lacks is carried rather than refused — no picker means the library is
+picked again at every launch, no fullscreen means a windowed session that Escape
+ends, no install means a tab, no index means measuring again.
+_Avoid_: splash, compatibility warning, onboarding, requirements check
+
+**Library source**:
+Where a library's bytes are reached: the folder handle a picker hands over,
+which outlives a launch, or the file list a folder upload hands over, which does
+not. Nothing below the scan can tell which one it was given.
+_Avoid_: adapter, provider, backend, driver

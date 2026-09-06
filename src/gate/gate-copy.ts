@@ -7,25 +7,18 @@ type GateCopy = {
 };
 
 export const GATE_COPY: Record<Diagnosis, GateCopy> = {
-  'unsupported-browser': {
-    hero: 'This browser cannot run the app',
+  'no-audio': {
+    hero: 'No audio',
     cure:
-      'Chromium engines only, and only as an installed app. Firefox and Safari are refused, '
-      + 'not degraded — there is no version of this app for them.',
+      'This browser has no Web Audio. All four layers are timed against it and the bed is '
+      + 'generated in it, so there is nothing here that can run without it.',
     reopen: false,
   },
-  'no-file-access': {
-    hero: 'No file access',
+  'no-directory-read': {
+    hero: 'No folder access',
     cure:
-      'Brave removes this API by default: set brave://flags/#file-system-access-api to Enabled '
-      + 'and relaunch. On another engine (Firefox, Safari) the app cannot run at all.',
-    reopen: true,
-  },
-  'not-installed': {
-    hero: 'Not installed',
-    cure:
-      'Install the app from the address bar, then open it from the installed window. '
-      + 'This tab cannot run a session.',
+      'The library is a folder on your disk, and this browser can open one neither by picker '
+      + 'nor by folder upload. A current Chromium, Firefox or Safari can.',
     reopen: true,
   },
 };

@@ -5,10 +5,9 @@ import { createDecoder, decodeClip } from './decode-clip';
 import { CLIPS_FOLDER, IMAGES_FOLDER } from './library-root';
 import { measureClip } from './clip-measurement';
 import { poolInventory } from './pool-inventory';
-import { readScripts } from '../script/read-scripts';
 import { validateScripts } from '../script/validate-script';
 import type { ScriptEntry } from '../script/validate-script';
-import { walkSection } from './walk-library';
+import type { LibrarySource } from './library-source';
 import type { LibraryFile, Pool } from './walk-library';
 
 export type ScanProgress = {
@@ -30,17 +29,17 @@ export type Library = {
 };
 
 export async function scanLibrary(
-  root: FileSystemDirectoryHandle,
+  source: LibrarySource,
   report: ReportProgress,
 ): Promise<Library> {
-  const images = await walkSection(root, IMAGES_FOLDER, 'image');
-  const pools = await walkSection(root, CLIPS_FOLDER, 'audio');
+  const images = await source.pools(IMAGES_FOLDER, 'image');
+  const pools = await source.pools(CLIPS_FOLDER, 'audio');
   const records = await loadClipRecords();
   const plans = planMeasurement(pools, records);
   const clips = await measurePlans(plans, report);
   const walked = clipPaths(pools);
   await pruneClipRecords(walked);
-  const files = await readScripts(root);
+  const files = await source.scripts();
   const inventory = poolInventory(images, clips);
   const scripts = validateScripts(files, inventory);
   return { images, clips, scripts };

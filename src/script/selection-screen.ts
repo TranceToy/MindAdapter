@@ -1,6 +1,7 @@
 import { CALIBRATION_LINE } from '../calibration/calibration-copy';
 import { RELINK_LINE } from '../library/library-copy';
 import { actionSecondary, secondary, surface } from '../shell/antechamber';
+import { installNudge } from '../shell/install-nudge';
 import { problemsLine } from './finding-copy';
 import { durationText } from './session-duration';
 import { isPlayable } from './validate-script';
@@ -30,7 +31,10 @@ export function renderSelection(scripts: ScriptEntry[], actions: SelectionAction
   }
   const calibration = renderAside(CALIBRATION_LINE, actions.calibrate);
   const library = renderAside(RELINK_LINE, actions.relink);
-  return surface([list, calibration, library]);
+  const parts = [list, calibration, library];
+  const nudge = installNudge();
+  if (nudge) parts.push(nudge);
+  return surface(parts);
 }
 
 function renderAside(text: string, reach: () => void): HTMLElement {

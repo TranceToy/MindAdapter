@@ -1,13 +1,16 @@
 export type Capabilities = {
-  fileAccess: boolean;
-  installed: boolean;
+  audio: boolean;
+  directoryPicker: boolean;
+  directoryInput: boolean;
 };
 
-export type Diagnosis = 'unsupported-browser' | 'no-file-access' | 'not-installed';
+export type Diagnosis = 'no-audio' | 'no-directory-read';
 
+// The gate refuses only what no fallback covers. A missing picker leaves the
+// folder input, a missing install leaves a tab, a missing wake lock leaves a
+// dimming screen — those are degradations the app carries, not preconditions.
 export function diagnose(capabilities: Capabilities): Diagnosis | null {
-  if (!capabilities.fileAccess && !capabilities.installed) return 'unsupported-browser';
-  if (!capabilities.fileAccess) return 'no-file-access';
-  if (!capabilities.installed) return 'not-installed';
+  if (!capabilities.audio) return 'no-audio';
+  if (!capabilities.directoryPicker && !capabilities.directoryInput) return 'no-directory-read';
   return null;
 }

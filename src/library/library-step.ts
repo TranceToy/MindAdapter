@@ -5,12 +5,13 @@ import { loadCalibration } from '../calibration/calibration-store';
 import { showSelection } from '../script/selection-step';
 import type { SurfaceHost } from '../shell/surface-host';
 import { renderLibrary } from './library-screen';
-import { chooseLibrary, reconnectLibrary, resolveLibrary } from './resolve-library';
+import { chooseLibrary, lostLibrary, reconnectLibrary, resolveLibrary } from './resolve-library';
 import type { CurableResolution, LibraryResolution } from './resolve-library';
+import type { LibrarySource } from './library-source';
 import { requestPersistentIndex } from './root-handle-store';
 import { displayScanProgress } from './scan-progress';
 import { scanLibrary } from './scan-library';
-import type { Library } from './scan-library';
+import type { Library, ReportProgress } from './scan-library';
 
 export async function runLibraryStep(host: SurfaceHost): Promise<void> {
   requestPersistentIndex();
@@ -20,19 +21,32 @@ export async function runLibraryStep(host: SurfaceHost): Promise<void> {
 
 function present(host: SurfaceHost, resolution: LibraryResolution): void {
   if (resolution.state === 'healthy') {
-    void rescan(host, resolution.root);
+    void rescan(host, resolution.source);
     return;
   }
   const screen = renderLibrary(resolution.state, () => void cure(host, resolution));
   host.show(screen);
 }
 
-async function rescan(host: SurfaceHost, root: FileSystemDirectoryHandle): Promise<void> {
+async function rescan(host: SurfaceHost, source: LibrarySource): Promise<void> {
   const display = displayScanProgress(host);
-  const library = await scanLibrary(root, display.report);
+  const library = await scan(source, display.report);
   display.stop();
+  if (!library) {
+    present(host, lostLibrary());
+    return;
+  }
   const calibration = await loadCalibration();
   presentLibrary(host, library, calibration);
+}
+
+// A library that goes mid-scan is a library to pick again, not a failed launch.
+async function scan(source: LibrarySource, report: ReportProgress): Promise<Library | null> {
+  try {
+    return await scanLibrary(source, report);
+  } catch {
+    return null;
+  }
 }
 
 // Levels the index has never held are levels the user has never set, so first

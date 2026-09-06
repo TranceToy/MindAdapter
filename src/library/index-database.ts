@@ -4,10 +4,17 @@ const DATABASE_VERSION = 2;
 export const LIBRARY_STORE = 'library';
 export const CLIP_STORE = 'clips';
 
-export function openIndex(): Promise<IDBDatabase> {
-  const opening = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
-  opening.onupgradeneeded = () => addMissingStores(opening.result);
-  return settled(opening);
+// The index is expendable by design, and a browser that refuses it — private
+// window, blocked site data, no IndexedDB at all — costs a measurement pass and
+// a calibration, never content. So every read of it may come back with nothing.
+export async function openIndex(): Promise<IDBDatabase | null> {
+  try {
+    const opening = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+    opening.onupgradeneeded = () => addMissingStores(opening.result);
+    return await settled(opening);
+  } catch {
+    return null;
+  }
 }
 
 export function settled<T>(request: IDBRequest<T>): Promise<T> {

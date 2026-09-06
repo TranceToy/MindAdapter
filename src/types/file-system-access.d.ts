@@ -10,11 +10,13 @@ interface DirectoryPickerOptions {
   startIn?: FileSystemHandle | string;
 }
 
+// Optional throughout: the app runs on browsers that have none of this, so
+// every call site has to ask before it reaches for one.
 interface FileSystemHandle {
-  queryPermission(descriptor?: FileSystemHandlePermissionDescriptor): Promise<PermissionState>;
-  requestPermission(descriptor?: FileSystemHandlePermissionDescriptor): Promise<PermissionState>;
+  queryPermission?(descriptor?: FileSystemHandlePermissionDescriptor): Promise<PermissionState>;
+  requestPermission?(descriptor?: FileSystemHandlePermissionDescriptor): Promise<PermissionState>;
 }
 
 interface Window {
-  showDirectoryPicker(options?: DirectoryPickerOptions): Promise<FileSystemDirectoryHandle>;
+  showDirectoryPicker?(options?: DirectoryPickerOptions): Promise<FileSystemDirectoryHandle>;
 }

@@ -15,13 +15,16 @@ export function whenInterrupted(context: AudioContext, interrupt: Interrupt): ()
     interrupt();
   }
 
+  // A browser that exposes no devices reports no device changes, which costs
+  // the third signal and leaves the other two watching.
+  const devices = navigator.mediaDevices ?? null;
   document.addEventListener('visibilitychange', watchVisibility);
   context.addEventListener('statechange', watchState);
-  navigator.mediaDevices.addEventListener('devicechange', interrupt);
+  devices?.addEventListener('devicechange', interrupt);
 
   return () => {
     document.removeEventListener('visibilitychange', watchVisibility);
     context.removeEventListener('statechange', watchState);
-    navigator.mediaDevices.removeEventListener('devicechange', interrupt);
+    devices?.removeEventListener('devicechange', interrupt);
   };
 }

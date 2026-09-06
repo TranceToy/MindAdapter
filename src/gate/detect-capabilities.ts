@@ -1,8 +1,10 @@
+import { hasAudio, hasDirectoryInput, hasDirectoryPicker } from '../shell/platform';
 import type { Capabilities } from './diagnose';
 
 export function detectCapabilities(): Capabilities {
   return {
-    fileAccess: typeof window.showDirectoryPicker === 'function',
-    installed: matchMedia('(display-mode: standalone)').matches,
+    audio: hasAudio(),
+    directoryPicker: hasDirectoryPicker(),
+    directoryInput: hasDirectoryInput(),
   };
 }

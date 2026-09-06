@@ -3,6 +3,7 @@ import type { Library } from '../library/scan-library';
 import type { ScriptEntry } from '../script/validate-script';
 import { wordTimes } from '../script/word-times';
 import type { SurfaceHost } from '../shell/surface-host';
+import { whenEscaped } from './escape-exit';
 import { leaveFullscreen, whenFullscreenLeft } from './fullscreen';
 import { createImageField } from './image-field';
 import { runImageLayer } from './image-layer';
@@ -10,7 +11,7 @@ import type { ImageLayer } from './image-layer';
 import { startSessionAudio } from './session-audio';
 import type { SessionAudio } from './session-audio';
 import { anchorClock } from './session-clock';
-import { FULLSCREEN_REFUSED } from './session-copy';
+import { AUDIO_REFUSED } from './session-copy';
 import { runPause } from './session-pause';
 import type { PausedSession, SessionPause } from './session-pause';
 import { renderStage } from './session-screen';
@@ -68,7 +69,7 @@ async function startSession(
 ): Promise<void> {
   const entry = await enterSession();
   if (!entry) {
-    screen.fail(FULLSCREEN_REFUSED);
+    screen.fail(AUDIO_REFUSED);
     return;
   }
   runSession(host, script, library, calibration, entry, leave);
@@ -129,10 +130,17 @@ function runSession(
     wake: entry.wake,
   };
   session.pause = runPause(interruptible, host, () => endSession(session));
-  session.unwatch = whenFullscreenLeft(() => stopSession(session));
+  session.unwatch = watchExit(entry, () => stopSession(session));
   // Selection renders now, behind the opaque stage, so leaving the session is a
   // single synchronous dismissal on the frame the exit gesture arrives.
   leave();
+}
+
+// The same gesture either way: the key that leaves fullscreen where there is
+// fullscreen, and the key itself where there is none.
+function watchExit(entry: SessionEntry, leave: LeaveSession): () => void {
+  if (entry.fullscreen) return whenFullscreenLeft(leave);
+  return whenEscaped(leave);
 }
 
 // A fullscreen loss over the overlay is the same ending the overlay's own End

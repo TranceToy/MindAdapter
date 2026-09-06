@@ -1,3 +1,5 @@
+import type { FileSource } from './library-source';
+
 const DECODE_SAMPLE_RATE = 44100;
 
 export function createDecoder(): OfflineAudioContext {
@@ -6,7 +8,7 @@ export function createDecoder(): OfflineAudioContext {
 
 export async function decodeClip(
   context: BaseAudioContext,
-  handle: FileSystemFileHandle,
+  handle: FileSource,
 ): Promise<AudioBuffer | null> {
   try {
     const file = await handle.getFile();

@@ -1,9 +1,10 @@
 import { isAsset } from './asset-allowlist';
 import type { AssetKind } from './asset-allowlist';
+import type { FileSource } from './library-source';
 
 export type LibraryFile = {
   path: string;
-  handle: FileSystemFileHandle;
+  handle: FileSource;
   size: number;
   lastModified: number;
 };
@@ -18,7 +19,8 @@ export async function walkSection(
   section: string,
   kind: AssetKind,
 ): Promise<Pool[]> {
-  const container = await root.getDirectoryHandle(section);
+  const container = await openSection(root, section);
+  if (!container) return [];
   const pools: Pool[] = [];
   for await (const [tag, handle] of container.entries()) {
     if (handle.kind !== 'directory') continue;
@@ -29,6 +31,19 @@ export async function walkSection(
     pools.push(pool);
   }
   return pools;
+}
+
+// A section the library has not got is a layer with no pools, which the scripts
+// that ask for one already report as a finding. It is not a reason to stop.
+async function openSection(
+  root: FileSystemDirectoryHandle,
+  section: string,
+): Promise<FileSystemDirectoryHandle | null> {
+  try {
+    return await root.getDirectoryHandle(section);
+  } catch {
+    return null;
+  }
 }
 
 async function collectFiles(
