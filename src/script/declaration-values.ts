@@ -20,6 +20,11 @@ export const PACE_HIGH = 240;
 // passes a point exactly as often.
 export const RATE_LOW = 0.5;
 export const RATE_HIGH = 12;
+// Two spirals over one photograph pass a point as often as one turning at the
+// sum of their rates, so what a pair may turn between them is what one may turn
+// alone. A third would leave each of them too little of that to read as turning,
+// and would knot the centre they all end at.
+export const SPIRALS_HIGH = 2;
 export const DEPTH_LOW = 0;
 export const DEPTH_HIGH = 1;
 // One pass out and back at the low bound is 0.1 Hz, a quarter of what the
@@ -35,7 +40,7 @@ const PACE_NUMBER = new RegExp(`^${NUMBER}$`);
 // A rate, a rate over a still depth, or a rate over a depth that swells between
 // two bounds and takes so many seconds to travel out and back.
 const SPIRAL_VALUE = new RegExp(`^(-?${NUMBER})(?:/(${NUMBER})(?:-(${NUMBER})/(${NUMBER}))?)?$`);
-const TAG_SEPARATOR = ',';
+const LIST_SEPARATOR = ',';
 
 export type BedPair = {
   carrier: number;
@@ -82,9 +87,23 @@ export type Spiral = {
   depth: Depth;
 };
 
-// Empty is the author asking for no spiral, which reads the same as malformed
-// here and is told apart from it where the findings are written.
-export function readSpiral(value: string): Spiral | null {
+// Empty is the author asking for no spiral, and a comma is the author asking
+// for two: what the declaration holds is a list, of no spirals or of however
+// many were written, and a list one entry of which is malformed is malformed
+// entire.
+export function readSpirals(value: string): Spiral[] | null {
+  const declared = value.trim();
+  if (declared === '') return [];
+  const spirals: Spiral[] = [];
+  for (const part of declared.split(LIST_SEPARATOR)) {
+    const spiral = readSpiral(part.trim());
+    if (!spiral) return null;
+    spirals.push(spiral);
+  }
+  return spirals;
+}
+
+function readSpiral(value: string): Spiral | null {
   const declared = SPIRAL_VALUE.exec(value);
   if (!declared) return null;
   const rate = Number(declared[1]);
@@ -111,7 +130,7 @@ function stillDepth(depth: number): Depth {
 
 export function readTagList(value: string): string[] {
   const tags: string[] = [];
-  for (const part of value.split(TAG_SEPARATOR)) {
+  for (const part of value.split(LIST_SEPARATOR)) {
     const tag = part.trim();
     if (tag) tags.push(tag);
   }

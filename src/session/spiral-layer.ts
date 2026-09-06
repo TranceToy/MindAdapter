@@ -19,12 +19,12 @@ export function runSpiralLayer(
 
   function tick(): void {
     frame = requestAnimationFrame(tick);
-    const phase = spiralAt(turns, elapsed());
-    if (phase) field.turn(phase);
+    const phases = spiralAt(turns, elapsed());
+    if (phases.length > 0) field.turn(phases);
     else field.clear();
   }
 
-  // Where a session ends the spiral stands still: the hold is a frame going
+  // Where a session ends the spirals stand still: the hold is a frame going
   // quiet, and a layer still turning over it would be the one thing in it that
   // moves.
   function stop(): void {

@@ -233,10 +233,12 @@ body {
 }
 
 /* Between the photograph and the word: the depth a script declares is the whole
-   of the blend, so the layer is white geometry at that opacity and no filter,
+   of the blend, so a spiral is white geometry at that opacity and no filter,
    scrim or blend mode of its own. The box holds still over the whole screen and
    the arms turn inside it, so the clip is the screen edge at every angle and
-   nothing about the turn reflows the frame. */
+   nothing about the turn reflows the frame. Two spirals share the box and turn
+   independently in it, each at its own depth, so the opacity is the arms' and
+   the arms of a spiral that is not turning are taken out of the paint. */
 .spiral {
   position: absolute;
   inset: 0;
@@ -245,10 +247,18 @@ body {
   pointer-events: none;
 }
 
+/* Stacked rather than laid out, so a second set turns over the first instead of
+   under it, and the box is the screen for both. */
 .spiral__arms {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.spiral__arms[hidden] {
+  display: none;
 }
 
 /* Untouched and at full brightness: no dim, no scrim, no vignette. Legibility

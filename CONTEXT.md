@@ -26,7 +26,9 @@ _Avoid_: track, channel, stream
 **Spiral**:
 The turning geometry between the imagery and the words, drawn by the app rather
 than taken from the library. It is the only layer a session can run without: a
-script that declares no rate for it shows none at all.
+script that declares no rate for it shows none at all. A script may declare two,
+which turn at once and keep their own angles by the order they were written in;
+two whose rates have opposite signs turn against each other.
 _Avoid_: vortex, wheel, overlay, animation
 
 **Rate**:
@@ -34,7 +36,9 @@ How fast the spiral turns, in turns per minute — the spiral's word for it, as
 pace is the word layer's. A script declares it in its head and on any segment
 that should turn at a rate of its own, and it is never the user's to adjust
 during a session. A rate below zero turns the spiral the other way round: how
-fast it turns is bounded, which way it turns is not.
+fast it turns is bounded, which way it turns is not. What two spirals turn
+between them is bounded as one alone is, since a point is passed as often either
+way round.
 _Avoid_: speed, rpm, spin, pace (which belongs to the word layer)
 
 **Depth**:

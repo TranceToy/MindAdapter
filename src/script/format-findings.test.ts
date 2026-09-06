@@ -113,6 +113,11 @@ describe('formatFindings', () => {
     expect(findings).toEqual([]);
   });
 
+  it('accepts a pair of spirals turning against each other', () => {
+    const findings = findingsOf('spiral: 3, -2/0.08\n\n# ocean\n\nOnly this.\n');
+    expect(findings).toEqual([]);
+  });
+
   it('accepts an empty spiral value as the way to stop it', () => {
     const findings = findingsOf('spiral: 3\n\n# ocean\nspiral:\n\nOnly this.\n');
     expect(findings).toEqual([]);
@@ -130,6 +135,22 @@ describe('formatFindings', () => {
     expect(messages).toEqual([
       'spiral 3/0.05-0.3 is not a rate, a rate/depth pair, or a rate/from-to/seconds swell',
     ]);
+  });
+
+  it('rejects a third spiral rather than turning two of the three', () => {
+    const messages = messagesOf('spiral: 2, -2, 1\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spiral names 3 spirals, and a session turns 2 at most']);
+  });
+
+  // Each of them is inside the bounds; what they turn between them is not.
+  it('rejects a pair that turns more in the frame than one spiral may', () => {
+    const messages = messagesOf('spiral: 8, -6\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spirals turning 14 turns per minute between them, past 12']);
+  });
+
+  it('leaves a pair that meets the bound exactly alone', () => {
+    const findings = findingsOf('spiral: 8.1, -3.9\n\n# ocean\n\nOnly this.\n');
+    expect(findings).toEqual([]);
   });
 
   it('rejects a spiral rate outside its range rather than clamping it', () => {

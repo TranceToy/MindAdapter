@@ -9,7 +9,7 @@ function segment(words: string[]): Segment {
     bed: { carrier: 150, beat: 6 },
     voice: [],
     pace: DEFAULT_PACE,
-    spiral: null,
+    spirals: [],
     words,
   };
 }

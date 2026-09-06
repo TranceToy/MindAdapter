@@ -18,7 +18,7 @@ function segment(tags: string[], words: number): Segment {
     bed: { carrier: 150, beat: 6 },
     voice: [],
     pace: DEFAULT_PACE,
-    spiral: null,
+    spirals: [],
     words: new Array(words).fill('down'),
   };
 }

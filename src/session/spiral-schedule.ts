@@ -8,14 +8,16 @@ const SECONDS_PER_MINUTE = 60;
 const DEGREES_PER_TURN = 360;
 const FULL_SWELL = Math.PI * 2;
 
-// One stretch turned at a single rate, or not turned at all: the second it
-// opens on and the spiral in force from there.
+const NOTHING_TURNING: SpiralPhase[] = [];
+
+// One stretch turned by a single set of spirals, or by none at all: the second
+// it opens on and the spirals in force from there.
 export type SpiralTurn = {
   at: number;
-  spiral: Spiral | null;
+  spirals: Spiral[];
 };
 
-// Where the spiral stands: how far it has come round since the session began,
+// Where one spiral stands: how far it has come round since the session began,
 // and how much of the photograph it takes at this second.
 export type SpiralPhase = {
   angle: number;
@@ -27,41 +29,57 @@ export type SpiralPhase = {
 // first word of the segment that declares it, as a bed pair does.
 export function spiralTurns(segments: Segment[]): SpiralTurn[] {
   const times = wordTimes(segments);
-  const opening = segments[0]?.spiral ?? null;
-  const turns: SpiralTurn[] = [{ at: 0, spiral: opening }];
+  const opening = segments[0]?.spirals ?? [];
+  const turns: SpiralTurn[] = [{ at: 0, spirals: opening }];
   let running = opening;
   let words = 0;
   for (const segment of segments) {
-    if (!sameSpiral(segment.spiral, running)) turns.push(turnAt(times, words, segment.spiral));
-    running = segment.spiral;
+    if (!sameSpirals(segment.spirals, running)) turns.push(turnAt(times, words, segment.spirals));
+    running = segment.spirals;
     words += segment.words.length;
   }
   return turns;
 }
 
-// The angle is carried across the turns rather than measured from the last one,
-// so a rate change is a change of speed and never a jump, and a stretch that
-// declares no spiral leaves the angle where it stopped for the next one to
-// take up.
-export function spiralAt(turns: SpiralTurn[], elapsed: number): SpiralPhase | null {
-  let angle = 0;
+// The angles are carried across the turns rather than measured from the last
+// one, so a rate change is a change of speed and never a jump, and a stretch
+// that turns fewer spirals leaves the angles where it stopped them for the next
+// one to take up.
+export function spiralAt(turns: SpiralTurn[], elapsed: number): SpiralPhase[] {
+  const angles: number[] = [];
   let held: SpiralTurn | null = null;
   for (const turn of turns) {
     if (turn.at > elapsed) break;
-    if (held) angle += sweep(held.spiral, turn.at - held.at);
+    if (held) sweepInto(angles, held.spirals, turn.at - held.at);
     held = turn;
   }
-  if (!held?.spiral) return null;
-  angle += sweep(held.spiral, elapsed - held.at);
-  const depth = depthAt(held.spiral.depth, elapsed);
-  return { angle, depth };
+  if (!held) return NOTHING_TURNING;
+  sweepInto(angles, held.spirals, elapsed - held.at);
+  return phasesOf(held.spirals, angles, elapsed);
+}
+
+// Each spiral is carried by its place in the declaration, which is what makes a
+// pair that loses one and takes it up again take it up where it stopped.
+function sweepInto(angles: number[], spirals: Spiral[], seconds: number): void {
+  spirals.forEach((spiral, place) => {
+    const turned = angles[place] ?? 0;
+    angles[place] = turned + sweep(spiral, seconds);
+  });
+}
+
+function phasesOf(spirals: Spiral[], angles: number[], elapsed: number): SpiralPhase[] {
+  return spirals.map((spiral, place) => {
+    const angle = angles[place] ?? 0;
+    const depth = depthAt(spiral.depth, elapsed);
+    return { angle, depth };
+  });
 }
 
 // A rate below zero sweeps backwards, which is why the angle is signed and
 // nothing else here reads it: a reversal is a rate passing through zero, not a
-// state the schedule holds.
-function sweep(spiral: Spiral | null, seconds: number): number {
-  if (!spiral) return 0;
+// state the schedule holds, and a pair turning against each other is one rate
+// of each sign.
+function sweep(spiral: Spiral, seconds: number): number {
   return (spiral.rate * DEGREES_PER_TURN * seconds) / SECONDS_PER_MINUTE;
 }
 
@@ -75,12 +93,17 @@ function depthAt(depth: Depth, elapsed: number): number {
   return depth.from + (depth.to - depth.from) * swept;
 }
 
-function turnAt(times: WordTimes, word: number, spiral: Spiral | null): SpiralTurn {
-  return { at: onsetSeconds(times, word), spiral };
+function turnAt(times: WordTimes, word: number, spirals: Spiral[]): SpiralTurn {
+  return { at: onsetSeconds(times, word), spirals };
 }
 
-function sameSpiral(left: Spiral | null, right: Spiral | null): boolean {
-  if (!left || !right) return left === right;
+function sameSpirals(left: Spiral[], right: Spiral[]): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((spiral, place) => sameSpiral(spiral, right[place]));
+}
+
+function sameSpiral(left: Spiral, right: Spiral | undefined): boolean {
+  if (!right) return false;
   return left.rate === right.rate && sameDepth(left.depth, right.depth);
 }
 

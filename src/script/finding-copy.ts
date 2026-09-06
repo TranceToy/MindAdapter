@@ -9,6 +9,7 @@ import {
   PACE_LOW,
   RATE_HIGH,
   RATE_LOW,
+  SPIRALS_HIGH,
   SWELL_HIGH,
   SWELL_LOW,
 } from './declaration-values';
@@ -49,6 +50,14 @@ export function paceOutOfRangeLine(pace: number): string {
 
 export function malformedSpiralLine(value: string): string {
   return `spiral ${value} is not a rate, a rate/depth pair, or a rate/from-to/seconds swell`;
+}
+
+export function tooManySpiralsLine(count: number): string {
+  return `spiral names ${count} spirals, and a session turns ${SPIRALS_HIGH} at most`;
+}
+
+export function turningOutOfRangeLine(turning: number): string {
+  return `spirals turning ${turning} turns per minute between them, past ${RATE_HIGH}`;
 }
 
 export function rateOutOfRangeLine(rate: number): string {

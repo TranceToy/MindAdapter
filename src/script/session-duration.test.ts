@@ -9,7 +9,7 @@ function segment(words: number, pace = DEFAULT_PACE): Segment {
     bed: DEFAULT_BED,
     voice: [],
     pace,
-    spiral: null,
+    spirals: [],
     words: new Array(words).fill('down'),
   };
 }

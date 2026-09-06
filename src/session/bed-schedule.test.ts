@@ -11,7 +11,7 @@ const DEEPEST: BedPair = { carrier: 90, beat: 2 };
 const BEAT_SECONDS = beatSeconds(DEFAULT_PACE);
 
 function segment(bed: BedPair, words: number, pace = DEFAULT_PACE): Segment {
-  return { tags: [], bed, voice: [], pace, spiral: null, words: new Array(words).fill('down') };
+  return { tags: [], bed, voice: [], pace, spirals: [], words: new Array(words).fill('down') };
 }
 
 describe('bedGlides', () => {

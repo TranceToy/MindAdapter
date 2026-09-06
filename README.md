@@ -22,7 +22,7 @@ name without its extension is the name the selection screen lists.
 bed: 141.5/7.83
 voice: obedience
 pace: 200
-spiral: 3
+spiral: 3, -1/0.06
 
 # ocean, deep water
 
@@ -70,7 +70,7 @@ a finding, as is the same key twice in one block.
 | `bed` | `carrier/beat` in Hz, decimals allowed | `150/6` |
 | `voice` | comma-separated clip pool tags, or empty for silence | none |
 | `pace` | words per minute, decimals allowed | `220` |
-| `spiral` | `rate`, `rate/depth` or `rate/from-to/seconds`, or empty for none | no spiral |
+| `spiral` | one or two spirals: `rate`, `rate/depth`, `rate/from-to/seconds`, or empty | no spiral |
 
 `bed`, `voice`, `pace` and `spiral` are declared in the head for the whole
 session and again on any segment that should differ, and each holds from there
@@ -114,6 +114,13 @@ reversal turns back from where the spiral had got to rather than from the top.
 angle up from there. It is the one layer a script may leave out entirely, and
 it stands still for the hold the session ends in.
 
+Two spirals separated by a comma turn at once, one over the other, each with its
+own rate and depth — and with one of the rates below zero they turn against each
+other. Each keeps its own angle by its place in the declaration, so a segment
+that drops the second and a later one that takes it up again take it up where it
+stopped. What the two turn between them is bounded by what one may turn alone,
+since a point is passed as often either way round.
+
 A depth written as two bounds and a number of seconds swells rather than stands:
 `0.1-0.4/40` travels from a tenth of the frame to four tenths and back every
 forty seconds. The swell is measured from the start of the session rather than
@@ -139,6 +146,9 @@ its range would play a session the author did not write.
   0.4 Hz of luminance change, just under what a new photograph every eight words
   makes, and the low swell bound holds one pass out and back at a quarter of
   that
+- more than two spirals in one declaration, or a pair turning more than 12 turns
+  per minute between them — two spirals pass a point as often as one turning at
+  the sum of their rates
 - an unknown declaration key, or one declared twice in a single block
 - prose in the head, or prose in a segment without the blank line before it
 - no segment header anywhere, or no words left once punctuation is stripped

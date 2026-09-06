@@ -11,15 +11,16 @@ import {
   RATE_HIGH,
   RATE_LOW,
   SPIRAL_KEY,
+  SPIRALS_HIGH,
   SWELL_HIGH,
   SWELL_LOW,
   VOICE_KEY,
   readBedPair,
   readPace,
-  readSpiral,
+  readSpirals,
   swells,
 } from './declaration-values';
-import type { Depth } from './declaration-values';
+import type { Depth, Spiral } from './declaration-values';
 import { fileFinding } from './finding';
 import type { Finding } from './finding';
 import {
@@ -37,12 +38,15 @@ import {
   paceOutOfRangeLine,
   rateOutOfRangeLine,
   swellOutOfRangeLine,
+  tooManySpiralsLine,
+  turningOutOfRangeLine,
   unknownKeyLine,
 } from './finding-copy';
 import { countWords } from './parse-script';
 import type { BlockEntry, DeclarationBlock, DeclarationEntry, ParsedScript } from './parse-script';
 
 const WHOLE_FILE_LINE = 1;
+const TURNING_PLACES = 3;
 
 export function formatFindings(script: ParsedScript): Finding[] {
   const findings = blockFindings(script.head, PROSE_IN_HEAD);
@@ -117,19 +121,48 @@ function paceFindings(entry: DeclarationEntry): Finding[] {
 }
 
 // An empty value is the author asking for no spiral, the way an empty voice
-// list asks for silence, so it is read before the value is read at all.
+// list asks for silence, and it comes back as a list of none rather than as a
+// value that would not read.
 function spiralFindings(entry: DeclarationEntry): Finding[] {
-  if (entry.value === '') return [];
-  const spiral = readSpiral(entry.value);
-  if (!spiral) {
+  const spirals = readSpirals(entry.value);
+  if (!spirals) {
     const message = malformedSpiralLine(entry.value);
     const malformed = fileFinding(entry.line, message);
     return [malformed];
   }
-  const findings = rateFindings(entry, spiral.rate);
-  const depth = depthFindings(entry, spiral.depth);
-  findings.push(...depth);
+  const findings = countFindings(entry, spirals);
+  for (const spiral of spirals) {
+    findings.push(...rateFindings(entry, spiral.rate));
+    findings.push(...depthFindings(entry, spiral.depth));
+  }
+  findings.push(...turningFindings(entry, spirals));
   return findings;
+}
+
+function countFindings(entry: DeclarationEntry, spirals: Spiral[]): Finding[] {
+  if (spirals.length <= SPIRALS_HIGH) return [];
+  const message = tooManySpiralsLine(spirals.length);
+  const tooMany = fileFinding(entry.line, message);
+  return [tooMany];
+}
+
+// What a pair turns between them is bounded by what one may turn alone, since a
+// point is passed as often either way. The sum is rounded because two decimals
+// that meet the bound exactly can land a hair past it, and because the number
+// the finding names should be the one the author wrote.
+function turningFindings(entry: DeclarationEntry, spirals: Spiral[]): Finding[] {
+  if (spirals.length < 2) return [];
+  const turning = totalTurning(spirals);
+  if (turning <= RATE_HIGH) return [];
+  const message = turningOutOfRangeLine(turning);
+  const outside = fileFinding(entry.line, message);
+  return [outside];
+}
+
+function totalTurning(spirals: Spiral[]): number {
+  let turning = 0;
+  for (const spiral of spirals) turning += Math.abs(spiral.rate);
+  return Number(turning.toFixed(TURNING_PLACES));
 }
 
 // How fast it turns is bounded and which way it turns is not, so the bounds are
