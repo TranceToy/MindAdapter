@@ -35,7 +35,7 @@ _Avoid_: outro screen, end screen, session summary, results
 
 **Gap**:
 The silence between one clip ending and the next beginning — drawn at random
-between ten and twenty seconds, and the only thing that governs how often a
+between seven and fifteen seconds, and the only thing that governs how often a
 suggestion is heard. Clips never overlap, because the gap is measured from the
 end of one to the start of the next.
 _Avoid_: interval, delay, cooldown, frequency
