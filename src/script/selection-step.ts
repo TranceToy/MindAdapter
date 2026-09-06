@@ -8,7 +8,7 @@ import type { ScriptEntry } from './validate-script';
 
 export function showSelection(host: SurfaceHost, library: Library, relink: RelinkLibrary): void {
   const back = () => showSelection(host, library, relink);
-  const start = (script: ScriptEntry) => showStart(host, script, library.images, back);
+  const start = (script: ScriptEntry) => showStart(host, script, library, back);
   const open = (script: ScriptEntry) => showFindings(host, library, relink, script);
   const screen = renderSelection(library.scripts, start, open, relink);
   host.show(screen);

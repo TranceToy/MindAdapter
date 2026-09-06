@@ -17,7 +17,21 @@ export const NATURAL_END_SECONDS = 10;
 // by someone already feeling.
 export const EXIT_SECONDS = 0.3;
 
+// Headroom by construction. An oscillator is a full-scale sine, so an unscaled
+// bed leaves the output no room at all and a suggestion summing onto it drives
+// the mix past the ceiling, where the tone turns to buzz and takes the voice
+// with it. The two levels together cannot reach full scale: a clip is capped at
+// a 0.99 peak by its own scan, and 0.6 + 0.3 x 0.99 leaves the ending fade
+// something to fade.
+export const BED_LEVEL = 0.6;
+
+// A suggestion belongs under the bed rather than over it: near-continuous
+// underlay, not punctuation, and a voice at the level of the words it plays
+// beneath is one the user listens to instead of hears.
+export const VOICE_LEVEL = 0.3;
+
 export type SessionAudio = {
+  voice: GainNode;
   end: () => void;
   leave: () => void;
 };
@@ -30,14 +44,21 @@ export function startSessionAudio(
   const graph = createAudioGraph(context);
   warnIfMono(context.destination);
   const bed = runBed(context, graph.merger, bedGlides(segments), from);
+  setLevels(graph, from);
   leadIn(graph.master.gain, from);
   return stops(context, graph, bed);
 }
 
-// masterGain rests at 1 and the lead-in is the one place it climbs. bedGain and
-// voiceGain are not written at all: they rest at their default until calibration
-// persists a pair, and the bed's is never touched again once written — no
-// ducking, ever.
+// Written once at the start and never again, the bed's least of all: a bed
+// dipping under every clip would make itself an event and train the user to
+// anticipate suggestions — no ducking, ever. These are the levels the
+// calibration step will come to own.
+function setLevels(graph: AudioGraph, from: number): void {
+  graph.bed.gain.setValueAtTime(BED_LEVEL, from);
+  graph.voice.gain.setValueAtTime(VOICE_LEVEL, from);
+}
+
+// masterGain rests at 1 and the lead-in is the one place it climbs.
 function leadIn(master: AudioParam, from: number): void {
   master.setValueAtTime(0, from);
   master.linearRampToValueAtTime(1, from + LEAD_IN_SECONDS);
@@ -61,7 +82,7 @@ function stops(context: AudioContext, graph: AudioGraph, bed: BedLayer): Session
     closeAfter(context, done - context.currentTime);
   }
 
-  return { end, leave };
+  return { voice: graph.voice, end, leave };
 }
 
 const SECOND = 1000;

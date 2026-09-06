@@ -1,4 +1,4 @@
-import type { Pool } from '../library/walk-library';
+import type { Library } from '../library/scan-library';
 import type { ScriptEntry } from '../script/validate-script';
 import type { SurfaceHost } from '../shell/surface-host';
 import { whenFullscreenLeft } from './fullscreen';
@@ -15,6 +15,8 @@ import { enterSession } from './start-activation';
 import type { SessionEntry } from './start-activation';
 import { renderStart } from './start-screen';
 import type { StartScreen } from './start-screen';
+import { runVoiceLayer } from './voice-layer';
+import type { VoiceLayer } from './voice-layer';
 import { createWordField, followViewport } from './word-field';
 import { runWordLayer } from './word-layer';
 import type { WordLayer } from './word-layer';
@@ -26,6 +28,7 @@ type Session = {
   audio: SessionAudio;
   words: WordLayer;
   imagery: ImageLayer;
+  voice: VoiceLayer;
   dismiss: () => void;
   unfollow: () => void;
   unwatch: () => void;
@@ -36,11 +39,11 @@ const NOTHING = () => {};
 export function showStart(
   host: SurfaceHost,
   script: ScriptEntry,
-  pools: Pool[],
+  library: Library,
   leave: LeaveSession,
 ): void {
   function begin(): void {
-    void startSession(host, script, pools, screen, leave);
+    void startSession(host, script, library, screen, leave);
   }
 
   const screen = renderStart(script, begin, leave);
@@ -50,7 +53,7 @@ export function showStart(
 async function startSession(
   host: SurfaceHost,
   script: ScriptEntry,
-  pools: Pool[],
+  library: Library,
   screen: StartScreen,
   leave: LeaveSession,
 ): Promise<void> {
@@ -59,13 +62,13 @@ async function startSession(
     screen.fail(FULLSCREEN_REFUSED);
     return;
   }
-  runSession(host, script, pools, entry, leave);
+  runSession(host, script, library, entry, leave);
 }
 
 function runSession(
   host: SurfaceHost,
   script: ScriptEntry,
-  pools: Pool[],
+  library: Library,
   entry: SessionEntry,
   leave: LeaveSession,
 ): void {
@@ -81,12 +84,21 @@ function runSession(
   const audio = startSessionAudio(entry.context, script.segments, startedAt);
   const elapsed = anchorClock(entry.context, startedAt);
   const wordLayer = runWordLayer(field, words.length, elapsed, audio.end);
-  const imageLayer = runImageLayer(imagery, script.segments, pools, elapsed);
+  const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed);
+  const voiceLayer = runVoiceLayer(
+    entry.context,
+    audio.voice,
+    script.segments,
+    library.clips,
+    elapsed,
+    startedAt,
+  );
   const session: Session = {
     entry,
     audio,
     words: wordLayer,
     imagery: imageLayer,
+    voice: voiceLayer,
     dismiss,
     unfollow,
     unwatch: NOTHING,
@@ -104,5 +116,6 @@ function stopSession(session: Session): void {
   session.unfollow();
   session.words.stop();
   session.imagery.stop();
+  session.voice.stop();
   session.audio.leave();
 }

@@ -5,13 +5,13 @@ export function createDecoder(): OfflineAudioContext {
 }
 
 export async function decodeClip(
-  decoder: OfflineAudioContext,
+  context: BaseAudioContext,
   handle: FileSystemFileHandle,
 ): Promise<AudioBuffer | null> {
   try {
     const file = await handle.getFile();
     const bytes = await file.arrayBuffer();
-    return await decoder.decodeAudioData(bytes);
+    return await context.decodeAudioData(bytes);
   } catch {
     return null;
   }
