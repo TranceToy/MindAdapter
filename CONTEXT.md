@@ -23,6 +23,14 @@ spiral. Layers share a clock and a start gesture; none can play alone. Four of
 them are in every session; the spiral is the one a script may leave out.
 _Avoid_: track, channel, stream
 
+**Flash budget**:
+The ceiling on how fast anything may change the frame's luminance — half a
+hertz, a sixth of the flash threshold — and the share of it each layer spends:
+the whole of it to the imagery, 0.4 Hz to the spiral, 0.1 Hz to the swell, none
+at all to the words, which change a glyph and not the frame. It is spent at
+authoring time: a script over it is refused, and a session never mentions it.
+_Avoid_: flicker limit, strobe threshold, safety margin, photosensitivity warning
+
 **Spiral**:
 The turning geometry between the imagery and the words, drawn by the app rather
 than taken from the library. It is the only layer a session can run without: a

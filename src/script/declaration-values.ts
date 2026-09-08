@@ -8,17 +8,17 @@ export const CARRIER_LOW = 50;
 export const CARRIER_HIGH = 1000;
 export const BEAT_LOW = 0;
 export const BEAT_HIGH = 30;
-// The bounds are the word layer's own: above the high one the eight-word image
-// slot passes half a hertz of full-screen luminance change, and below the low
-// one a word is held so long that the session reads as stopped rather than slow.
+// The high bound is the imagery layer's rather than the word layer's, since the
+// image slot is counted in words: above it the eight-word slot spends more than
+// the flash budget allows. See ADR 0006. Below the low one a word is held so
+// long that the session reads as stopped rather than slow.
 export const PACE_LOW = 40;
 export const PACE_HIGH = 240;
 // A two-armed spiral passes an arm over any one point twice a turn, so the high
-// bound holds that passage at 0.4 Hz — just under the 0.46 Hz the image layer
-// already runs at, and nowhere near the word layer's. Below the low one the
-// turn reads as a still picture rather than a slow one. The bounds are on the
-// number and not the direction: a rate below zero turns the other way and
-// passes a point exactly as often.
+// bound is the spiral's share of the flash budget: 0.4 Hz, a step under the
+// imagery's. See ADR 0006. Below the low one the turn reads as a still picture
+// rather than a slow one. The bounds are on the number and not the direction: a
+// rate below zero turns the other way and passes a point exactly as often.
 export const RATE_LOW = 0.5;
 export const RATE_HIGH = 12;
 // Two spirals over one photograph pass a point as often as one turning at the
@@ -28,10 +28,10 @@ export const RATE_HIGH = 12;
 export const SPIRALS_HIGH = 2;
 export const DEPTH_LOW = 0;
 export const DEPTH_HIGH = 1;
-// One pass out and back at the low bound is 0.1 Hz, a quarter of what the
-// imagery layer already runs at, and it moves part of the depth rather than the
-// whole screen. Below it the depth reads as a pulse rather than a swell; above
-// the high one it never comes round inside a session.
+// The low bound is the swell's share of the flash budget: one pass out and back
+// at 0.1 Hz, a quarter of the spiral's, over part of the depth rather than the
+// whole frame. See ADR 0006. Below it the depth reads as a pulse rather than a
+// swell; above the high one it never comes round inside a session.
 export const SWELL_LOW = 10;
 export const SWELL_HIGH = 600;
 // A bound on the silence rather than on how often a suggestion comes, since a

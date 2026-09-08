@@ -1,5 +1,9 @@
 # A layer the app draws
 
+_The ceiling this decision derives the spiral's rate from is now stated once, as
+the frame's flash budget, in ADR 0006. The derivation below still holds; it is a
+consequence of that budget rather than the place it is decided._
+
 Every layer a session runs came out of the library: the words and structure a
 script declares, the photographs of a pool, the clips of another, and a bed
 generated from two numbers a script names. The spiral is the first that comes

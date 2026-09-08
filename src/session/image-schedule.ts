@@ -2,8 +2,9 @@ import type { LibraryFile, Pool } from '../library/walk-library';
 import type { Segment } from '../script/resolve-script';
 import { bindPools } from './image-pools';
 
-// 0.46 Hz of full-screen luminance change, a factor of eight under the flash
-// threshold the word layer sits so close to.
+// The imagery spends the whole flash budget, since a new photograph is the only
+// change that takes the whole frame at once: eight words to an image is 0.46 Hz
+// at the default pace and 0.5 Hz at the pace ceiling. See ADR 0006.
 export const WORDS_PER_IMAGE = 8;
 
 export type ImageSlot = {
