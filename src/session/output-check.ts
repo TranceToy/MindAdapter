@@ -1,5 +1,3 @@
-import { MONO_OUTPUT_WARNING } from './session-copy';
-
 const STEREO = 2;
 
 // Read wherever the audio path is entered — at session start and again on every
@@ -11,11 +9,32 @@ export function isMono(destination: AudioDestinationNode): boolean {
   return destination.maxChannelCount < STEREO;
 }
 
-// A mono output silently destroys the premise — the ears sum and the
-// interference disappears — but the words, the imagery and the voice all still
-// work, so it warns and proceeds rather than withholding three working layers to
-// protect one.
-export function warnIfMono(destination: AudioDestinationNode): void {
-  if (!isMono(destination)) return;
-  console.warn(MONO_OUTPUT_WARNING);
+// The start screen has no context to read: the session's is not opened until
+// the Start click, and the line has to be said before it. So the question is
+// asked of a context opened and closed for the question alone.
+//
+// The other candidate was calibration, where audio already exists and no second
+// context is needed. It was rejected because calibration runs only until levels
+// are stored: every launch after the first goes library to selection to start
+// without it, and a reading taken there would be the one launch in many that a
+// device was ever asked about. A probe costs a context per visit to the start
+// screen and reads the device as it stands, which is the reading with the
+// shortest way to go stale.
+export function probeMono(): boolean {
+  const context = openProbe();
+  if (!context) return false;
+  const mono = isMono(context.destination);
+  void context.close();
+  return mono;
+}
+
+// A browser that refuses a context here says nothing about the output, and the
+// Start click has its own refusal to report — so an unanswered question is
+// carried as no line rather than as a warning nobody can act on.
+function openProbe(): AudioContext | null {
+  try {
+    return new AudioContext();
+  } catch {
+    return null;
+  }
 }

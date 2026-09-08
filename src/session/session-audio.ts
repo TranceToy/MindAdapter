@@ -8,7 +8,6 @@ import type { BedLayer } from './bed-layer';
 import { bedGlides } from './bed-schedule';
 import { enterRunning, suspendQuietly } from './context-state';
 import { rampGain, riseGain } from './gain-ramp';
-import { warnIfMono } from './output-check';
 
 // The image is held against this one, so the ending is ten seconds of a still
 // frame going quiet rather than a cut.
@@ -40,7 +39,6 @@ export function startSessionAudio(
   from: number,
 ): SessionAudio {
   const graph = createAudioGraph(context);
-  warnIfMono(context.destination);
   const bed = runBed(context, graph.merger, bedGlides(segments), from);
   setLevels(graph, calibration, from);
   enter(graph.master.gain, from);

@@ -2,7 +2,8 @@ import { durationText } from '../script/session-duration';
 import type { ScriptEntry } from '../script/validate-script';
 import { actionHero, dimActionHero, prose, secondary, surface } from '../shell/antechamber';
 import { hasFullscreen } from '../shell/platform';
-import { START_LINE, WINDOWED_SESSION } from './session-copy';
+import { probeMono } from './output-check';
+import { MONO_OUTPUT_WARNING, START_LINE, WINDOWED_SESSION } from './session-copy';
 
 export type BeginSession = () => void;
 
@@ -25,6 +26,8 @@ export function renderStart(
   const parts = [name, duration, start, failure];
   const windowed = renderWindowed();
   if (windowed) parts.push(windowed);
+  const mono = renderMono();
+  if (mono) parts.push(mono);
   const element = surface(parts);
 
   function fail(line: string): void {
@@ -45,6 +48,14 @@ function renderBegin(begin: BeginSession): HTMLElement {
 function renderWindowed(): HTMLElement | null {
   if (hasFullscreen()) return null;
   return prose(WINDOWED_SESSION);
+}
+
+// Said here for the same reason: it changes what the session will be — three
+// layers instead of four — and it is known before the Start rather than only
+// once something interrupts one.
+function renderMono(): HTMLElement | null {
+  if (!probeMono()) return null;
+  return prose(MONO_OUTPUT_WARNING);
 }
 
 function renderFailure(): HTMLElement {

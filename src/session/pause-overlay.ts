@@ -9,8 +9,9 @@ export type EndSession = () => void;
 // keeps nothing, so equal weight would put the irreversible one at the same
 // visual value in front of someone interrupted mid-trance. The overlay says
 // nothing about which of the three triggers fired, and its one conditional line
-// is the mono warning, which earns its place by saying something no ear can
-// infer.
+// is the mono warning. The start screen says it too, before the Start; this one
+// is the second reading, against the device as it stands now, and it is what
+// catches an output changed while the session was running.
 export function renderPause(resume: ResumeSession, end: EndSession, mono: boolean): HTMLElement {
   const lit = actionHero(RESUME_LINE, resume);
   const dim = dimActionHero(END_LINE, end);
