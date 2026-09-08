@@ -1,7 +1,7 @@
 # Writing a script
 
-`README.md` says what a script may contain. This says what to put there. A
-script that parses is not yet a script that works: every finding can be absent
+`script-format.md` says what a script may contain. This says what to put there.
+A script that parses is not yet a script that works: every finding can be absent
 and the session still be shapeless, too fast to sink into, or over before the
 words have done anything.
 

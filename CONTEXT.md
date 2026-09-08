@@ -5,8 +5,7 @@ concurrent layers — paced words, background imagery, spoken suggestion and a
 binaural bed — from content the user owns and authors outside the app, with a
 fifth, the spiral, that turns only where a script asks for it.
 
-The language below is fixed by the wayfinder map at
-`.scratch/adapting-the-mind/map.md` and by `docs/adr/`.
+The language below is fixed by the decisions in `docs/adr/`.
 
 ## Language
 

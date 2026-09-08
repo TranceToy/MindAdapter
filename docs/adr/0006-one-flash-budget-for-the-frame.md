@@ -78,9 +78,9 @@ running the session.
 - ADR 0003 derived the spiral's rate from the imagery's, and ADR 0004 bounded a
   pair by what one spiral may turn. Both readings still hold. The derivation now
   lives here, and those are consequences of it.
-- The README keeps telling the author why each bound sits where it does, in the
-  words the finding uses. That is not a second decision; it is this one, said
-  where the author is already looking.
+- `docs/script-format.md` keeps telling the author why each bound sits where it
+  does, in the words the finding uses. That is not a second decision; it is this
+  one, said where the author is already looking.
 - The budget is kept in two places and shown in neither: the findings, which
   speak to the author before a session exists, and the app's geometry, which
   nobody declares. A layer whose rate the app cannot bound — anything driven by
