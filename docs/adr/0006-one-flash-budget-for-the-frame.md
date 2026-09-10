@@ -20,10 +20,12 @@ step below the one above:
   default pace of 220 words a minute, 0.5 Hz at the pace ceiling of 240. This is
   what `pace` is bounded at 240 for. That bound is the imagery's, not the word
   layer's, because the image slot is counted in words.
-- **The spiral spends 0.4 Hz**, just under: two arms passing a point at 12 turns
-  a minute. A pair spends that between them, since a point is passed as often
-  either way round.
-- **The swell spends 0.1 Hz**, a quarter of the spiral's, and it moves part of
+- **The spiral spends 0.2 Hz**: one arm passing a point at 12 turns a minute. A
+  pair spends that between them, since a point is passed as often either way
+  round. It was 0.4 Hz on two arms; ADR 0008 dropped the second arm and left the
+  rate bound where it was, spending the freed room on the size of each change
+  rather than on more of them.
+- **The swell spends 0.1 Hz**, half the spiral's, and it moves part of
   the depth rather than the whole frame.
 - **The word layer spends none of it.** At 240 words a minute a word changes at
   4 Hz, over the threshold, and it costs nothing: the change is a glyph, not the
@@ -61,7 +63,7 @@ running the session.
 - **One constant in code that the bounds are computed from** — rejected. It is
   what "one place" usually means, and here it would lie. The bounds are not the
   ceiling divided; they are what each layer's own arithmetic — eight words to an
-  image, two arms to a turn, one pass out and back — happens to make near it,
+  image, one arm to a turn, one pass out and back — happens to make near it,
   and a shared constant would have to be walked back through three different
   derivations to arrive at 8, 12 and 10. The numbers stay where they are read.
   What is shared is the reason.

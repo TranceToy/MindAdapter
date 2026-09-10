@@ -14,9 +14,11 @@ export const BEAT_HIGH = 30;
 // long that the session reads as stopped rather than slow.
 export const PACE_LOW = 40;
 export const PACE_HIGH = 240;
-// A two-armed spiral passes an arm over any one point twice a turn, so the high
-// bound is the spiral's share of the flash budget: 0.4 Hz, a step under the
-// imagery's. See ADR 0006. Below the low one the turn reads as a still picture
+// A one-armed spiral passes its arm over any one point once a turn, so the high
+// bound spends less than the spiral's share of the flash budget: 0.2 Hz, a step
+// under the imagery's, and half what the same bound spent on two arms. What the
+// second arm freed is spent on the size of each change rather than on more of
+// them; see ADR 0008. See ADR 0006. Below the low one the turn reads as a still picture
 // rather than a slow one. The bounds are on the number and not the direction: a
 // rate below zero turns the other way and passes a point exactly as often.
 export const RATE_LOW = 0.5;
@@ -29,8 +31,8 @@ export const SPIRALS_HIGH = 2;
 export const DEPTH_LOW = 0;
 export const DEPTH_HIGH = 1;
 // The low bound is the swell's share of the flash budget: one pass out and back
-// at 0.1 Hz, a quarter of the spiral's, over part of the depth rather than the
-// whole frame. See ADR 0006. Below it the depth reads as a pulse rather than a
+// at 0.1 Hz, half the spiral's, over part of the depth rather than the whole
+// frame. See ADR 0006. Below it the depth reads as a pulse rather than a
 // swell; above the high one it never comes round inside a session.
 export const SWELL_LOW = 10;
 export const SWELL_HIGH = 600;

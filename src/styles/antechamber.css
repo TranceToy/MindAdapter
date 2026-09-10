@@ -234,17 +234,17 @@ body {
 }
 
 /* Between the photograph and the word: the depth a script declares is the whole
-   of the blend, so a spiral is white geometry at that opacity and no filter,
-   scrim or blend mode of its own. The box holds still over the whole screen and
-   the arms turn inside it, so the clip is the screen edge at every angle and
-   nothing about the turn reflows the frame. Two spirals share the box and turn
-   independently in it, each at its own depth, so the opacity is the arms' and
-   the arms of a spiral that is not turning are taken out of the paint. */
+   of the blend, so a spiral is black and white geometry at that opacity and no
+   filter, scrim or blend mode of its own. The box holds still over the whole
+   screen and the arms turn inside it, so the clip is the screen edge at every
+   angle and nothing about the turn reflows the frame. Two spirals share the box
+   and turn independently in it, each at its own depth, so the opacity is the
+   arms' and the arms of a spiral that is not turning are taken out of the
+   paint. */
 .spiral {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  color: var(--lit);
   pointer-events: none;
 }
 
@@ -260,6 +260,20 @@ body {
 
 .spiral__arms[hidden] {
   display: none;
+}
+
+/* The arm is a lit band drawn on a wider dark one, so what passes over a point
+   is the whole step from ground to light rather than light over whatever the
+   photograph happens to show there. The depth is still the whole of the blend:
+   at a low one the photograph reads through both bands, and at 1 the spiral is
+   the frame. Where two spirals turn, the upper one's dark band covers the lower
+   at full depth — the pair is read at the depths a script gives them. */
+.spiral__shade {
+  stroke: var(--ground);
+}
+
+.spiral__band {
+  stroke: var(--lit);
 }
 
 /* Untouched and at full brightness: no dim, no scrim, no vignette. Legibility

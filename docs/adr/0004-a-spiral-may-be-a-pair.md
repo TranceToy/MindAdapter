@@ -1,5 +1,9 @@
 # A spiral may be a pair
 
+_The shape this decision holds fixed at two arms is now one arm carrying its own
+dark band; see ADR 0008. Everything below about a pair — two rates, two signs,
+two depths, two angles — still holds._
+
 The session's language refuses effects: no scrim over the photograph, no blur
 behind the pause, no vignette, no fade between one image and the next. What it
 has instead is geometry the app draws and a script turns. So the way to deepen

@@ -134,7 +134,8 @@ between them.
 declares it. The carrier is the left ear; the right ear carries the carrier plus
 the beat frequency.
 
-**Spiral.** A two-armed spiral turns between the photograph and the words, at
+**Spiral.** A one-armed spiral turns between the photograph and the words — a
+lit band on a dark one, so a pass is the whole step from black to white — at
 the rate in force where the session has got to, and takes the depth beside it —
 `0.15` where only a rate is declared, `1` for a spiral the photograph does not
 show through at all. A rate below zero turns it the other way; the bounds are on
@@ -179,10 +180,9 @@ its range would play a session the author did not write.
 - a spiral `rate` outside 0.5–12 turns per minute in either direction, a depth
   bound outside 0–1, a swell outside 10–600 seconds, or a value that is none of
   a rate, a `rate/depth` pair and a `rate/from-to/seconds` swell. The high rate
-  bound is the imagery layer's: two arms passing a point at 12 turns a minute is
-  0.4 Hz of luminance change, just under what a new photograph every eight words
-  makes, and the low swell bound holds one pass out and back at a quarter of
-  that
+  bound is the imagery layer's: one arm passing a point at 12 turns a minute is
+  0.2 Hz of luminance change, under what a new photograph every eight words
+  makes, and the low swell bound holds one pass out and back at half of that
 - more than two spirals in one declaration, or a pair turning more than 12 turns
   per minute between them — two spirals pass a point as often as one turning at
   the sum of their rates

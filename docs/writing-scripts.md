@@ -100,8 +100,9 @@ also changes the pace, not on one of its own.
 **Spiral.** It is opt-in, and a session with no spiral is a complete session.
 Where it is used, one spiral at a low rate and a shallow depth under the descent
 does more than a fast one — the depth defaults to a fifteenth for a reason, and
-anything above about a quarter starts taking the photograph rather than sitting
-over it. A pair turning against each other belongs at the floor, where there is
+anything above about a sixth starts taking the photograph rather than sitting
+over it, since the arm carries its own dark band and covers what it passes over.
+A pair turning against each other belongs at the floor, where there is
 nothing left to introduce. A swell is measured from the start of the session, so
 its period is chosen against the whole length, not against the segment; a period
 near the length of a segment makes the segment breathe once.

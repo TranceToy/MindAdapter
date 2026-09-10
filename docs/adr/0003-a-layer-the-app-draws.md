@@ -40,8 +40,9 @@ written before it plays exactly as it did.
   spiral needs no scheduling the word layer did not already need, and nothing
   about it would have been decided differently.
 - The spiral's rate is bounded by the imagery layer rather than the word layer.
-  Two arms at the ceiling of 12 turns a minute pass a point at 0.4 Hz, just
-  under the 0.46 Hz a new photograph every eight words already makes. The word
+  One arm at the ceiling of 12 turns a minute passes a point at 0.2 Hz — 0.4 Hz
+  when this was written, two arms ago; see ADR 0008 — under the 0.46 Hz a new
+  photograph every eight words already makes. The word
   layer's own 3.67 Hz is nowhere near it, and nothing on screen may approach it
   twice.
 - A declaration can now mean nothing rather than be absent. `spiral:` stops the

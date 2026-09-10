@@ -25,14 +25,16 @@ _Avoid_: track, channel, stream
 **Flash budget**:
 The ceiling on how fast anything may change the frame's luminance — half a
 hertz, a sixth of the flash threshold — and the share of it each layer spends:
-the whole of it to the imagery, 0.4 Hz to the spiral, 0.1 Hz to the swell, none
+the whole of it to the imagery, 0.2 Hz to the spiral, 0.1 Hz to the swell, none
 at all to the words, which change a glyph and not the frame. It is spent at
 authoring time: a script over it is refused, and a session never mentions it.
 _Avoid_: flicker limit, strobe threshold, safety margin, photosensitivity warning
 
 **Spiral**:
 The turning geometry between the imagery and the words, drawn by the app rather
-than taken from the library. It is the only layer a session can run without: a
+than taken from the library: one arm winding in to the centre, a lit band on a
+dark one of twice its width, so what passes over a point is the whole step from
+ground to light. It is the only layer a session can run without: a
 script that declares no rate for it shows none at all. A script may declare two,
 which turn at once and keep their own angles by the order they were written in;
 two whose rates have opposite signs turn against each other.
