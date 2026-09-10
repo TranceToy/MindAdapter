@@ -1,6 +1,6 @@
 import { actionHero, surface } from '../shell/antechamber';
 import type { Calibration } from './calibration';
-import { BED_LINE, CALIBRATION_LINE, VOICE_LINE } from './calibration-copy';
+import { BED_LINE, CALIBRATION_LINE, SNAP_LINE, VOICE_LINE } from './calibration-copy';
 import { renderTrack } from './track';
 import type { MoveLevel } from './track';
 
@@ -9,6 +9,7 @@ export type LeaveCalibration = () => void;
 export type CalibrationMoves = {
   voice: MoveLevel;
   bed: MoveLevel;
+  snap: MoveLevel;
   leave: LeaveCalibration;
 };
 
@@ -20,5 +21,6 @@ export function renderCalibration(opening: Calibration, moves: CalibrationMoves)
   const heading = actionHero(CALIBRATION_LINE, moves.leave);
   const voice = renderTrack(VOICE_LINE, opening.voice, moves.voice);
   const bed = renderTrack(BED_LINE, opening.bed, moves.bed);
-  return surface([heading, voice, bed]);
+  const snap = renderTrack(SNAP_LINE, opening.snap, moves.snap);
+  return surface([heading, voice, bed, snap]);
 }

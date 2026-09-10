@@ -1,4 +1,5 @@
 import { LIBRARY_STORE, openIndex, settled } from '../library/index-database';
+import { restoreCalibration } from './calibration';
 import type { Calibration } from './calibration';
 
 const CALIBRATION_KEY = 'calibration';
@@ -11,7 +12,8 @@ export async function loadCalibration(): Promise<Calibration | null> {
     const store = transaction.objectStore(LIBRARY_STORE);
     const read = store.get(CALIBRATION_KEY);
     const stored = await settled(read);
-    return (stored as Calibration | undefined) ?? null;
+    if (!stored) return null;
+    return restoreCalibration(stored as Partial<Calibration>);
   } catch {
     return null;
   } finally {

@@ -107,10 +107,10 @@ _Avoid_: text, transcript, session file, program
 
 **Mark**:
 What a script puts round a word, or a run of words, to have it shown in the
-marked colour rather than white for the beats it is on — a trigger word set
-apart from the prose it sits in. The script says which words; the colour is the
-app's, and a mark changes nothing else about the word, neither its size nor its
-beat.
+marked colour rather than white, and snapped, for the beats it is on — a trigger
+word set apart from the prose it sits in. The script says which words; the
+colour and the snap are the app's, and a mark changes nothing else about the
+word, neither its size nor its beat.
 _Avoid_: highlight, emphasis, bold, keyword, tag (which belongs to the pools)
 
 **Segment**:
@@ -151,6 +151,15 @@ _Avoid_: base tone, frequency, root
 The offset between the bed's two tones, which is the binaural effect itself.
 _Avoid_: beat (bare — that word belongs to the word layer), binaural rate
 
+**Snap**:
+The sound a mark makes: one short strike on the beat every marked word lands on,
+heard as often as words are marked and no oftener. It is the app's own sound
+rather than the library's, and it is not a layer — a mark is heard as well as
+seen, the way it is coloured as well as shown. Which sound it is belongs to the
+app; how loud it is against the bed and the voice is a calibration track like
+theirs.
+_Avoid_: click, trigger sound, cue, sting, sixth layer
+
 ### Setup
 
 **Index**:
@@ -165,8 +174,9 @@ files in the library.
 _Avoid_: import, sync, refresh, ingest
 
 **Calibration**:
-The two levels — voice and bed — the user sets on first run and cannot change
-during a session. They persist in the index and are revisited only on demand.
+The three levels — voice, bed and snap — the user sets on first run and cannot
+change during a session. They persist in the index and are revisited only on
+demand.
 _Avoid_: volume settings, mixer, levels screen
 
 **Precondition gate**:

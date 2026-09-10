@@ -16,6 +16,7 @@ import { runPause } from './session-pause';
 import type { PausedSession } from './session-pause';
 import { renderStage } from './session-screen';
 import { sessionWords } from './session-words';
+import { runSnapLayer } from './snap-layer';
 import { createSpiralField } from './spiral-field';
 import { runSpiralLayer } from './spiral-layer';
 import { enterSession } from './start-activation';
@@ -92,12 +93,14 @@ function runSession(
     elapsed,
     startedAt,
   );
+  const snapLayer = runSnapLayer(entry.context, audio.snap, script.segments, elapsed, startedAt);
   const parts: SessionParts = {
     audio,
     words: wordLayer,
     spiral: spiralLayer,
     imagery: imageLayer,
     voice: voiceLayer,
+    snaps: snapLayer,
     wake: entry.wake,
     pause: NEVER_PAUSED,
     unwatch: NOT_WATCHED,

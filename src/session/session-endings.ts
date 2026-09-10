@@ -2,7 +2,8 @@ import type { ScreenWake } from './screen-wake';
 import type { SessionAudio } from './session-audio';
 import type { SessionPause } from './session-pause';
 
-// What an ending needs of a layer, which is the same of all five.
+// What an ending needs of a layer, which is the same of all five, and of the
+// snaps a mark sounds, which stop with them.
 export type Stopping = {
   stop: () => void;
 };
@@ -20,6 +21,7 @@ export type SessionParts = {
   spiral: Stopping;
   imagery: Stopping;
   voice: Stopping;
+  snaps: Stopping;
   wake: Pick<ScreenWake, 'release'>;
   pause: SessionPause;
   unwatch: () => void;
@@ -80,6 +82,7 @@ export function sessionEndings(parts: SessionParts): SessionEndings {
     parts.spiral.stop();
     parts.imagery.stop();
     parts.voice.stop();
+    parts.snaps.stop();
     quit();
   }
 

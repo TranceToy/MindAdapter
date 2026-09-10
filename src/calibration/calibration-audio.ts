@@ -1,20 +1,28 @@
 import type { MeasuredClip } from '../library/clip-reconcile';
 import { decodeClip } from '../library/decode-clip';
 import type { ClipPool } from '../library/scan-library';
-import { DEFAULT_BED, DEFAULT_GAP } from '../script/declaration-values';
+import { DEFAULT_BED, DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
+import { beatSeconds } from '../script/word-times';
 import { createAudioGraph } from '../session/audio-graph';
 import { runBed } from '../session/bed-layer';
 import { fillBag } from '../session/clip-bag';
 import { DECLICK_SECONDS, rampGain } from '../session/gain-ramp';
 import { EXIT_SECONDS } from '../session/session-audio';
+import { loadSnap, strikeSnap } from '../session/snap-sound';
 import { bindClips } from '../session/voice-pools';
 import { gapSeconds } from '../session/voice-schedule';
-import { bedLevel, voiceLevel } from './calibration';
+import { bedLevel, snapLevel, voiceLevel } from './calibration';
 import type { Calibration } from './calibration';
 
 // The screen cross-fades in over this, so the bed arrives under it rather than
 // as a click at whatever level was last set.
 const ARRIVAL_SECONDS = 0.2;
+
+// One strike every eight beats of the default pace, which is a marked word
+// oftener than any script should carry one: a level set against the densest
+// marking a session could hold is a level no session then overshoots, and a
+// strike a drag has to wait for is a strike set by memory instead of by ear.
+const SNAP_BEATS = 8;
 
 const SECOND = 1000;
 
@@ -38,6 +46,7 @@ export function startPreview(pools: ClipPool[], opening: Calibration): Calibrati
   function set(calibration: Calibration): void {
     hold(graph.bed.gain, bedLevel(calibration));
     hold(graph.voice.gain, voiceLevel(calibration));
+    hold(graph.snap.gain, snapLevel(calibration));
   }
 
   // A drag writes a level on every frame it moves, and ramping each write is
@@ -60,6 +69,18 @@ export function startPreview(pools: ClipPool[], opening: Calibration): Calibrati
     }
   }
 
+  // The sound is loaded once and struck on a rest of its own, under the clips
+  // and over them as it falls in a session: what the two are worth against each
+  // other is what the two tracks are set against.
+  async function strikeOnCycle(): Promise<void> {
+    const sound = await loadSnap(context);
+    if (!sound) return;
+    while (running) {
+      strikeSnap(context, graph.snap, sound);
+      await rest(SNAP_BEATS * beatSeconds(DEFAULT_PACE));
+    }
+  }
+
   function stop(): void {
     running = false;
     const done = rampGain(graph.master.gain, 0, EXIT_SECONDS, context.currentTime);
@@ -71,6 +92,7 @@ export function startPreview(pools: ClipPool[], opening: Calibration): Calibrati
   fadeIn(graph.master.gain, context.currentTime);
   void resumeQuietly(context);
   void speakOnCycle();
+  void strikeOnCycle();
   return { set, stop };
 }
 

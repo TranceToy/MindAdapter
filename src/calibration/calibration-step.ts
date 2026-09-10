@@ -32,13 +32,19 @@ export function showCalibration(
     preview.set(moved);
   }
 
+  function moveSnap(position: number): void {
+    const moved = { ...held, snap: position };
+    held = moved;
+    preview.set(moved);
+  }
+
   function leave(): void {
     preview.stop();
     void saveCalibration(held);
     done(held);
   }
 
-  const moves: CalibrationMoves = { voice: moveVoice, bed: moveBed, leave };
+  const moves: CalibrationMoves = { voice: moveVoice, bed: moveBed, snap: moveSnap, leave };
   const screen = renderCalibration(opening, moves);
   host.show(screen);
 }

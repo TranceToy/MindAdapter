@@ -72,11 +72,12 @@ every other. That single fact governs the prose:
 - **Avoid numerals and abbreviations.** They tokenise oddly and read as
   instructions to think rather than words to follow. Write counts as words.
 - **Mark the few words the session turns on.** `*heavy*` is the one colour a
-  session has, and it works by being rare: a handful of trigger words across a
-  whole script reads as the session pointing at something, while a marked word
-  every other line reads as a second voice running under the prose. Mark the
-  same word every time it returns, so the colour is heard as the same
-  instruction rather than as this one occurrence being different.
+  session has and the one sound it snaps, and it works by being rare: a handful
+  of trigger words across a whole script reads as the session pointing at
+  something, while a marked word every other line reads as a second voice
+  running under the prose — and now sounds like one, since every marked word is
+  struck. Mark the same word every time it returns, so the colour is heard as
+  the same instruction rather than as this one occurrence being different.
 
 ## Setting the other layers
 

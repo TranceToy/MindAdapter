@@ -23,6 +23,7 @@ function parts(log: Log, paused = false): SessionParts {
     spiral: stopping(log, 'spiral'),
     imagery: stopping(log, 'imagery'),
     voice: stopping(log, 'voice'),
+    snaps: stopping(log, 'snaps'),
     wake: { release: () => log.push('wake released') },
     pause: { paused: () => paused, stop: () => log.push('pause stopped') },
     unwatch: () => log.push('exit unwatched'),
@@ -42,6 +43,7 @@ const TEARDOWN = [
   'spiral stopped',
   'imagery stopped',
   'voice stopped',
+  'snaps stopped',
 ];
 
 function times(log: Log, call: string): number {
@@ -166,6 +168,7 @@ describe('what an ending leaves running', () => {
       'spiral stopped',
       'imagery stopped',
       'voice stopped',
+      'snaps stopped',
       'audio left',
     ]);
   });
