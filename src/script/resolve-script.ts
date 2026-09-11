@@ -2,13 +2,16 @@ import {
   BED_KEY,
   DEFAULT_BED,
   DEFAULT_GAP,
+  DEFAULT_LOOP,
   DEFAULT_PACE,
   GAP_KEY,
+  LOOP_KEY,
   PACE_KEY,
   SPIRAL_KEY,
   VOICE_KEY,
   readBedPair,
   readGap,
+  readLoop,
   readPace,
   readSpirals,
   readTagList,
@@ -58,6 +61,16 @@ export function resolveSegments(script: ParsedScript): Segment[] {
     segments.push(segment);
   }
   return segments;
+}
+
+// Whether the script comes round, which is the head's to say and nothing a
+// segment inherits: what loops is the session, not a stretch of it.
+export function resolveLoop(script: ParsedScript): boolean {
+  for (const entry of script.head) {
+    if (entry.kind !== 'declaration' || entry.key !== LOOP_KEY) continue;
+    return readLoop(entry.value) ?? DEFAULT_LOOP;
+  }
+  return DEFAULT_LOOP;
 }
 
 function declaredBed(block: DeclarationBlock): BedPair | null {

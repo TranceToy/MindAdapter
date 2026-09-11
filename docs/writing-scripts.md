@@ -48,6 +48,12 @@ Four movements carry most sessions, and each is usually one or two segments:
 Never end at the floor. A script whose last segment is its slowest leaves the
 session to the user's exit gesture rather than to the writing.
 
+Unless it loops. A looping script has no end to write, and the four movements
+are the wrong shape for one: a return that brings the pace back up hands
+straight over to an arrival that is already awake, and the session climbs out
+of the floor once a round for no reason. Write a looping script as a circle
+instead — see below.
+
 ## The words themselves
 
 One word per beat, punctuation stripped, every word held exactly as long as
@@ -78,6 +84,41 @@ every other. That single fact governs the prose:
   running under the prose — and now sounds like one, since every marked word is
   struck. Mark the same word every time it returns, so the colour is heard as
   the same instruction rather than as this one occurrence being different.
+
+## Writing a script that comes round
+
+`loop: yes` in the head makes the script a round rather than a session. The
+first word follows the last on the next beat and nothing resets, so what the
+seam sounds like is entirely the author's: the last words of the script are
+heard immediately before the first, every round, for as long as the session
+runs.
+
+- **Write the seam as a join, not as an ending.** Read the last three lines and
+  the first three as one passage, because that is what they are. A script whose
+  last segment returns — pace up, voice silent, imagery bright — reads as a
+  session ending and then starting again, once a round.
+- **Keep the pace and the bed level across the seam.** The last segment's pace
+  is the one the first segment's pace steps from. A round that ends at 120 and
+  opens at 220 is a jolt on every lap; ending and opening at the same number
+  makes the seam inaudible.
+- **Drop the arrival and the return.** A looping script is usually descent and
+  floor alone: the arrival is only needed once, and a session that loops gets it
+  from the first round. What the later rounds want is the floor coming round
+  again, not a fresh introduction.
+- **Length is the whole of the repetition.** A three-minute round is heard twenty
+  times in an hour and every phrase in it is heard twenty times; a twenty-minute
+  round is heard three. Write short rounds for a session that drills a handful
+  of suggestions and long ones for a session that wanders.
+- **Say the marked words once a round, not once a script.** A marked word is
+  rare by the round it sits in, and a looping session multiplies whatever the
+  round holds.
+- **A swell crosses the seam on the session's clock**, not the round's, so its
+  period is chosen against how long the session will run rather than against the
+  round. A period close to the round's length makes every round breathe the same
+  way; a period unrelated to it makes no two rounds alike.
+- **Say where the session ends, because the script does not.** A looping session
+  is left by the exit gesture and nothing else. The start screen says so before
+  the Start.
 
 ## Setting the other layers
 
@@ -110,7 +151,8 @@ near the length of a segment makes the segment breathe once.
 ## Before playing it
 
 - Total words divided by pace: is the session the length it was meant to be?
-- Does the last segment return — pace up, spiral stopped, voice silent?
+- Does the last segment return — pace up, spiral stopped, voice silent? Or,
+  where it loops, does the last line read straight into the first?
 - Does every segment header name pools that exist and hold files?
 - Is anything said only once that should have been said three times?
 - Are the marked words few enough to be heard, and marked every time?

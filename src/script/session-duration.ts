@@ -1,3 +1,4 @@
+import { loopedLine } from './finding-copy';
 import type { Segment } from './resolve-script';
 import { sessionSeconds, wordTimes } from './word-times';
 
@@ -11,8 +12,12 @@ export function durationLabel(seconds: number): string {
   return `${minutes}:${padded}`;
 }
 
-export function durationText(segments: Segment[]): string {
+// One round, since a looping session has no length of its own: what the author
+// wrote is as long as it says here however many times the session plays it.
+export function durationText(segments: Segment[], loops: boolean): string {
   const times = wordTimes(segments);
   const seconds = sessionSeconds(times);
-  return durationLabel(seconds);
+  const label = durationLabel(seconds);
+  if (!loops) return label;
+  return loopedLine(label);
 }

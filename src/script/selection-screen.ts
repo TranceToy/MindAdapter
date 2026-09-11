@@ -75,12 +75,13 @@ function nameButton(name: string): HTMLButtonElement {
 }
 
 function renderMeta(script: ScriptEntry): HTMLElement {
-  const text = isPlayable(script) ? durationText(script.segments) : problemCount(script);
+  const text = metaLine(script);
   const meta = secondary(text);
   meta.classList.add('list__meta');
   return meta;
 }
 
-function problemCount(script: ScriptEntry): string {
-  return problemsLine(script.findings.length);
+function metaLine(script: ScriptEntry): string {
+  if (!isPlayable(script)) return problemsLine(script.findings.length);
+  return durationText(script.segments, script.loops);
 }

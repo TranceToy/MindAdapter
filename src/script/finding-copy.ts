@@ -21,6 +21,8 @@ export const PROSE_IN_HEAD = 'prose before the first segment, where only declara
 export const PROSE_IN_SEGMENT = 'prose without the blank line a segment requires before it';
 export const NO_SEGMENT_HEADER = 'no segment header anywhere';
 export const NO_WORDS = 'no words left once punctuation is stripped';
+export const LOOP_IN_SEGMENT =
+  'loop declared on a segment, where only the head says whether a script comes round';
 
 export function unknownKeyLine(key: string): string {
   return `unknown declaration key ${key}`;
@@ -86,6 +88,10 @@ export function swellOutOfRangeLine(seconds: number): string {
   return `spiral swell ${seconds} outside ${SWELL_LOW}–${SWELL_HIGH} seconds`;
 }
 
+export function malformedLoopLine(value: string): string {
+  return `loop ${value} is neither yes nor no`;
+}
+
 export function missingImagePoolLine(tag: string, line: number): string {
   return `# ${tag} at line ${line} names a pool that does not exist`;
 }
@@ -107,6 +113,12 @@ export const BACK_LINE = 'scripts';
 export function problemsLine(count: number): string {
   const noun = count === 1 ? 'problem' : 'problems';
   return `${count} ${noun}`;
+}
+
+// What a looping script's row says: the length of one round, and that the
+// session runs rounds rather than ending after one.
+export function loopedLine(duration: string): string {
+  return `${duration} looped`;
 }
 
 export function findingLine(finding: Finding): string {

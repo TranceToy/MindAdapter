@@ -3,6 +3,7 @@ import type { ClipPool } from '../library/scan-library';
 import { DEFAULT_GAP } from '../script/declaration-values';
 import type { Gap } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import type { Rounds } from '../script/session-round';
 import { onsetSeconds, wordTimes } from '../script/word-times';
 import type { WordTimes } from '../script/word-times';
 import { fillBag } from './clip-bag';
@@ -39,17 +40,86 @@ type Run = {
   over: boolean;
 };
 
-// The whole session's voice is known before a word is shown, so it is a
-// schedule rather than a state machine: a firing decision is made once and
-// nothing later revokes it, which is what keeps a clip whole across a pool
-// change and off the end of the session.
-export function voiceFirings(segments: Segment[], pools: ClipPool[], roll: Roll): VoiceFiring[] {
+// One round's worth of voice, and where the silence after its last clip runs
+// out — which is past the end of the round whenever a suggestion was still
+// speaking there, and nothing at all where the round ended on a stretch that
+// binds no clips.
+type VoiceRound = {
+  firings: VoiceFiring[];
+  next: number | null;
+};
+
+// The session's voice rather than a round's, read one firing at a time: a
+// looping script has no last suggestion to schedule, so a round is drawn only
+// once the round before it runs out of firings.
+export type VoiceLine = {
+  firing: (place: number) => VoiceFiring | null;
+};
+
+// A round that comes round has no deadline: there is no last word for a clip to
+// run past, so a suggestion started near the seam speaks on over the first words
+// of the round after it, and the silence it owes is carried there with it.
+const NO_DEADLINE = Number.POSITIVE_INFINITY;
+
+// A round's voice is known before a word of it is shown, so it is a schedule
+// rather than a state machine: a firing decision is made once and nothing later
+// revokes it, which is what keeps a clip whole across a pool change and off the
+// end of the session.
+//
+// Every round draws its own suggestions, so a script heard twice is not heard
+// twice over: what repeats is the writing, never the order the library is drawn
+// in. The cadence carries across the seam rather than restarting on it, so the
+// silence a round ends in is the silence the round after it opens on.
+export function voiceLine(
+  segments: Segment[],
+  pools: ClipPool[],
+  rounds: Rounds,
+  roll: Roll,
+): VoiceLine {
+  const deadline = rounds.loops ? NO_DEADLINE : voiceDeadline(segments);
+  const drawn: VoiceFiring[] = [];
+  let behind = 0;
+  let opening: number | null = null;
+  let spent = false;
+
+  function extend(): void {
+    const round = fireRound(segments, pools, deadline, opening, roll);
+    for (const firing of round.firings) drawn.push(shifted(firing, behind * rounds.seconds));
+    opening = round.next === null ? null : round.next - rounds.seconds;
+    behind += 1;
+    // A round that fires nothing and carries nothing is a script with no voice
+    // in it at all, since every round of it is drawn from the same bindings.
+    if (!rounds.loops || (round.firings.length === 0 && round.next === null)) spent = true;
+  }
+
+  function firing(place: number): VoiceFiring | null {
+    while (place >= drawn.length) {
+      if (spent) return null;
+      extend();
+    }
+    return drawn[place] ?? null;
+  }
+
+  return { firing };
+}
+
+function shifted(firing: VoiceFiring, seconds: number): VoiceFiring {
+  if (seconds === 0) return firing;
+  return { at: firing.at + seconds, clip: firing.clip };
+}
+
+function fireRound(
+  segments: Segment[],
+  pools: ClipPool[],
+  deadline: number,
+  opening: number | null,
+  roll: Roll,
+): VoiceRound {
   const times = wordTimes(segments);
   const spans = voiceSpans(segments, times);
   const bindings = boundSpans(spans, pools);
   const holds = gapHolds(segments, times);
-  const deadline = voiceDeadline(segments);
-  return fireAcross(bindings, holds, deadline, roll);
+  return fireAcross(bindings, holds, deadline, opening, roll);
 }
 
 // The last word's own beat, not the fade behind it. A suggestion still speaking
@@ -129,10 +199,11 @@ function fireAcross(
   bindings: VoiceBinding[],
   holds: GapHold[],
   deadline: number,
+  opening: number | null,
   roll: Roll,
-): VoiceFiring[] {
+): VoiceRound {
   const firings: VoiceFiring[] = [];
-  let next: number | null = null;
+  let next = opening;
   for (const binding of bindings) {
     if (binding.clips.length === 0) {
       next = null;
@@ -142,10 +213,10 @@ function fireAcross(
     const bag = fillBag(binding.clips, roll);
     const run = fireWithin(bag, binding.until, next, { holds, deadline, roll });
     firings.push(...run.firings);
-    if (run.over) break;
+    if (run.over) return { firings, next: null };
     next = run.next;
   }
-  return firings;
+  return { firings, next };
 }
 
 type Cadence = {

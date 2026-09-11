@@ -217,3 +217,22 @@ describe('formatFindings', () => {
     ]);
   });
 });
+
+describe('formatFindings, on loop', () => {
+  it('accepts the two words the head may say', () => {
+    expect(findingsOf('loop: yes\n\n# ocean\n\nOnly this.\n')).toEqual([]);
+    expect(findingsOf('loop: no\n\n# ocean\n\nOnly this.\n')).toEqual([]);
+  });
+
+  it('rejects a value that is neither', () => {
+    const messages = messagesOf('loop: sometimes\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['loop sometimes is neither yes nor no']);
+  });
+
+  it('rejects loop on a segment, where nothing comes round', () => {
+    const findings = findingsOf('# ocean\nloop: yes\n\nOnly this.\n');
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.locus).toEqual({ kind: 'file', line: 2 });
+    expect(findings[0]?.message).toContain('loop declared on a segment');
+  });
+});

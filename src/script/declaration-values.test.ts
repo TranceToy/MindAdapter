@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readTagList } from './declaration-values';
+import { readLoop, readTagList } from './declaration-values';
 
 describe('readTagList', () => {
   it('trims the whitespace around each entry', () => {
@@ -22,5 +22,19 @@ describe('readTagList', () => {
   it('reads an empty value as no tags at all', () => {
     expect(readTagList('')).toEqual([]);
     expect(readTagList('   ')).toEqual([]);
+  });
+});
+
+describe('readLoop', () => {
+  it('reads the two words a script may say', () => {
+    expect(readLoop('yes')).toBe(true);
+    expect(readLoop('no')).toBe(false);
+  });
+
+  it('reads anything else as nothing, so it is a finding rather than a guess', () => {
+    expect(readLoop('')).toBeNull();
+    expect(readLoop('true')).toBeNull();
+    expect(readLoop('Yes')).toBeNull();
+    expect(readLoop('3')).toBeNull();
   });
 });

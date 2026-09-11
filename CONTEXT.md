@@ -13,8 +13,26 @@ The language below is fixed by the decisions in `docs/adr/`.
 
 **Session**:
 One uninterrupted run of a script with all four layers playing together, and the
-spiral turning wherever it is declared.
+spiral turning wherever it is declared. A session is one round of the script, or
+round after round of it where the script loops.
 _Avoid_: run, playback, trance, experience
+
+**Loop**:
+What a script declares when it is to be played round after round rather than
+once. Declared in the head and nowhere else, since what comes round is the whole
+script and not a stretch of it, and defaulting to a script that plays once. A
+looping session has no hold: the exit gesture is the only way out of it.
+_Avoid_: repeat, cycle, replay, autoplay, continuous
+
+**Round**:
+One run of a script from its first word to its last — the unit a looping session
+is made of, and the whole of a session that does not loop. Its length is what the
+selection screen names. Nothing is reset at the seam between one round and the
+next: the words come round, the imagery opens a fresh slot as it does on any
+segment, the voice draws its suggestions again and carries its silence over, the
+bed glides, and the spiral takes its angle up where the round before it left it.
+_Avoid_: pass (which belongs to the spiral arm and the swell), iteration, cycle,
+lap, repetition
 
 **Layer**:
 One of the concurrent streams a session is made of — word, image, voice, bed and
@@ -59,8 +77,9 @@ _Avoid_: opacity, alpha, strength, intensity
 **Swell**:
 A depth that moves rather than stands: the two bounds it travels between and the
 seconds one pass out to the far bound and back takes. It is read off the start
-of the session rather than off the segment that declares it, so a change of rate
-under an unchanged swell moves the speed without stepping the depth.
+of the session rather than off the segment that declares it, or off the round,
+so a change of rate under an unchanged swell moves the speed without stepping
+the depth and the seam of a loop does not step it either.
 _Avoid_: pulse, breathing, oscillation, fade, animation
 
 **Pace**:
@@ -73,7 +92,8 @@ _Avoid_: speed, wpm setting, tempo
 **Hold**:
 The state a session ends in: the final image left on screen in silence,
 indefinitely, until the user's exit gesture leaves it. There is no screen that
-announces the end.
+announces the end. A looping session never reaches one, because it has no last
+word to reach it from.
 _Avoid_: outro screen, end screen, session summary, results
 
 **Gap**:
@@ -104,7 +124,7 @@ _Avoid_: collection, media folder, vault, store
 
 **Script**:
 A file authored outside the app that supplies a session's words and its segment
-structure.
+structure, and says whether the session plays it once or loops it.
 _Avoid_: text, transcript, session file, program
 
 **Mark**:

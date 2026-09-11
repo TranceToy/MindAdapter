@@ -27,6 +27,7 @@ voice: obedience
 pace: 200
 gap: 9-18
 spiral: 3, -1/0.06
+loop: no
 
 # ocean, deep water
 
@@ -54,7 +55,8 @@ Up, and awake, and back in the room.
 A script is a head followed by one or more segments.
 
 The **head** is everything before the first segment header. Only declarations
-belong there — a line of prose in the head is a finding.
+belong there — a line of prose in the head is a finding. `loop` belongs there
+and nowhere else, because what comes round is the whole script.
 
 A **segment** opens on a line beginning with `#`. The rest of that line is its
 imagery tag list, comma-separated; the tags may contain spaces. Then come the
@@ -83,7 +85,7 @@ mark crosses a segment header.
 
 ## Declarations
 
-A declaration is `key: value`, one to a line. Five keys exist; anything else is
+A declaration is `key: value`, one to a line. Six keys exist; anything else is
 a finding, as is the same key twice in one block.
 
 | Key | Value | Default |
@@ -93,12 +95,15 @@ a finding, as is the same key twice in one block.
 | `pace` | words per minute, decimals allowed | `220` |
 | `gap` | seconds of silence between clips: `low-high`, or one number for a silence that never varies | `7-15` |
 | `spiral` | one or two spirals: `rate`, `rate/depth`, `rate/from-to/seconds`, or empty | no spiral |
+| `loop` | `yes` or `no`, in the head only | `no` |
 
 `bed`, `voice`, `pace`, `gap` and `spiral` are declared in the head for the whole
 session and again on any segment that should differ, and each holds from there
 until another segment changes it. Imagery tags never inherit: a segment header
 is the whole truth about what is on screen under it, and a bare `#` leaves the
-field blank.
+field blank. `loop` is the one key a segment may not declare at all: it says
+what the session does when the script runs out, which no stretch of a script
+has anything to say about.
 
 ## What the layers do with it
 
@@ -159,6 +164,40 @@ forty seconds. The swell is measured from the start of the session rather than
 from the segment that declares it, so a segment that changes only the rate moves
 the speed without stepping the depth.
 
+## Coming round
+
+`loop: yes` makes the script a **round** rather than a whole session: the first
+word follows the last on the next beat, and the session runs round after round
+until the exit gesture. There is no hold at the end of a looping script, because
+there is no end — the selection screen says how long one round is and that the
+script is looped, and the start screen says the gesture is the only way out
+before the session begins.
+
+Nothing is reset at the seam. Every layer crosses it the way it crosses a
+segment boundary:
+
+- **Words.** The word after the last is the first, on the beat it would have
+  fallen on inside a round. Nothing is held longer there than anywhere else.
+- **Imagery.** The first word of a round opens a fresh slot, as the first word
+  of a segment does, and the photograph it draws is never the one already on
+  screen.
+- **Voice.** Each round draws its suggestions again, so what repeats is the
+  writing and never the order the library is heard in. The cadence carries
+  across the seam: a suggestion still speaking there finishes over the first
+  words of the next round, and the silence it owes is measured from where it
+  ends. Nothing is refused for running past the last word, because there is no
+  last word.
+- **Bed.** The pair the script ends on glides into the pair it opens on, the
+  way any declared change glides. A script whose bed never changes writes
+  nothing at the seam at all.
+- **Spiral.** The angle carries. A rate declared in the head is a change of rate
+  like any other, so the spiral takes the seam up from where the last segment
+  left it rather than snapping back to the top, and a swell goes on swelling
+  from the start of the session rather than from the start of the round.
+
+A looping script is written to be read round after round, which the last segment
+of one is not usually written for: see `writing-scripts.md`.
+
 ## What makes a script unplayable
 
 A script with any finding is listed dim, with its count of problems, and opens
@@ -186,6 +225,8 @@ its range would play a session the author did not write.
 - more than two spirals in one declaration, or a pair turning more than 12 turns
   per minute between them — two spirals pass a point as often as one turning at
   the sum of their rates
+- a `loop` that is neither `yes` nor `no`, or a `loop` declared on a segment
+  rather than in the head
 - an unknown declaration key, or one declared twice in a single block
 - prose in the head, or prose in a segment without the blank line before it
 - no segment header anywhere, or no words left once punctuation is stripped

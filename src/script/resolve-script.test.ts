@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseScript } from './parse-script';
-import { resolveSegments } from './resolve-script';
+import { resolveLoop, resolveSegments } from './resolve-script';
 
 const SCRIPT = `bed: 150/6
 voice: obedience
@@ -106,5 +106,16 @@ describe('resolveSegments', () => {
     expect(segments[0]?.voice).toEqual([]);
     expect(segments[0]?.pace).toBe(220);
     expect(segments[0]?.gap).toEqual({ low: 7, high: 15 });
+  });
+});
+
+describe('resolveLoop', () => {
+  it('reads the head declaration', () => {
+    expect(resolveLoop(parseScript('loop: yes\n\n# ocean\n\nOnly this.\n'))).toBe(true);
+    expect(resolveLoop(parseScript('loop: no\n\n# ocean\n\nOnly this.\n'))).toBe(false);
+  });
+
+  it('plays once where the script says nothing', () => {
+    expect(resolveLoop(parseScript('# ocean\n\nOnly this.\n'))).toBe(false);
   });
 });

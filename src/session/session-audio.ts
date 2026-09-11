@@ -1,6 +1,7 @@
 import { bedLevel, snapLevel, voiceLevel } from '../calibration/calibration';
 import type { Calibration } from '../calibration/calibration';
 import type { Segment } from '../script/resolve-script';
+import type { Rounds } from '../script/session-round';
 import { createAudioGraph } from './audio-graph';
 import type { AudioGraph } from './audio-graph';
 import { runBed } from './bed-layer';
@@ -38,9 +39,11 @@ export function startSessionAudio(
   segments: Segment[],
   calibration: Calibration,
   from: number,
+  rounds: Rounds,
 ): SessionAudio {
   const graph = createAudioGraph(context);
-  const bed = runBed(context, graph.merger, bedGlides(segments), from);
+  const glides = bedGlides(segments);
+  const bed = runBed(context, graph.merger, glides, from, rounds);
   setLevels(graph, calibration, from);
   enter(graph.master.gain, from);
   return stops(context, graph, bed);

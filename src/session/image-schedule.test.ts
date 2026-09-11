@@ -3,7 +3,7 @@ import type { LibraryFile, Pool } from '../library/walk-library';
 import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import type { Word } from '../script/tokenise-prose';
-import { WORDS_PER_IMAGE, imageSlots, slotAfter } from './image-schedule';
+import { WORDS_PER_IMAGE, imageSlots, slotAfter, slotLine } from './image-schedule';
 
 function file(path: string): LibraryFile {
   return { path, handle: {} as FileSystemFileHandle, size: 1, lastModified: 1 };
@@ -64,22 +64,44 @@ describe('imageSlots', () => {
 });
 
 describe('slotAfter', () => {
-  const slots = imageSlots([segment(['ocean'], 24)], POOLS);
+  const once = slotLine([segment(['ocean'], 24)], POOLS, { seconds: 0, loops: false });
 
   it('opens on the first slot from before the first word', () => {
-    expect(slotAfter(slots, -1)?.at).toBe(0);
+    expect(slotAfter(once, -1)?.at).toBe(0);
   });
 
   it('takes the next slot from the word a slot was drawn on', () => {
-    expect(slotAfter(slots, 0)?.at).toBe(8);
-    expect(slotAfter(slots, 8)?.at).toBe(16);
+    expect(slotAfter(once, 0)?.at).toBe(8);
+    expect(slotAfter(once, 8)?.at).toBe(16);
   });
 
   it('skips the slots a late draw ran past', () => {
-    expect(slotAfter(slots, 10)?.at).toBe(16);
+    expect(slotAfter(once, 10)?.at).toBe(16);
   });
 
   it('has nothing past the last slot', () => {
-    expect(slotAfter(slots, 16)).toBeNull();
+    expect(slotAfter(once, 16)).toBeNull();
+  });
+});
+
+describe('slotAfter, where the script comes round', () => {
+  const segments = [segment(['ocean'], 24)];
+  const looped = slotLine(segments, POOLS, { seconds: 60, loops: true });
+
+  it('follows the last slot of a round with the first of the next', () => {
+    expect(slotAfter(looped, 16)?.at).toBe(24);
+  });
+
+  it('counts on rather than back, so a later round is never already reached', () => {
+    expect(slotAfter(looped, 24)?.at).toBe(32);
+    expect(slotAfter(looped, 40)?.at).toBe(48);
+  });
+
+  it('opens a round on the pool its first segment names', () => {
+    const paired = [segment(['ocean'], 8), segment(['void'], 8)];
+    const line = slotLine(paired, POOLS, { seconds: 60, loops: true });
+    const opening = slotAfter(line, 15);
+    expect(opening?.at).toBe(16);
+    expect(opening?.pool).toEqual(line.slots[0]?.pool);
   });
 });

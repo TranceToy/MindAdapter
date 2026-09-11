@@ -28,15 +28,19 @@ describe('durationLabel', () => {
 
 describe('durationText', () => {
   it('is the script read at the pace it declares', () => {
-    expect(durationText([segment(220)])).toBe('1:00');
-    expect(durationText([segment(110, 110)])).toBe('1:00');
+    expect(durationText([segment(220)], false)).toBe('1:00');
+    expect(durationText([segment(110, 110)], false)).toBe('1:00');
   });
 
   it('sums segments that are paced apart', () => {
-    expect(durationText([segment(110), segment(60, 120)])).toBe('1:00');
+    expect(durationText([segment(110), segment(60, 120)], false)).toBe('1:00');
   });
 
   it('is nothing without segments', () => {
-    expect(durationText([])).toBe('0:00');
+    expect(durationText([], false)).toBe('0:00');
+  });
+
+  it('is one round, said to be one, for a script that loops', () => {
+    expect(durationText([segment(220)], true)).toBe('1:00 looped');
   });
 });

@@ -2,6 +2,7 @@ import type { MeasuredClip } from '../library/clip-reconcile';
 import { decodeClip } from '../library/decode-clip';
 import type { ClipPool } from '../library/scan-library';
 import { DEFAULT_BED, DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
+import { ONE_ROUND } from '../script/session-round';
 import { beatSeconds } from '../script/word-times';
 import { createAudioGraph } from '../session/audio-graph';
 import { runBed } from '../session/bed-layer';
@@ -38,7 +39,7 @@ export function startPreview(pools: ClipPool[], opening: Calibration): Calibrati
   const context = new AudioContext();
   const graph = createAudioGraph(context);
   const glides = [{ at: 0, bed: DEFAULT_BED }];
-  const bed = runBed(context, graph.merger, glides, context.currentTime);
+  const bed = runBed(context, graph.merger, glides, context.currentTime, ONE_ROUND);
   const clips = everyClip(pools);
   const bag = fillBag(clips, Math.random);
   let running = true;

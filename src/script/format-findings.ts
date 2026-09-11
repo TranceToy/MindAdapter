@@ -8,6 +8,7 @@ import {
   GAP_KEY,
   GAP_LONGEST,
   GAP_SHORTEST,
+  LOOP_KEY,
   PACE_HIGH,
   PACE_KEY,
   PACE_LOW,
@@ -20,6 +21,7 @@ import {
   VOICE_KEY,
   readBedPair,
   readGap,
+  readLoop,
   readPace,
   readSpirals,
   swells,
@@ -28,6 +30,7 @@ import type { Depth, Gap, Spiral } from './declaration-values';
 import { fileFinding } from './finding';
 import type { Finding } from './finding';
 import {
+  LOOP_IN_SEGMENT,
   NO_SEGMENT_HEADER,
   NO_WORDS,
   PROSE_IN_HEAD,
@@ -40,6 +43,7 @@ import {
   gapOutOfRangeLine,
   malformedBedLine,
   malformedGapLine,
+  malformedLoopLine,
   malformedPaceLine,
   malformedSpiralLine,
   paceOutOfRangeLine,
@@ -55,10 +59,20 @@ import type { BlockEntry, DeclarationBlock, DeclarationEntry, ParsedScript } fro
 const WHOLE_FILE_LINE = 1;
 const TURNING_PLACES = 3;
 
+// The two findings a block's place decides: what a stray line reads as, and
+// whether loop may be declared there at all.
+type Place = {
+  stray: string;
+  head: boolean;
+};
+
+const HEAD: Place = { stray: PROSE_IN_HEAD, head: true };
+const SEGMENT: Place = { stray: PROSE_IN_SEGMENT, head: false };
+
 export function formatFindings(script: ParsedScript): Finding[] {
-  const findings = blockFindings(script.head, PROSE_IN_HEAD);
+  const findings = blockFindings(script.head, HEAD);
   for (const segment of script.segments) {
-    const declared = blockFindings(segment.block, PROSE_IN_SEGMENT);
+    const declared = blockFindings(segment.block, SEGMENT);
     findings.push(...declared);
   }
   const structure = structureFindings(script);
@@ -78,19 +92,19 @@ function structureFindings(script: ParsedScript): Finding[] {
   return [];
 }
 
-function blockFindings(block: DeclarationBlock, strayMessage: string): Finding[] {
+function blockFindings(block: DeclarationBlock, place: Place): Finding[] {
   const findings: Finding[] = [];
   const declared = new Set<string>();
   for (const entry of block) {
-    const found = entryFindings(entry, strayMessage, declared);
+    const found = entryFindings(entry, place, declared);
     findings.push(...found);
   }
   return findings;
 }
 
-function entryFindings(entry: BlockEntry, strayMessage: string, declared: Set<string>): Finding[] {
+function entryFindings(entry: BlockEntry, place: Place, declared: Set<string>): Finding[] {
   if (entry.kind === 'stray') {
-    const stray = fileFinding(entry.line, strayMessage);
+    const stray = fileFinding(entry.line, place.stray);
     return [stray];
   }
   if (declared.has(entry.key)) {
@@ -99,18 +113,35 @@ function entryFindings(entry: BlockEntry, strayMessage: string, declared: Set<st
     return [duplicate];
   }
   declared.add(entry.key);
-  return declarationFindings(entry);
+  return declarationFindings(entry, place);
 }
 
-function declarationFindings(entry: DeclarationEntry): Finding[] {
+function declarationFindings(entry: DeclarationEntry, place: Place): Finding[] {
   if (entry.key === VOICE_KEY) return [];
   if (entry.key === BED_KEY) return bedFindings(entry);
   if (entry.key === PACE_KEY) return paceFindings(entry);
   if (entry.key === GAP_KEY) return gapFindings(entry);
   if (entry.key === SPIRAL_KEY) return spiralFindings(entry);
+  if (entry.key === LOOP_KEY) return loopFindings(entry, place);
   const message = unknownKeyLine(entry.key);
   const unknown = fileFinding(entry.line, message);
   return [unknown];
+}
+
+// A segment cannot loop, because what comes round is the whole script: a loop
+// declared on one is an author asking for something the format has no way to
+// play rather than for a stretch that repeats.
+function loopFindings(entry: DeclarationEntry, place: Place): Finding[] {
+  if (!place.head) {
+    const misplaced = fileFinding(entry.line, LOOP_IN_SEGMENT);
+    return [misplaced];
+  }
+  if (readLoop(entry.value) === null) {
+    const message = malformedLoopLine(entry.value);
+    const malformed = fileFinding(entry.line, message);
+    return [malformed];
+  }
+  return [];
 }
 
 function paceFindings(entry: DeclarationEntry): Finding[] {

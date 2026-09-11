@@ -1,5 +1,9 @@
+import type { Rounds } from '../script/session-round';
 import { leftFrequency, rightFrequency } from './bed-schedule';
 import type { BedGlide, Ear } from './bed-schedule';
+import { watchRounds } from './round-watch';
+import type { ArmRound } from './round-watch';
+import { anchorClock } from './session-clock';
 
 // Long enough that entering a segment is not an event that pulls attention off
 // the words, and over well inside the segment that asked for it.
@@ -19,15 +23,26 @@ export function runBed(
   merger: ChannelMergerNode,
   glides: BedGlide[],
   from: number,
+  rounds: Rounds,
 ): BedLayer {
   const left = createTone(context, merger, LEFT_INPUT);
   const right = createTone(context, merger, RIGHT_INPUT);
-  schedule(left.frequency, glides, leftFrequency, from);
-  schedule(right.frequency, glides, rightFrequency, from);
+  const ears = [
+    armEar(left.frequency, glides, leftFrequency, from, rounds),
+    armEar(right.frequency, glides, rightFrequency, from, rounds),
+  ];
+
+  function arm(round: number): void {
+    for (const ear of ears) ear(round);
+  }
+
+  const elapsed = anchorClock(context, from);
+  const watch = watchRounds(elapsed, rounds, arm);
   left.start(from);
   right.start(from);
 
   function stop(at: number): void {
+    watch.stop();
     left.stop(at);
     right.stop(at);
   }
@@ -48,16 +63,31 @@ function createTone(
 // Scheduled on the frequency params in absolute context time and never on a
 // gain, so a suspended context freezes the bed and the word clock together and
 // there is nothing to re-sync. A frequency change is phase-continuous, so the
-// glide is for perception rather than against a click.
-function schedule(frequency: AudioParam, glides: BedGlide[], ear: Ear, from: number): void {
-  const [opening, ...rest] = glides;
-  if (!opening) return;
-  let running = ear(opening.bed);
-  frequency.setValueAtTime(running, from);
-  for (const glide of rest) {
-    const target = ear(glide.bed);
-    frequency.setValueAtTime(running, from + glide.at);
-    frequency.linearRampToValueAtTime(target, from + glide.at + BED_GLIDE_SECONDS);
-    running = target;
-  }
+// glide is for perception rather than against a click. The running pair is
+// carried from round to round as it is from glide to glide, so a script that
+// comes round glides from the pair it ended on into the pair it opens on, and a
+// script whose bed never changes writes nothing after its first round.
+function armEar(
+  frequency: AudioParam,
+  glides: BedGlide[],
+  ear: Ear,
+  from: number,
+  rounds: Rounds,
+): ArmRound {
+  let running: number | null = null;
+  return (round: number) => {
+    const opened = from + round * rounds.seconds;
+    for (const glide of glides) {
+      const target = ear(glide.bed);
+      const at = opened + glide.at;
+      if (running === null) frequency.setValueAtTime(target, at);
+      else if (target !== running) glideTo(frequency, running, target, at);
+      running = target;
+    }
+  };
+}
+
+function glideTo(frequency: AudioParam, running: number, target: number, at: number): void {
+  frequency.setValueAtTime(running, at);
+  frequency.linearRampToValueAtTime(target, at + BED_GLIDE_SECONDS);
 }

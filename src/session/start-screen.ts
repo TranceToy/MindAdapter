@@ -3,7 +3,7 @@ import type { ScriptEntry } from '../script/validate-script';
 import { actionHero, dimActionHero, prose, secondary, surface } from '../shell/antechamber';
 import { hasFullscreen } from '../shell/platform';
 import { probeMono } from './output-check';
-import { MONO_OUTPUT_WARNING, START_LINE, WINDOWED_SESSION } from './session-copy';
+import { LOOPED_SESSION, MONO_OUTPUT_WARNING, START_LINE, WINDOWED_SESSION } from './session-copy';
 
 export type BeginSession = () => void;
 
@@ -20,10 +20,12 @@ export function renderStart(
   leave: LeaveStart,
 ): StartScreen {
   const name = dimActionHero(script.name, leave);
-  const duration = secondary(durationText(script.segments));
+  const duration = secondary(durationText(script.segments, script.loops));
   const start = renderBegin(begin);
   const failure = renderFailure();
   const parts = [name, duration, start, failure];
+  const looped = renderLooped(script.loops);
+  if (looped) parts.push(looped);
   const windowed = renderWindowed();
   if (windowed) parts.push(windowed);
   const mono = renderMono();
@@ -41,6 +43,14 @@ function renderBegin(begin: BeginSession): HTMLElement {
   const button = actionHero(START_LINE, begin);
   button.classList.add('start__begin');
   return button;
+}
+
+// Said for the same reason the windowed line is: it changes how the session is
+// left. A looping session reaches no hold, so the gesture is not the way out of
+// a still frame but the only way out at all.
+function renderLooped(loops: boolean): HTMLElement | null {
+  if (!loops) return null;
+  return prose(LOOPED_SESSION);
 }
 
 // Said before the Start, because it changes what the session will be and how

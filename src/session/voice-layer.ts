@@ -1,9 +1,10 @@
 import { decodeClip } from '../library/decode-clip';
 import type { ClipPool } from '../library/scan-library';
 import type { Segment } from '../script/resolve-script';
+import type { Rounds } from '../script/session-round';
 import { followPosition } from './cursor';
 import type { Elapsed } from './session-clock';
-import { voiceFirings } from './voice-schedule';
+import { voiceLine } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
 
 export type VoiceLayer = {
@@ -23,8 +24,9 @@ export function runVoiceLayer(
   pools: ClipPool[],
   elapsed: Elapsed,
   from: number,
+  rounds: Rounds,
 ): VoiceLayer {
-  const firings = voiceFirings(segments, pools, Math.random);
+  const line = voiceLine(segments, pools, rounds, Math.random);
   const cursor = followPosition(elapsed);
   const sounding = new Set<Sounding>();
   let running = true;
@@ -35,16 +37,17 @@ export function runVoiceLayer(
   // time: the schedule is drawn, the library is not.
   async function run(): Promise<void> {
     let at = 0;
-    let reading = readAhead(firings[at]);
-    while (at < firings.length) {
-      const firing = firings[at];
+    let firing = line.firing(at);
+    let reading = readAhead(firing);
+    while (firing) {
       const clip = await reading;
-      if (!running || !firing) break;
+      if (!running) break;
       if (clip) speak(clip, firing);
       const reached = await cursor.reach(firing.at);
       if (!reached) break;
       at += 1;
-      reading = readAhead(firings[at]);
+      firing = line.firing(at);
+      reading = readAhead(firing);
     }
     cursor.stop();
   }
@@ -52,7 +55,7 @@ export function runVoiceLayer(
   // A clip gone from disk since the scan costs its own turn and nothing else:
   // the gap after it was drawn before the read, so the next suggestion still
   // speaks on time.
-  function readAhead(firing: VoiceFiring | undefined): Promise<AudioBuffer | null> {
+  function readAhead(firing: VoiceFiring | null): Promise<AudioBuffer | null> {
     if (!firing) return Promise.resolve(null);
     return decodeClip(context, firing.clip.handle);
   }

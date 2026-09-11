@@ -4,10 +4,11 @@ import type { ClipPool } from '../library/scan-library';
 import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Gap } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
+import { sessionRounds } from '../script/session-round';
 import type { Word } from '../script/tokenise-prose';
 import { beatSeconds } from '../script/word-times';
 import type { Roll } from './clip-bag';
-import { voiceDeadline, voiceFirings } from './voice-schedule';
+import { voiceDeadline, voiceLine } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
 
 function clip(path: string, duration: number): MeasuredClip {
@@ -60,6 +61,21 @@ const WIDE: Gap = { low: 20, high: 30 };
 const ROUNDING = 1e-9;
 const SILENT_AT = 121;
 const CHANGE_SECONDS = SILENT_AT * BEAT_SECONDS;
+
+// A round of a script that plays once, drained: what the voice layer walks when
+// nothing comes round.
+function voiceFirings(segments: Segment[], pools: ClipPool[], roll: Roll): VoiceFiring[] {
+  const line = voiceLine(segments, pools, sessionRounds(segments, false), roll);
+  const firings: VoiceFiring[] = [];
+  let place = 0;
+  let firing = line.firing(place);
+  while (firing) {
+    firings.push(firing);
+    place += 1;
+    firing = line.firing(place);
+  }
+  return firings;
+}
 
 function gapsOf(firings: VoiceFiring[]): number[] {
   const gaps: number[] = [];
@@ -192,5 +208,47 @@ describe('voiceFirings', () => {
 
   it('has no voice for a tag with no pool on disk', () => {
     expect(voiceFirings([segment(['tide'], 4000)], POOLS, rolling())).toEqual([]);
+  });
+});
+
+describe('voiceLine, where the script comes round', () => {
+  const SEGMENTS = [segment(['obedience'], 4000)];
+  const LOOPED = sessionRounds(SEGMENTS, true);
+
+  function drawn(places: number): VoiceFiring[] {
+    const line = voiceLine(SEGMENTS, POOLS, LOOPED, rolling());
+    const firings: VoiceFiring[] = [];
+    for (let place = 0; place < places; place += 1) {
+      const firing = line.firing(place);
+      if (firing) firings.push(firing);
+    }
+    return firings;
+  }
+
+  it('goes on past the round it opened in', () => {
+    const firings = drawn(200);
+    const last = firings[firings.length - 1];
+    expect(firings).toHaveLength(200);
+    expect(last?.at).toBeGreaterThan(LOOPED.seconds);
+  });
+
+  it('keeps the gap the cadence declares across the seam', () => {
+    const gaps = gapsOf(drawn(200));
+    for (const gap of gaps) expect(gap).toBeCloseTo(GAP_LOW, 6);
+  });
+
+  it('runs out where the script binds no clips at all', () => {
+    const silent = [segment([], 4000)];
+    const line = voiceLine(silent, POOLS, sessionRounds(silent, true), rolling());
+    expect(line.firing(0)).toBeNull();
+  });
+
+  it('runs out after one round where the script does not loop', () => {
+    const rounds = sessionRounds(SEGMENTS, false);
+    const line = voiceLine(SEGMENTS, POOLS, rounds, rolling());
+    const held = voiceFirings(SEGMENTS, POOLS, rolling());
+    const last = held[held.length - 1];
+    expect(last?.at).toBeLessThan(rounds.seconds);
+    expect(line.firing(held.length)).toBeNull();
   });
 });

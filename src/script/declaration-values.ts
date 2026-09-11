@@ -3,6 +3,7 @@ export const VOICE_KEY = 'voice';
 export const PACE_KEY = 'pace';
 export const GAP_KEY = 'gap';
 export const SPIRAL_KEY = 'spiral';
+export const LOOP_KEY = 'loop';
 
 export const CARRIER_LOW = 50;
 export const CARRIER_HIGH = 1000;
@@ -159,6 +160,20 @@ export function readGap(value: string): Gap | null {
   const high = declared[2];
   if (high === undefined) return { low, high: low };
   return { low, high: Number(high) };
+}
+
+// Whether a script comes round rather than ends: the head's alone to say, since
+// what loops is the whole session and not a stretch of it. A script that says
+// nothing plays once and holds.
+export const DEFAULT_LOOP = false;
+
+const LOOPS = 'yes';
+const ONCE = 'no';
+
+export function readLoop(value: string): boolean | null {
+  if (value === LOOPS) return true;
+  if (value === ONCE) return false;
+  return null;
 }
 
 export function readTagList(value: string): string[] {

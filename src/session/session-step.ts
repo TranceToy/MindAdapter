@@ -1,5 +1,6 @@
 import type { Calibration } from '../calibration/calibration';
 import type { Library } from '../library/scan-library';
+import { sessionRounds } from '../script/session-round';
 import type { ScriptEntry } from '../script/validate-script';
 import { wordTimes } from '../script/word-times';
 import type { SurfaceHost } from '../shell/surface-host';
@@ -8,7 +9,7 @@ import { leaveFullscreen, whenFullscreenLeft } from './fullscreen';
 import { createImageField } from './image-field';
 import { runImageLayer } from './image-layer';
 import { startSessionAudio } from './session-audio';
-import { anchorClock } from './session-clock';
+import { anchorClock, roundClock } from './session-clock';
 import { AUDIO_REFUSED } from './session-copy';
 import { NEVER_PAUSED, NOT_WATCHED, sessionEndings } from './session-endings';
 import type { SessionParts } from './session-endings';
@@ -70,6 +71,7 @@ function runSession(
 ): void {
   const words = sessionWords(script.segments);
   const times = wordTimes(script.segments);
+  const rounds = sessionRounds(script.segments, script.loops);
   const field = createWordField(words);
   const imagery = createImageField();
   const spiral = createSpiralField();
@@ -80,11 +82,16 @@ function runSession(
   const dismiss = host.raise(stage);
   const unfollow = followViewport(field);
   const startedAt = entry.context.currentTime;
-  const audio = startSessionAudio(entry.context, script.segments, calibration, startedAt);
+  const audio = startSessionAudio(entry.context, script.segments, calibration, startedAt, rounds);
   const elapsed = anchorClock(entry.context, startedAt);
-  const wordLayer = runWordLayer(field, times, elapsed, () => endings.hold());
-  const spiralLayer = runSpiralLayer(spiral, script.segments, elapsed);
-  const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed);
+  // The words are the one layer that reads the round rather than the session:
+  // where a looping script comes round, its clock does too, and the cue that
+  // would have been the last word is the first word of the round after it.
+  const inRound = roundClock(rounds, elapsed);
+  const held = () => endings.hold();
+  const wordLayer = runWordLayer(field, times, inRound, held);
+  const spiralLayer = runSpiralLayer(spiral, script.segments, elapsed, rounds);
+  const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed, rounds);
   const voiceLayer = runVoiceLayer(
     entry.context,
     audio.voice,
@@ -92,8 +99,16 @@ function runSession(
     library.clips,
     elapsed,
     startedAt,
+    rounds,
   );
-  const snapLayer = runSnapLayer(entry.context, audio.snap, script.segments, elapsed, startedAt);
+  const snapLayer = runSnapLayer(
+    entry.context,
+    audio.snap,
+    script.segments,
+    elapsed,
+    startedAt,
+    rounds,
+  );
   const parts: SessionParts = {
     audio,
     words: wordLayer,

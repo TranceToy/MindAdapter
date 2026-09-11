@@ -42,7 +42,8 @@ export const NOT_WATCHED = (): void => {};
 
 // The three endings a session has, as an order over parts rather than over a
 // browser: the hold after the last word, the exit gesture mid-session, and End
-// from the pause overlay.
+// from the pause overlay. A looping script reaches no last word, so a session
+// of one has two endings and both of them are gestures.
 export function sessionEndings(parts: SessionParts): SessionEndings {
   // The triggers belong to a running session: the terminal hold is silent and
   // still, so there is nothing left in it to protect. Nothing else is taken —

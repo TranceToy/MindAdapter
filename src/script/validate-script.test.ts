@@ -19,6 +19,13 @@ describe('validateScript', () => {
     expect(entry.segments[0]?.words).toHaveLength(6);
   });
 
+  it('carries whether the script comes round', () => {
+    const once: ScriptFile = { name: 'Deep water', text: CLEAN };
+    const looped: ScriptFile = { name: 'Deep water', text: `loop: yes\n${CLEAN}` };
+    expect(validateScript(once, INVENTORY).loops).toBe(false);
+    expect(validateScript(looped, INVENTORY).loops).toBe(true);
+  });
+
   it('suppresses asset findings while the format is broken', () => {
     const file: ScriptFile = { name: 'Broken', text: 'bed: 150\n\n# ocaen\n\nOnly this.\n' };
     const entry = validateScript(file, INVENTORY);
