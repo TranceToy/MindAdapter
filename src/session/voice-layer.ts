@@ -1,8 +1,8 @@
 import { decodeClip } from '../library/decode-clip';
 import type { ClipPool } from '../library/scan-library';
-import type { Segment } from '../script/resolve-script';
 import type { Rounds } from '../script/session-round';
 import { followPosition } from './cursor';
+import type { SegmentOrder } from './segment-order';
 import type { Elapsed } from './session-clock';
 import { voiceLine } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
@@ -20,13 +20,13 @@ type Sounding = {
 export function runVoiceLayer(
   context: AudioContext,
   voice: GainNode,
-  segments: Segment[],
+  order: SegmentOrder,
   pools: ClipPool[],
   elapsed: Elapsed,
   from: number,
   rounds: Rounds,
 ): VoiceLayer {
-  const line = voiceLine(segments, pools, rounds, Math.random);
+  const line = voiceLine(order, pools, rounds, Math.random);
   const cursor = followPosition(elapsed);
   const sounding = new Set<Sounding>();
   let running = true;

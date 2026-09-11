@@ -4,6 +4,7 @@ export const PACE_KEY = 'pace';
 export const GAP_KEY = 'gap';
 export const SPIRAL_KEY = 'spiral';
 export const LOOP_KEY = 'loop';
+export const SHUFFLE_KEY = 'shuffle';
 
 export const CARRIER_LOW = 50;
 export const CARRIER_HIGH = 1000;
@@ -167,12 +168,28 @@ export function readGap(value: string): Gap | null {
 // nothing plays once and holds.
 export const DEFAULT_LOOP = false;
 
-const LOOPS = 'yes';
-const ONCE = 'no';
+// Whether a round draws the order its segments come in rather than playing them
+// as written: the head's alone to say too, since what is shuffled is the whole
+// round and no stretch of it. A script that says nothing plays what was written,
+// in the order it was written.
+export const DEFAULT_SHUFFLE = false;
+
+const YES = 'yes';
+const NO = 'no';
 
 export function readLoop(value: string): boolean | null {
-  if (value === LOOPS) return true;
-  if (value === ONCE) return false;
+  return readYesNo(value);
+}
+
+export function readShuffle(value: string): boolean | null {
+  return readYesNo(value);
+}
+
+// The two head declarations that are answers rather than values, and neither is
+// a number to be clamped: anything but the two words is a finding.
+function readYesNo(value: string): boolean | null {
+  if (value === YES) return true;
+  if (value === NO) return false;
   return null;
 }
 

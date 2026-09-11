@@ -7,7 +7,9 @@ import type { Rounds } from '../script/session-round';
 import { onsetSeconds, wordTimes } from '../script/word-times';
 import type { WordTimes } from '../script/word-times';
 import { fillBag } from './clip-bag';
-import type { ClipBag, Roll } from './clip-bag';
+import type { ClipBag } from './clip-bag';
+import type { Roll } from './draw';
+import type { SegmentOrder } from './segment-order';
 import { bindClips } from './voice-pools';
 
 export type VoiceFiring = {
@@ -69,20 +71,23 @@ const NO_DEADLINE = Number.POSITIVE_INFINITY;
 // Every round draws its own suggestions, so a script heard twice is not heard
 // twice over: what repeats is the writing, never the order the library is drawn
 // in. The cadence carries across the seam rather than restarting on it, so the
-// silence a round ends in is the silence the round after it opens on.
+// silence a round ends in is the silence the round after it opens on. A round's
+// own segments are asked for as it is drawn, since a shuffled script binds its
+// pools in a different order every round while the round stays the same length.
 export function voiceLine(
-  segments: Segment[],
+  order: SegmentOrder,
   pools: ClipPool[],
   rounds: Rounds,
   roll: Roll,
 ): VoiceLine {
-  const deadline = rounds.loops ? NO_DEADLINE : voiceDeadline(segments);
+  const deadline = rounds.loops ? NO_DEADLINE : voiceDeadline(order.playing(0).segments);
   const drawn: VoiceFiring[] = [];
   let behind = 0;
   let opening: number | null = null;
   let spent = false;
 
   function extend(): void {
+    const segments = order.playing(behind).segments;
     const round = fireRound(segments, pools, deadline, opening, roll);
     for (const firing of round.firings) drawn.push(shifted(firing, behind * rounds.seconds));
     opening = round.next === null ? null : round.next - rounds.seconds;

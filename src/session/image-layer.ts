@@ -1,12 +1,11 @@
 import type { Pool } from '../library/walk-library';
-import type { Segment } from '../script/resolve-script';
 import type { Rounds } from '../script/session-round';
-import { wordTimes } from '../script/word-times';
 import type { ImageField } from './image-field';
 import { slotAfter, slotLine } from './image-schedule';
 import type { ImageSlot } from './image-schedule';
 import { drawPhotograph } from './image-source';
 import type { Photograph } from './image-source';
+import type { SegmentOrder } from './segment-order';
 import type { Elapsed } from './session-clock';
 import { followWords } from './word-cursor';
 
@@ -16,14 +15,13 @@ export type ImageLayer = {
 
 export function runImageLayer(
   field: ImageField,
-  segments: Segment[],
+  order: SegmentOrder,
   pools: Pool[],
   elapsed: Elapsed,
   rounds: Rounds,
 ): ImageLayer {
-  const line = slotLine(segments, pools, rounds);
-  const times = wordTimes(segments);
-  const cursor = followWords(elapsed, times, rounds);
+  const line = slotLine(order, pools, rounds);
+  const cursor = followWords(elapsed, order, rounds);
   let previous: string | null = null;
   let running = true;
 
@@ -33,7 +31,7 @@ export function runImageLayer(
   // reached is what holds a late one: the current frame stays until it lands,
   // and the slot it lands in is the one the words have got to by then.
   async function run(): Promise<void> {
-    let slot: ImageSlot | null = line.slots[0] ?? null;
+    let slot: ImageSlot | null = line.slots(0)[0] ?? null;
     let drawing = draw(slot);
     while (slot) {
       const reached = await cursor.reach(slot.at);

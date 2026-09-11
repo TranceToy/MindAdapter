@@ -5,6 +5,7 @@ import type { Segment } from '../script/resolve-script';
 import { ONE_ROUND } from '../script/session-round';
 import type { Word } from '../script/tokenise-prose';
 import { beatSeconds } from '../script/word-times';
+import { writtenOrder } from './segment-order';
 import { spiralAt, spiralTurning, spiralTurns } from './spiral-schedule';
 import type { Turning } from './spiral-schedule';
 
@@ -38,7 +39,7 @@ function segment(spirals: Spiral[], words: number, pace = DEFAULT_PACE): Segment
 }
 
 function turning(segments: Segment[]): Turning {
-  return spiralTurning(segments, ONE_ROUND);
+  return spiralTurning(writtenOrder(segments), ONE_ROUND);
 }
 
 describe('spiralTurns', () => {
@@ -167,13 +168,13 @@ describe('spiralAt, where the script comes round', () => {
   const rounds = { seconds: ROUND_SECONDS, loops: true };
 
   it('takes the angle up where the round before it left it', () => {
-    const looped = spiralTurning([segment([SLOW], 4)], rounds);
+    const looped = spiralTurning(writtenOrder([segment([SLOW], 4)]), rounds);
     const seam = spiralAt(looped, ROUND_SECONDS)[0]?.angle ?? 0;
     expect(seam).toBeCloseTo(3 * 6 * ROUND_SECONDS);
   });
 
   it('never jumps the angle across the seam', () => {
-    const looped = spiralTurning([segment([SLOW], 4), segment([SLOWER], 4)], {
+    const looped = spiralTurning(writtenOrder([segment([SLOW], 4), segment([SLOWER], 4)]), {
       seconds: 8 * BEAT_SECONDS,
       loops: true,
     });
@@ -184,7 +185,7 @@ describe('spiralAt, where the script comes round', () => {
   });
 
   it('goes on swelling through the seam rather than stepping back', () => {
-    const looped = spiralTurning([segment([SWELLING], 4)], rounds);
+    const looped = spiralTurning(writtenOrder([segment([SWELLING], 4)]), rounds);
     const at = ROUND_SECONDS;
     const before = spiralAt(looped, at - 0.001)[0]?.depth ?? 0;
     const after = spiralAt(looped, at + 0.001)[0]?.depth ?? 0;
@@ -192,7 +193,7 @@ describe('spiralAt, where the script comes round', () => {
   });
 
   it('carries each place of a pair by itself', () => {
-    const looped = spiralTurning([segment(PAIR, 4)], rounds);
+    const looped = spiralTurning(writtenOrder([segment(PAIR, 4)]), rounds);
     const phases = spiralAt(looped, 2 * ROUND_SECONDS);
     expect(phases[0]?.angle).toBeCloseTo(3 * 6 * 2 * ROUND_SECONDS);
     expect(phases[1]?.angle).toBeCloseTo(-2 * 6 * 2 * ROUND_SECONDS);

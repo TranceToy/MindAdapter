@@ -120,6 +120,44 @@ runs.
   is left by the exit gesture and nothing else. The start screen says so before
   the Start.
 
+## Writing a script whose order is drawn
+
+`shuffle: yes` in the head makes each round draw the order its segments come in.
+Every segment is still played once a round and the round is still exactly as
+long, so what the declaration buys is a session that does not say the same thing
+in the same order twice — most of all in a looping script, where the alternative
+is the same twenty minutes forty times running.
+
+It also takes the ordering away from you, which most scripts cannot spare:
+
+- **Write segments that follow anything.** A shuffled segment has no segment
+  before it to lean on. Open each one on something the session can verify and
+  close it somewhere any other segment could begin from; a segment that opens
+  with "and deeper still" has assumed a neighbour it may not get.
+- **Shuffle the floor, not the session.** The descent is an order — 200, 160,
+  120 — and drawing it is drawing the descent away. Where a session wants both,
+  write the arrival and the descent as a script that does not shuffle, and keep
+  the shuffling for a looping script that is floor alone.
+- **Declare the pace where it must hold.** A segment inherits from the segment
+  written before it, not the one drawn before it, so a segment that leaves the
+  pace open takes whatever its neighbour in the file had. Under a drawn order
+  that reads as arbitrary: declare `pace` on every segment, or on none of them.
+- **Keep the segments comparable in length.** Five segments of a minute each
+  shuffle; four short ones and a ten-minute floor come out as the floor landing
+  anywhere in the round, which is a different session each time rather than the
+  same session in another order.
+- **Write one voice and one bed across the whole of it.** A `voice:` that
+  silences the layer or a bed that drops to 4 Hz is a movement, and a movement
+  drawn at random lands in the middle of what it was meant to close.
+- **Mark the same words wherever the segment lands.** The colour has to read as
+  the same instruction from any neighbour, which it does if it is the word that
+  is marked and not the moment.
+
+No segment plays twice running — the seam is re-drawn where one would — so a
+two-segment script alternates and can do nothing else, and a one-segment script
+is unchanged by the declaration. Three segments is where a drawn order starts to
+be worth declaring.
+
 ## Setting the other layers
 
 **Imagery.** Tags are a flat union: a 200-file pool named beside a 5-file pool
@@ -153,6 +191,7 @@ near the length of a segment makes the segment breathe once.
 - Total words divided by pace: is the session the length it was meant to be?
 - Does the last segment return — pace up, spiral stopped, voice silent? Or,
   where it loops, does the last line read straight into the first?
+- Where the order is drawn, does every segment read after every other one?
 - Does every segment header name pools that exist and hold files?
 - Is anything said only once that should have been said three times?
 - Are the marked words few enough to be heard, and marked every time?

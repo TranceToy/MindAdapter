@@ -23,6 +23,8 @@ export const NO_SEGMENT_HEADER = 'no segment header anywhere';
 export const NO_WORDS = 'no words left once punctuation is stripped';
 export const LOOP_IN_SEGMENT =
   'loop declared on a segment, where only the head says whether a script comes round';
+export const SHUFFLE_IN_SEGMENT =
+  'shuffle declared on a segment, where only the head says what order a round comes in';
 
 export function unknownKeyLine(key: string): string {
   return `unknown declaration key ${key}`;
@@ -90,6 +92,10 @@ export function swellOutOfRangeLine(seconds: number): string {
 
 export function malformedLoopLine(value: string): string {
   return `loop ${value} is neither yes nor no`;
+}
+
+export function malformedShuffleLine(value: string): string {
+  return `shuffle ${value} is neither yes nor no`;
 }
 
 export function missingImagePoolLine(tag: string, line: number): string {

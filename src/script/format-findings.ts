@@ -14,6 +14,7 @@ import {
   PACE_LOW,
   RATE_HIGH,
   RATE_LOW,
+  SHUFFLE_KEY,
   SPIRAL_KEY,
   SPIRALS_HIGH,
   SWELL_HIGH,
@@ -23,6 +24,7 @@ import {
   readGap,
   readLoop,
   readPace,
+  readShuffle,
   readSpirals,
   swells,
 } from './declaration-values';
@@ -35,6 +37,7 @@ import {
   NO_WORDS,
   PROSE_IN_HEAD,
   PROSE_IN_SEGMENT,
+  SHUFFLE_IN_SEGMENT,
   beatOutOfRangeLine,
   carrierOutOfRangeLine,
   depthOutOfRangeLine,
@@ -45,6 +48,7 @@ import {
   malformedGapLine,
   malformedLoopLine,
   malformedPaceLine,
+  malformedShuffleLine,
   malformedSpiralLine,
   paceOutOfRangeLine,
   rateOutOfRangeLine,
@@ -59,11 +63,19 @@ import type { BlockEntry, DeclarationBlock, DeclarationEntry, ParsedScript } fro
 const WHOLE_FILE_LINE = 1;
 const TURNING_PLACES = 3;
 
-// The two findings a block's place decides: what a stray line reads as, and
-// whether loop may be declared there at all.
+// The findings a block's place decides: what a stray line reads as, and whether
+// the two head declarations may be declared there at all.
 type Place = {
   stray: string;
   head: boolean;
+};
+
+// A head declaration that is one of two words rather than a value: how to read
+// it, and what to say where it is neither in the head nor one of the two.
+type Answer = {
+  read: (value: string) => boolean | null;
+  misplaced: string;
+  line: (value: string) => string;
 };
 
 const HEAD: Place = { stray: PROSE_IN_HEAD, head: true };
@@ -123,6 +135,7 @@ function declarationFindings(entry: DeclarationEntry, place: Place): Finding[] {
   if (entry.key === GAP_KEY) return gapFindings(entry);
   if (entry.key === SPIRAL_KEY) return spiralFindings(entry);
   if (entry.key === LOOP_KEY) return loopFindings(entry, place);
+  if (entry.key === SHUFFLE_KEY) return shuffleFindings(entry, place);
   const message = unknownKeyLine(entry.key);
   const unknown = fileFinding(entry.line, message);
   return [unknown];
@@ -132,12 +145,29 @@ function declarationFindings(entry: DeclarationEntry, place: Place): Finding[] {
 // declared on one is an author asking for something the format has no way to
 // play rather than for a stretch that repeats.
 function loopFindings(entry: DeclarationEntry, place: Place): Finding[] {
+  const answer: Answer = { read: readLoop, misplaced: LOOP_IN_SEGMENT, line: malformedLoopLine };
+  return answerFindings(entry, place, answer);
+}
+
+// A segment cannot shuffle either, and for the same reason: what the order is
+// drawn for is the round, and a segment asking for one inside itself is asking
+// for something the format has no way to play.
+function shuffleFindings(entry: DeclarationEntry, place: Place): Finding[] {
+  const answer: Answer = {
+    read: readShuffle,
+    misplaced: SHUFFLE_IN_SEGMENT,
+    line: malformedShuffleLine,
+  };
+  return answerFindings(entry, place, answer);
+}
+
+function answerFindings(entry: DeclarationEntry, place: Place, answer: Answer): Finding[] {
   if (!place.head) {
-    const misplaced = fileFinding(entry.line, LOOP_IN_SEGMENT);
+    const misplaced = fileFinding(entry.line, answer.misplaced);
     return [misplaced];
   }
-  if (readLoop(entry.value) === null) {
-    const message = malformedLoopLine(entry.value);
+  if (answer.read(entry.value) === null) {
+    const message = answer.line(entry.value);
     const malformed = fileFinding(entry.line, message);
     return [malformed];
   }

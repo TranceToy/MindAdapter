@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseScript } from './parse-script';
-import { resolveLoop, resolveSegments } from './resolve-script';
+import { resolveLoop, resolveSegments, resolveShuffle } from './resolve-script';
 
 const SCRIPT = `bed: 150/6
 voice: obedience
@@ -117,5 +117,21 @@ describe('resolveLoop', () => {
 
   it('plays once where the script says nothing', () => {
     expect(resolveLoop(parseScript('# ocean\n\nOnly this.\n'))).toBe(false);
+  });
+});
+
+describe('resolveShuffle', () => {
+  it('reads the head declaration', () => {
+    expect(resolveShuffle(parseScript('shuffle: yes\n\n# ocean\n\nOnly this.\n'))).toBe(true);
+    expect(resolveShuffle(parseScript('shuffle: no\n\n# ocean\n\nOnly this.\n'))).toBe(false);
+  });
+
+  it('plays the written order where the script says nothing', () => {
+    expect(resolveShuffle(parseScript('# ocean\n\nOnly this.\n'))).toBe(false);
+  });
+
+  it('is the head to say, so a segment declaring it changes nothing', () => {
+    const script = parseScript('# ocean\nshuffle: yes\n\nOnly this.\n');
+    expect(resolveShuffle(script)).toBe(false);
   });
 });

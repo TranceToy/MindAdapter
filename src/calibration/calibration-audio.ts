@@ -6,6 +6,7 @@ import { ONE_ROUND } from '../script/session-round';
 import { beatSeconds } from '../script/word-times';
 import { createAudioGraph } from '../session/audio-graph';
 import { runBed } from '../session/bed-layer';
+import { heldGlides } from '../session/bed-schedule';
 import { fillBag } from '../session/clip-bag';
 import { DECLICK_SECONDS, rampGain } from '../session/gain-ramp';
 import { EXIT_SECONDS } from '../session/session-audio';
@@ -38,7 +39,7 @@ export type CalibrationPreview = {
 export function startPreview(pools: ClipPool[], opening: Calibration): CalibrationPreview {
   const context = new AudioContext();
   const graph = createAudioGraph(context);
-  const glides = [{ at: 0, bed: DEFAULT_BED }];
+  const glides = heldGlides([{ at: 0, bed: DEFAULT_BED }]);
   const bed = runBed(context, graph.merger, glides, context.currentTime, ONE_ROUND);
   const clips = everyClip(pools);
   const bag = fillBag(clips, Math.random);

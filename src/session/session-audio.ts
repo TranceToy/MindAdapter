@@ -1,14 +1,15 @@
 import { bedLevel, snapLevel, voiceLevel } from '../calibration/calibration';
 import type { Calibration } from '../calibration/calibration';
-import type { Segment } from '../script/resolve-script';
 import type { Rounds } from '../script/session-round';
 import { createAudioGraph } from './audio-graph';
 import type { AudioGraph } from './audio-graph';
 import { runBed } from './bed-layer';
 import type { BedLayer } from './bed-layer';
 import { bedGlides } from './bed-schedule';
+import type { Glides } from './bed-schedule';
 import { enterRunning, suspendQuietly } from './context-state';
 import { rampGain, riseGain } from './gain-ramp';
+import type { SegmentOrder } from './segment-order';
 
 // The image is held against this one, so the ending is ten seconds of a still
 // frame going quiet rather than a cut.
@@ -36,13 +37,13 @@ export type SessionAudio = {
 
 export function startSessionAudio(
   context: AudioContext,
-  segments: Segment[],
+  order: SegmentOrder,
   calibration: Calibration,
   from: number,
   rounds: Rounds,
 ): SessionAudio {
   const graph = createAudioGraph(context);
-  const glides = bedGlides(segments);
+  const glides: Glides = (round) => bedGlides(order.playing(round).segments);
   const bed = runBed(context, graph.merger, glides, from, rounds);
   setLevels(graph, calibration, from);
   enter(graph.master.gain, from);

@@ -9,6 +9,17 @@ export type BedGlide = {
   bed: BedPair;
 };
 
+// The glides of a round, asked for by round: a shuffled script glides to its
+// pairs in a different order every round, and the bed is armed a round at a
+// time anyway.
+export type Glides = (round: number) => BedGlide[];
+
+// What a session whose pairs never change plays every round: the calibration
+// preview's own bed, and any script the order of whose segments is written.
+export function heldGlides(glides: BedGlide[]): Glides {
+  return () => glides;
+}
+
 export type Ear = (bed: BedPair) => number;
 
 // The whole session's bed is known before a word is shown, so it is a schedule

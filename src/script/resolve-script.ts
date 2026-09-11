@@ -4,20 +4,23 @@ import {
   DEFAULT_GAP,
   DEFAULT_LOOP,
   DEFAULT_PACE,
+  DEFAULT_SHUFFLE,
   GAP_KEY,
   LOOP_KEY,
   PACE_KEY,
+  SHUFFLE_KEY,
   SPIRAL_KEY,
   VOICE_KEY,
   readBedPair,
   readGap,
   readLoop,
   readPace,
+  readShuffle,
   readSpirals,
   readTagList,
 } from './declaration-values';
 import type { BedPair, Gap, Spiral } from './declaration-values';
-import type { DeclarationBlock, ParsedScript } from './parse-script';
+import type { DeclarationBlock, DeclarationEntry, ParsedScript } from './parse-script';
 import type { Word } from './tokenise-prose';
 
 const NO_VOICE: string[] = [];
@@ -66,11 +69,25 @@ export function resolveSegments(script: ParsedScript): Segment[] {
 // Whether the script comes round, which is the head's to say and nothing a
 // segment inherits: what loops is the session, not a stretch of it.
 export function resolveLoop(script: ParsedScript): boolean {
+  const declared = headEntry(script, LOOP_KEY);
+  if (!declared) return DEFAULT_LOOP;
+  return readLoop(declared.value) ?? DEFAULT_LOOP;
+}
+
+// Whether the round draws the order its segments come in, which is the head's
+// to say for the same reason: what is shuffled is the whole round.
+export function resolveShuffle(script: ParsedScript): boolean {
+  const declared = headEntry(script, SHUFFLE_KEY);
+  if (!declared) return DEFAULT_SHUFFLE;
+  return readShuffle(declared.value) ?? DEFAULT_SHUFFLE;
+}
+
+function headEntry(script: ParsedScript, key: string): DeclarationEntry | null {
   for (const entry of script.head) {
-    if (entry.kind !== 'declaration' || entry.key !== LOOP_KEY) continue;
-    return readLoop(entry.value) ?? DEFAULT_LOOP;
+    if (entry.kind !== 'declaration' || entry.key !== key) continue;
+    return entry;
   }
-  return DEFAULT_LOOP;
+  return null;
 }
 
 function declaredBed(block: DeclarationBlock): BedPair | null {

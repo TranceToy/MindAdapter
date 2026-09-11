@@ -9,7 +9,8 @@ Nothing about a session is set in the app. A script declares it, the app plays
 what is declared and defaults the rest, and the session ends in a hold: the last
 image on screen in silence until you leave it. A script that declares `loop: yes`
 comes round instead — its first word follows its last, for as long as you leave
-it running.
+it running — and one that declares `shuffle: yes` draws the order its segments
+come in afresh every round.
 
 It runs at **<https://trancetoy.github.io/MindAdapter/>**. Nothing is uploaded:
 the library stays on your disk and the browser reads it where it lies.

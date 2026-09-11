@@ -1,8 +1,9 @@
 import type { LibraryFile, Pool } from '../library/walk-library';
 import type { Segment } from '../script/resolve-script';
 import type { Rounds } from '../script/session-round';
-import { wordTimes } from '../script/word-times';
 import { bindPools } from './image-pools';
+import { heldByRound } from './segment-order';
+import type { SegmentOrder } from './segment-order';
 
 // The imagery spends the whole flash budget, since a new photograph is the only
 // change that takes the whole frame at once: eight words to an image is 0.46 Hz
@@ -14,11 +15,13 @@ export type ImageSlot = {
   pool: LibraryFile[];
 };
 
-// The imagery of a session rather than of a round: the slots one round holds,
-// and the words it spends, which is what puts the round after it a whole
-// script further along a line that only ever counts forward.
+// The imagery of a session rather than of a round: the slots a round holds,
+// asked for by round since a shuffled script opens different slots on different
+// rounds, and the words a round spends, which is the same count whatever order
+// it spends them in and so puts the round after it a whole script further along
+// a line that only ever counts forward.
 export type SlotLine = {
-  slots: ImageSlot[];
+  slots: (round: number) => ImageSlot[];
   words: number;
   loops: boolean;
 };
@@ -39,22 +42,24 @@ export function imageSlots(segments: Segment[], pools: Pool[]): ImageSlot[] {
   return slots;
 }
 
-export function slotLine(segments: Segment[], pools: Pool[], rounds: Rounds): SlotLine {
-  const slots = imageSlots(segments, pools);
-  const times = wordTimes(segments);
-  return { slots, words: times.words, loops: rounds.loops };
+export function slotLine(order: SegmentOrder, pools: Pool[], rounds: Rounds): SlotLine {
+  const slots = heldByRound((round: number) => imageSlots(order.playing(round).segments, pools));
+  const words = order.playing(0).times.words;
+  return { slots, words, loops: rounds.loops };
 }
 
 // The slot after a word, counted on rather than back: past the last slot of a
 // round the next one is the first of the round after it, a whole script's words
 // further on, so a layer waiting for it waits rather than finding it already
-// reached.
+// reached. The round after it is asked for its own slots, which is where a
+// shuffled script's next round is drawn.
 export function slotAfter(line: SlotLine, word: number): ImageSlot | null {
   const behind = line.loops ? Math.floor(word / line.words) : 0;
-  const next = line.slots.find((slot) => slot.at > word - behind * line.words);
+  const held = line.slots(behind);
+  const next = held.find((slot) => slot.at > word - behind * line.words);
   if (next) return shifted(next, behind * line.words);
   if (!line.loops) return null;
-  const opening = line.slots[0];
+  const opening = line.slots(behind + 1)[0];
   if (!opening) return null;
   return shifted(opening, (behind + 1) * line.words);
 }

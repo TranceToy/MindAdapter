@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { MeasuredClip } from '../library/clip-reconcile';
 import { fillBag } from './clip-bag';
-import type { ClipBag, Roll } from './clip-bag';
+import type { ClipBag } from './clip-bag';
+import type { Roll } from './draw';
 
 function clip(path: string): MeasuredClip {
   return {

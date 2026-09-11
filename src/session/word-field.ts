@@ -7,7 +7,7 @@ const MARKED_CLASS = 'word--marked';
 export type WordField = {
   element: HTMLElement;
   fit: () => void;
-  show: (index: number) => void;
+  show: (word: Word) => void;
   retire: () => void;
 };
 
@@ -36,10 +36,10 @@ export function createWordField(words: Word[]): WordField {
   // The only write to the field, and it only ever writes a word: a blank frame
   // between two words would make the layer a 3.67 Hz full-contrast flicker. A
   // marked word is the same word in another colour, so the mark rides the same
-  // write rather than adding one of its own.
-  function show(index: number): void {
-    const shown = words[index];
-    if (shown === undefined) return;
+  // write rather than adding one of its own. The word is handed in rather than
+  // looked up by place, because which word a place holds is the round's to say
+  // and a shuffled script says something different every round.
+  function show(shown: Word): void {
     word.textContent = shown.text;
     word.classList.toggle(MARKED_CLASS, shown.marked);
   }
@@ -61,7 +61,9 @@ export function followViewport(field: WordField): () => void {
 }
 
 // The size the field is fitted to is the widest word it will ever hold, and a
-// mark changes the colour of a word and never its width.
+// mark changes the colour of a word and never its width. Which words a round
+// holds does not change with the order it draws them in, so the fit is the
+// session's however the segments come.
 function wordTexts(words: Word[]): string[] {
   const texts: string[] = [];
   for (const word of words) texts.push(word.text);

@@ -2,21 +2,20 @@ import type { Calibration } from '../calibration/calibration';
 import type { Library } from '../library/scan-library';
 import { sessionRounds } from '../script/session-round';
 import type { ScriptEntry } from '../script/validate-script';
-import { wordTimes } from '../script/word-times';
 import type { SurfaceHost } from '../shell/surface-host';
 import { whenEscaped } from './escape-exit';
 import { leaveFullscreen, whenFullscreenLeft } from './fullscreen';
 import { createImageField } from './image-field';
 import { runImageLayer } from './image-layer';
+import { segmentOrder } from './segment-order';
 import { startSessionAudio } from './session-audio';
-import { anchorClock, roundClock } from './session-clock';
+import { anchorClock } from './session-clock';
 import { AUDIO_REFUSED } from './session-copy';
 import { NEVER_PAUSED, NOT_WATCHED, sessionEndings } from './session-endings';
 import type { SessionParts } from './session-endings';
 import { runPause } from './session-pause';
 import type { PausedSession } from './session-pause';
 import { renderStage } from './session-screen';
-import { sessionWords } from './session-words';
 import { runSnapLayer } from './snap-layer';
 import { createSpiralField } from './spiral-field';
 import { runSpiralLayer } from './spiral-layer';
@@ -69,10 +68,14 @@ function runSession(
   entry: SessionEntry,
   leave: LeaveSession,
 ): void {
-  const words = sessionWords(script.segments);
-  const times = wordTimes(script.segments);
+  // The order is drawn here and nowhere else, so every layer of the session
+  // reads the same rounds: one order for the whole session where the script was
+  // written to be played as written, a fresh one every round where it shuffles.
+  // The length of a round is the script's however it is ordered, which is why
+  // the rounds are counted off the segments as written.
+  const order = segmentOrder(script.segments, script.shuffles, Math.random);
   const rounds = sessionRounds(script.segments, script.loops);
-  const field = createWordField(words);
+  const field = createWordField(order.playing(0).words);
   const imagery = createImageField();
   const spiral = createSpiralField();
   // Imagery first and the words last, so the spiral turns over the photograph
@@ -82,33 +85,25 @@ function runSession(
   const dismiss = host.raise(stage);
   const unfollow = followViewport(field);
   const startedAt = entry.context.currentTime;
-  const audio = startSessionAudio(entry.context, script.segments, calibration, startedAt, rounds);
+  const audio = startSessionAudio(entry.context, order, calibration, startedAt, rounds);
   const elapsed = anchorClock(entry.context, startedAt);
   // The words are the one layer that reads the round rather than the session:
   // where a looping script comes round, its clock does too, and the cue that
   // would have been the last word is the first word of the round after it.
-  const inRound = roundClock(rounds, elapsed);
   const held = () => endings.hold();
-  const wordLayer = runWordLayer(field, times, inRound, held);
-  const spiralLayer = runSpiralLayer(spiral, script.segments, elapsed, rounds);
-  const imageLayer = runImageLayer(imagery, script.segments, library.images, elapsed, rounds);
+  const wordLayer = runWordLayer(field, order, rounds, elapsed, held);
+  const spiralLayer = runSpiralLayer(spiral, order, elapsed, rounds);
+  const imageLayer = runImageLayer(imagery, order, library.images, elapsed, rounds);
   const voiceLayer = runVoiceLayer(
     entry.context,
     audio.voice,
-    script.segments,
+    order,
     library.clips,
     elapsed,
     startedAt,
     rounds,
   );
-  const snapLayer = runSnapLayer(
-    entry.context,
-    audio.snap,
-    script.segments,
-    elapsed,
-    startedAt,
-    rounds,
-  );
+  const snapLayer = runSnapLayer(entry.context, audio.snap, order, elapsed, startedAt, rounds);
   const parts: SessionParts = {
     audio,
     words: wordLayer,

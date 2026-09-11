@@ -1,5 +1,5 @@
-import type { Segment } from '../script/resolve-script';
 import type { Rounds } from '../script/session-round';
+import type { SegmentOrder } from './segment-order';
 import type { Elapsed } from './session-clock';
 import type { SpiralField } from './spiral-field';
 import { spiralAt, spiralTurning } from './spiral-schedule';
@@ -12,11 +12,11 @@ export type SpiralLayer = {
 // freezes the turn where it froze the words and there is nothing to re-sync.
 export function runSpiralLayer(
   field: SpiralField,
-  segments: Segment[],
+  order: SegmentOrder,
   elapsed: Elapsed,
   rounds: Rounds,
 ): SpiralLayer {
-  const turning = spiralTurning(segments, rounds);
+  const turning = spiralTurning(order, rounds);
   let frame = 0;
 
   function tick(): void {

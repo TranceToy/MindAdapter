@@ -236,3 +236,27 @@ describe('formatFindings, on loop', () => {
     expect(findings[0]?.message).toContain('loop declared on a segment');
   });
 });
+
+describe('formatFindings, on shuffle', () => {
+  it('accepts the two words the head may say', () => {
+    expect(findingsOf('shuffle: yes\n\n# ocean\n\nOnly this.\n')).toEqual([]);
+    expect(findingsOf('shuffle: no\n\n# ocean\n\nOnly this.\n')).toEqual([]);
+  });
+
+  it('rejects a value that is neither', () => {
+    const messages = messagesOf('shuffle: sometimes\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['shuffle sometimes is neither yes nor no']);
+  });
+
+  it('rejects shuffle on a segment, where no order is drawn', () => {
+    const findings = findingsOf('# ocean\nshuffle: yes\n\nOnly this.\n');
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.locus).toEqual({ kind: 'file', line: 2 });
+    expect(findings[0]?.message).toContain('shuffle declared on a segment');
+  });
+
+  it('rejects it twice in the head, as any key declared twice', () => {
+    const messages = messagesOf('shuffle: yes\nshuffle: no\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['shuffle declared twice in one block']);
+  });
+});

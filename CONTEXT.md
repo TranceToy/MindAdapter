@@ -27,12 +27,24 @@ _Avoid_: repeat, cycle, replay, autoplay, continuous
 **Round**:
 One run of a script from its first word to its last — the unit a looping session
 is made of, and the whole of a session that does not loop. Its length is what the
-selection screen names. Nothing is reset at the seam between one round and the
-next: the words come round, the imagery opens a fresh slot as it does on any
-segment, the voice draws its suggestions again and carries its silence over, the
-bed glides, and the spiral takes its angle up where the round before it left it.
+selection screen names, and it is that length whatever order its segments come
+in. Nothing is reset at the seam between one round and the next: the words come
+round, the imagery opens a fresh slot as it does on any segment, the voice draws
+its suggestions again and carries its silence over, the bed glides, and the
+spiral takes its angle up where the round before it left it.
 _Avoid_: pass (which belongs to the spiral arm and the swell), iteration, cycle,
 lap, repetition
+
+**Shuffle**:
+What a script declares when the order its segments come in is to be drawn for
+each round rather than read off the file. Declared in the head and nowhere else,
+since what an order is drawn for is the whole round, and defaulting to the order
+the author wrote. Every segment is played once a round either way, and the round
+is as long either way, because what a segment carries was settled where it was
+written and travels with it: only the order moves. No segment opens the round
+after the one it closed, so the seam is the one place a drawn order is refused
+and drawn again.
+_Avoid_: random, randomise, reorder, mix
 
 **Layer**:
 One of the concurrent streams a session is made of — word, image, voice, bed and
@@ -124,7 +136,8 @@ _Avoid_: collection, media folder, vault, store
 
 **Script**:
 A file authored outside the app that supplies a session's words and its segment
-structure, and says whether the session plays it once or loops it.
+structure, and says whether the session plays it once or loops it, and whether
+each round draws the order its segments come in.
 _Avoid_: text, transcript, session file, program
 
 **Mark**:
@@ -137,7 +150,8 @@ _Avoid_: highlight, emphasis, bold, keyword, tag (which belongs to the pools)
 
 **Segment**:
 A named stretch of a script that carries its own imagery tag and may declare its
-own carrier, beat frequency, pace and gap.
+own carrier, beat frequency, pace and gap. What it declares is resolved where it
+was written, so a segment is the same stretch wherever a shuffled round draws it.
 _Avoid_: section, block, scene, chapter
 
 **Pool**:

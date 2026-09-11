@@ -7,7 +7,8 @@ import type { Segment } from '../script/resolve-script';
 import { sessionRounds } from '../script/session-round';
 import type { Word } from '../script/tokenise-prose';
 import { beatSeconds } from '../script/word-times';
-import type { Roll } from './clip-bag';
+import type { Roll } from './draw';
+import { writtenOrder } from './segment-order';
 import { voiceDeadline, voiceLine } from './voice-schedule';
 import type { VoiceFiring } from './voice-schedule';
 
@@ -65,7 +66,7 @@ const CHANGE_SECONDS = SILENT_AT * BEAT_SECONDS;
 // A round of a script that plays once, drained: what the voice layer walks when
 // nothing comes round.
 function voiceFirings(segments: Segment[], pools: ClipPool[], roll: Roll): VoiceFiring[] {
-  const line = voiceLine(segments, pools, sessionRounds(segments, false), roll);
+  const line = voiceLine(writtenOrder(segments), pools, sessionRounds(segments, false), roll);
   const firings: VoiceFiring[] = [];
   let place = 0;
   let firing = line.firing(place);
@@ -216,7 +217,7 @@ describe('voiceLine, where the script comes round', () => {
   const LOOPED = sessionRounds(SEGMENTS, true);
 
   function drawn(places: number): VoiceFiring[] {
-    const line = voiceLine(SEGMENTS, POOLS, LOOPED, rolling());
+    const line = voiceLine(writtenOrder(SEGMENTS), POOLS, LOOPED, rolling());
     const firings: VoiceFiring[] = [];
     for (let place = 0; place < places; place += 1) {
       const firing = line.firing(place);
@@ -239,13 +240,13 @@ describe('voiceLine, where the script comes round', () => {
 
   it('runs out where the script binds no clips at all', () => {
     const silent = [segment([], 4000)];
-    const line = voiceLine(silent, POOLS, sessionRounds(silent, true), rolling());
+    const line = voiceLine(writtenOrder(silent), POOLS, sessionRounds(silent, true), rolling());
     expect(line.firing(0)).toBeNull();
   });
 
   it('runs out after one round where the script does not loop', () => {
     const rounds = sessionRounds(SEGMENTS, false);
-    const line = voiceLine(SEGMENTS, POOLS, rounds, rolling());
+    const line = voiceLine(writtenOrder(SEGMENTS), POOLS, rounds, rolling());
     const held = voiceFirings(SEGMENTS, POOLS, rolling());
     const last = held[held.length - 1];
     expect(last?.at).toBeLessThan(rounds.seconds);

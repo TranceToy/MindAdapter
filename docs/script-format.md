@@ -28,6 +28,7 @@ pace: 200
 gap: 9-18
 spiral: 3, -1/0.06
 loop: no
+shuffle: no
 
 # ocean, deep water
 
@@ -55,8 +56,9 @@ Up, and awake, and back in the room.
 A script is a head followed by one or more segments.
 
 The **head** is everything before the first segment header. Only declarations
-belong there — a line of prose in the head is a finding. `loop` belongs there
-and nowhere else, because what comes round is the whole script.
+belong there — a line of prose in the head is a finding. `loop` and `shuffle`
+belong there and nowhere else, because what comes round is the whole script and
+what an order is drawn for is the whole round.
 
 A **segment** opens on a line beginning with `#`. The rest of that line is its
 imagery tag list, comma-separated; the tags may contain spaces. Then come the
@@ -85,7 +87,7 @@ mark crosses a segment header.
 
 ## Declarations
 
-A declaration is `key: value`, one to a line. Six keys exist; anything else is
+A declaration is `key: value`, one to a line. Seven keys exist; anything else is
 a finding, as is the same key twice in one block.
 
 | Key | Value | Default |
@@ -96,14 +98,16 @@ a finding, as is the same key twice in one block.
 | `gap` | seconds of silence between clips: `low-high`, or one number for a silence that never varies | `7-15` |
 | `spiral` | one or two spirals: `rate`, `rate/depth`, `rate/from-to/seconds`, or empty | no spiral |
 | `loop` | `yes` or `no`, in the head only | `no` |
+| `shuffle` | `yes` or `no`, in the head only | `no` |
 
 `bed`, `voice`, `pace`, `gap` and `spiral` are declared in the head for the whole
 session and again on any segment that should differ, and each holds from there
 until another segment changes it. Imagery tags never inherit: a segment header
 is the whole truth about what is on screen under it, and a bare `#` leaves the
-field blank. `loop` is the one key a segment may not declare at all: it says
-what the session does when the script runs out, which no stretch of a script
-has anything to say about.
+field blank. `loop` and `shuffle` are the two keys a segment may not declare at
+all: one says what the session does when the script runs out and the other what
+order its segments come in, and no stretch of a script has anything to say about
+either.
 
 ## What the layers do with it
 
@@ -198,6 +202,63 @@ segment boundary:
 A looping script is written to be read round after round, which the last segment
 of one is not usually written for: see `writing-scripts.md`.
 
+## Drawing the order
+
+`shuffle: yes` makes the order a script's segments come in the round's own
+rather than the author's: every round draws a fresh one, and plays every segment
+of the script once in it.
+
+```
+pace: 160
+gap: 20-40
+loop: yes
+shuffle: yes
+
+# ocean
+
+Warm water, and nothing to hold on to.
+
+# void
+
+Nothing above you. Nothing below.
+
+# weight
+
+Your arms are *heavy*. Heavier than the chair.
+```
+
+What a segment carries is settled where it was written and travels with it. A
+segment that declares no pace of its own takes the pace of the segment written
+before it, never of the segment drawn before it, and the same holds for the bed,
+the voice, the gap and the spiral — so a round is the same segments at the same
+paces whatever order they come in, and every round is exactly as long as the
+selection screen says. Imagery never inherited anything, so a header means what
+it always meant.
+
+Nothing else about the seam changes. Every layer plays the round it is given:
+
+- **Words.** The words of the round, in the order the round drew them.
+- **Imagery.** Each segment opens a fresh slot on its first word, as it does
+  when the order is written, and the photograph it draws is never the one
+  already on screen — including at the seam.
+- **Voice.** The bindings come into force where the segments that name them
+  land, so a round in which the silent segment is drawn last is silent last. The
+  cadence still carries across the seam.
+- **Bed.** The pairs glide in the order the round drew them, and the pair a
+  round ends on glides into the pair the next one opens on.
+- **Spiral.** The rates land where their segments land. What the spiral sweeps
+  across a round is the same total however the round is ordered, so the angle
+  handed to the next round is the same as ever and the swell goes on reading off
+  the session's own clock.
+
+The one thing a drawn order refuses is the same segment twice running: where a
+round would open on the segment the round before it closed on, that segment is
+traded with another and the round opens on that instead. A script of one segment
+has no order to draw and is unaffected by the declaration.
+
+A script that shuffles is written to be read in any order, which most scripts
+are not: see `writing-scripts.md`.
+
 ## What makes a script unplayable
 
 A script with any finding is listed dim, with its count of problems, and opens
@@ -227,6 +288,8 @@ its range would play a session the author did not write.
   the sum of their rates
 - a `loop` that is neither `yes` nor `no`, or a `loop` declared on a segment
   rather than in the head
+- a `shuffle` that is neither `yes` nor `no`, or a `shuffle` declared on a
+  segment rather than in the head
 - an unknown declaration key, or one declared twice in a single block
 - prose in the head, or prose in a segment without the blank line before it
 - no segment header anywhere, or no words left once punctuation is stripped

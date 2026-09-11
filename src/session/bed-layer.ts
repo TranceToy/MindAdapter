@@ -1,6 +1,6 @@
 import type { Rounds } from '../script/session-round';
 import { leftFrequency, rightFrequency } from './bed-schedule';
-import type { BedGlide, Ear } from './bed-schedule';
+import type { Ear, Glides } from './bed-schedule';
 import { watchRounds } from './round-watch';
 import type { ArmRound } from './round-watch';
 import { anchorClock } from './session-clock';
@@ -21,7 +21,7 @@ export type BedLayer = {
 export function runBed(
   context: AudioContext,
   merger: ChannelMergerNode,
-  glides: BedGlide[],
+  glides: Glides,
   from: number,
   rounds: Rounds,
 ): BedLayer {
@@ -66,10 +66,11 @@ function createTone(
 // glide is for perception rather than against a click. The running pair is
 // carried from round to round as it is from glide to glide, so a script that
 // comes round glides from the pair it ended on into the pair it opens on, and a
-// script whose bed never changes writes nothing after its first round.
+// script whose bed never changes writes nothing after its first round — which is
+// true of a shuffled script too, whatever order its segments were drawn in.
 function armEar(
   frequency: AudioParam,
-  glides: BedGlide[],
+  glides: Glides,
   ear: Ear,
   from: number,
   rounds: Rounds,
@@ -77,7 +78,7 @@ function armEar(
   let running: number | null = null;
   return (round: number) => {
     const opened = from + round * rounds.seconds;
-    for (const glide of glides) {
+    for (const glide of glides(round)) {
       const target = ear(glide.bed);
       const at = opened + glide.at;
       if (running === null) frequency.setValueAtTime(target, at);

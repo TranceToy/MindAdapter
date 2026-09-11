@@ -4,6 +4,7 @@ import { DEFAULT_GAP, DEFAULT_PACE } from '../script/declaration-values';
 import type { Segment } from '../script/resolve-script';
 import type { Word } from '../script/tokenise-prose';
 import { WORDS_PER_IMAGE, imageSlots, slotAfter, slotLine } from './image-schedule';
+import { writtenOrder } from './segment-order';
 
 function file(path: string): LibraryFile {
   return { path, handle: {} as FileSystemFileHandle, size: 1, lastModified: 1 };
@@ -64,7 +65,8 @@ describe('imageSlots', () => {
 });
 
 describe('slotAfter', () => {
-  const once = slotLine([segment(['ocean'], 24)], POOLS, { seconds: 0, loops: false });
+  const straight = [segment(['ocean'], 24)];
+  const once = slotLine(writtenOrder(straight), POOLS, { seconds: 0, loops: false });
 
   it('opens on the first slot from before the first word', () => {
     expect(slotAfter(once, -1)?.at).toBe(0);
@@ -86,7 +88,7 @@ describe('slotAfter', () => {
 
 describe('slotAfter, where the script comes round', () => {
   const segments = [segment(['ocean'], 24)];
-  const looped = slotLine(segments, POOLS, { seconds: 60, loops: true });
+  const looped = slotLine(writtenOrder(segments), POOLS, { seconds: 60, loops: true });
 
   it('follows the last slot of a round with the first of the next', () => {
     expect(slotAfter(looped, 16)?.at).toBe(24);
@@ -99,9 +101,9 @@ describe('slotAfter, where the script comes round', () => {
 
   it('opens a round on the pool its first segment names', () => {
     const paired = [segment(['ocean'], 8), segment(['void'], 8)];
-    const line = slotLine(paired, POOLS, { seconds: 60, loops: true });
+    const line = slotLine(writtenOrder(paired), POOLS, { seconds: 60, loops: true });
     const opening = slotAfter(line, 15);
     expect(opening?.at).toBe(16);
-    expect(opening?.pool).toEqual(line.slots[0]?.pool);
+    expect(opening?.pool).toEqual(line.slots(0)[0]?.pool);
   });
 });

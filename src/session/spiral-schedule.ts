@@ -5,6 +5,8 @@ import { roundAt } from '../script/session-round';
 import type { Rounds } from '../script/session-round';
 import { onsetSeconds, wordTimes } from '../script/word-times';
 import type { WordTimes } from '../script/word-times';
+import { heldByRound } from './segment-order';
+import type { SegmentOrder } from './segment-order';
 
 const SECONDS_PER_MINUTE = 60;
 const DEGREES_PER_TURN = 360;
@@ -26,11 +28,18 @@ export type SpiralPhase = {
   depth: number;
 };
 
-// A script's turning read as a session's rather than as a round's: the turns one
-// round holds, and the angle each place has swept by the end of it, which is
-// what every round after the first takes up from.
+// A script's turning read as a session's rather than as a round's: the turns a
+// round holds, asked for by round since a shuffled script turns them in a
+// different order every round, and the angle each place has swept by the end of
+// a round, which is what every round after the first takes up from.
+//
+// The carried angle is one set of numbers for every round, not one per round:
+// what a place sweeps across a round is its rate times its seconds summed over
+// the segments that declare it, and a sum does not care what order it is taken
+// in. A shuffled round turns the same amount as the written one and hands the
+// round after it the same angle.
 export type Turning = {
-  turns: SpiralTurn[];
+  turns: (round: number) => SpiralTurn[];
   carried: number[];
   rounds: Rounds;
 };
@@ -58,9 +67,9 @@ export function spiralTurns(segments: Segment[]): SpiralTurn[] {
   return turns;
 }
 
-export function spiralTurning(segments: Segment[], rounds: Rounds): Turning {
-  const turns = spiralTurns(segments);
-  const carried = sweptTo(turns, rounds.seconds).angles;
+export function spiralTurning(order: SegmentOrder, rounds: Rounds): Turning {
+  const turns = heldByRound((round: number) => spiralTurns(order.playing(round).segments));
+  const carried = sweptTo(turns(0), rounds.seconds).angles;
   return { turns, carried, rounds };
 }
 
@@ -75,7 +84,7 @@ export function spiralTurning(segments: Segment[], rounds: Rounds): Turning {
 // back to where it opened.
 export function spiralAt(turning: Turning, elapsed: number): SpiralPhase[] {
   const round = roundAt(turning.rounds, elapsed);
-  const swept = sweptTo(turning.turns, round.at);
+  const swept = sweptTo(turning.turns(round.behind), round.at);
   if (!swept.held) return NOTHING_TURNING;
   const angles = carriedInto(swept.angles, turning.carried, round.behind);
   return phasesOf(swept.held.spirals, angles, elapsed);
