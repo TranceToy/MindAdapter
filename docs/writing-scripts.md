@@ -60,7 +60,11 @@ One word per beat, punctuation stripped, every word held exactly as long as
 every other. That single fact governs the prose:
 
 - **Short, concrete words read; long ones stall.** "Heavy" costs one beat and so
-  does "consequently". Weight the sentences toward words that carry an image.
+  does "consequently" — but a beat at 220 is a quarter of a second, and a word
+  of four syllables wants more of it than that. The long word is caught late or
+  not at all, and the word after it is lost to catching up. One or two syllables
+  at the top of the pace range, three where the pace has come down; weight the
+  sentences toward words that carry an image.
 - **Punctuation does no work.** Commas and full stops vanish before the words
   are shown, so the rhythm is the pace and the pace alone. Build cadence from
   word count — short runs, then longer ones — not from commas.
@@ -69,6 +73,12 @@ every other. That single fact governs the prose:
   spends nine beats before it says anything.
 - **Say what to do, not what not to do.** A negation is read one word at a time,
   and the word that carries the image lands before the word that cancels it.
+- **Never let a word touch itself.** Punctuation is stripped before the words
+  are shown, so "Die, die dich führt" plays as `die die dich führt` and "what it
+  is is heavy" as `is is`: the same word twice on two beats, with nothing on
+  screen to say whether the frame changed or the session stalled. It reads as a
+  fault in the app rather than as writing. Recast the line — the comma that made
+  it legible on the page is not there to save it.
 - **Repeat deliberately.** Repetition is the mechanism, not a flaw in the draft.
   A phrase that returns at the same pace three segments apart is heard as
   structure; a phrase varied each time is heard as new information.
@@ -196,3 +206,4 @@ near the length of a segment makes the segment breathe once.
 - Is anything said only once that should have been said three times?
 - Are the marked words few enough to be heard, and marked every time?
 - Are there long words where the beat needs a short one?
+- Does any word land twice in a row once the punctuation is gone?
