@@ -166,25 +166,25 @@ describe('formatFindings', () => {
 
   // Each of them is inside the bounds; what they turn between them is not.
   it('rejects a pair that turns more in the frame than one spiral may', () => {
-    const messages = messagesOf('spiral: 8, -6\n\n# ocean\n\nOnly this.\n');
-    expect(messages).toEqual(['spirals turning 14 turns per minute between them, past 12']);
+    const messages = messagesOf('spiral: 14, -12\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spirals turning 26 turns per minute between them, past 24']);
   });
 
   it('leaves a pair that meets the bound exactly alone', () => {
-    const findings = findingsOf('spiral: 8.1, -3.9\n\n# ocean\n\nOnly this.\n');
+    const findings = findingsOf('spiral: 16.1, -7.9\n\n# ocean\n\nOnly this.\n');
     expect(findings).toEqual([]);
   });
 
   it('rejects a spiral rate outside its range rather than clamping it', () => {
     const low = messagesOf('spiral: 0.2\n\n# ocean\n\nOnly this.\n');
-    const high = messagesOf('spiral: 20\n\n# ocean\n\nOnly this.\n');
-    expect(low).toEqual(['spiral 0.2 outside 0.5–12 turns per minute in either direction']);
-    expect(high).toEqual(['spiral 20 outside 0.5–12 turns per minute in either direction']);
+    const high = messagesOf('spiral: 30\n\n# ocean\n\nOnly this.\n');
+    expect(low).toEqual(['spiral 0.2 outside 0.5–24 turns per minute in either direction']);
+    expect(high).toEqual(['spiral 30 outside 0.5–24 turns per minute in either direction']);
   });
 
   it('bounds a rate below zero by the same numbers as one above it', () => {
-    const messages = messagesOf('spiral: -20\n\n# ocean\n\nOnly this.\n');
-    expect(messages).toEqual(['spiral -20 outside 0.5–12 turns per minute in either direction']);
+    const messages = messagesOf('spiral: -30\n\n# ocean\n\nOnly this.\n');
+    expect(messages).toEqual(['spiral -30 outside 0.5–24 turns per minute in either direction']);
   });
 
   it('rejects a depth past the whole of the frame', () => {

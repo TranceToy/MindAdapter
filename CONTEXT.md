@@ -55,7 +55,7 @@ _Avoid_: track, channel, stream
 **Flash budget**:
 The ceiling on how fast anything may change the frame's luminance — half a
 hertz, a sixth of the flash threshold — and the share of it each layer spends:
-the whole of it to the imagery, 0.2 Hz to the spiral, 0.1 Hz to the swell, none
+the whole of it to the imagery, 0.4 Hz to the spiral, 0.1 Hz to the swell, none
 at all to the words, which change a glyph and not the frame. It is spent at
 authoring time: a script over it is refused, and a session never mentions it.
 _Avoid_: flicker limit, strobe threshold, safety margin, photosensitivity warning
@@ -82,7 +82,7 @@ _Avoid_: speed, rpm, spin, pace (which belongs to the word layer)
 
 **Depth**:
 How much of the photograph the spiral takes, from none of it to all of it. It
-rides on the rate declaration and defaults to a fifteenth. Declared as one
+rides on the rate declaration and defaults to two fifths. Declared as one
 number it stands; declared as two bounds it swells between them.
 _Avoid_: opacity, alpha, strength, intensity
 

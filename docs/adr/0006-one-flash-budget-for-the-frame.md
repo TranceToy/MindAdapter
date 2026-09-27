@@ -1,5 +1,8 @@
 # One flash budget for the frame
 
+_The spiral's share is 0.4 Hz, `RATE_HIGH` 24; see ADR 0012. The ceiling and
+the ordering under it stand._
+
 Four things on screen move on their own: the word, the photograph under it, the
 spiral between them, and the depth that spiral is drawn at. Each was bounded
 when it was built, and each bound was argued from the same place — how often the
