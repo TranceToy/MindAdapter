@@ -1,15 +1,12 @@
 // The spiral is geometry, not a file: it is the one thing on screen the library
 // does not supply, so its shape is fixed here and only its turn and its depth
 // are the script's.
-// One arm, not two: every arm ends at the centre, so one of them leaves the
-// middle of the screen a single point the eye falls into rather than a meeting,
-// and what winds in is one band followed the whole way rather than two the eye
-// picks between.
-export const ARMS = 1;
-// Twice the turns the pair had, so dropping an arm changes what the eye follows
-// and not how wide the bands are: one arm over twelve turns crosses a ray as
-// often as two over six.
-export const TURNS = 12;
+// Three arms, each a thinner band, so the frame is dense with them and every
+// turn passes a point three times; see ADR 0013.
+export const ARMS = 3;
+// Three arms over eight turns cross a ray twice as often as one arm over
+// twelve, so each band is half as wide as it was.
+export const TURNS = 8;
 // The viewBox is a square around the centre, sliced to cover the screen, so the
 // furthest thing from the centre is the corner at VIEW_HALF × √2. What has to
 // reach it is not the end of the arm but the outermost band in every direction,

@@ -143,7 +143,7 @@ between them.
 declares it. The carrier is the left ear; the right ear carries the carrier plus
 the beat frequency.
 
-**Spiral.** A one-armed spiral turns between the photograph and the words — a
+**Spiral.** A three-armed spiral turns between the photograph and the words — a
 lit band on a dark one, so a pass is the whole step from black to jade — at
 the rate in force where the session has got to, and takes the depth beside it —
 `0.4` where only a rate is declared, `1` for a spiral the photograph does not
@@ -277,13 +277,13 @@ its range would play a session the author did not write.
   suggestions run together as one utterance; past three minutes a suggestion may
   not be heard in a session at all, which is a voice layer declared away rather
   than declared slow
-- a spiral `rate` outside 0.5–24 turns per minute in either direction, a depth
+- a spiral `rate` outside 0.5–40 turns per minute in either direction, a depth
   bound outside 0–1, a swell outside 10–600 seconds, or a value that is none of
   a rate, a `rate/depth` pair and a `rate/from-to/seconds` swell. The high rate
-  bound is the imagery layer's: one arm passing a point at 24 turns a minute is
-  0.4 Hz of luminance change, under what a new photograph every eight words
-  makes, and the low swell bound holds one pass out and back at a quarter of that
-- more than two spirals in one declaration, or a pair turning more than 24 turns
+  bound is the frame's ceiling: three arms passing a point at 40 turns a minute
+  is 2 Hz of luminance change, under the 3 Hz flash threshold, and the low swell
+  bound holds one pass out and back at 0.1 Hz
+- more than two spirals in one declaration, or a pair turning more than 40 turns
   per minute between them — two spirals pass a point as often as one turning at
   the sum of their rates
 - a `loop` that is neither `yes` nor `no`, or a `loop` declared on a segment

@@ -1,5 +1,8 @@
 # A spiral that is seen
 
+_`RATE_HIGH` is 40 on three arms, 2 Hz; see ADR 0013. The depth and the jade
+stand._
+
 The spiral read as pale and slow. Pale because a rate declared alone took a
 fifteenth of the photograph and the lit band was a jade dark enough to sink into
 it; slow because `RATE_HIGH` held at 12 after ADR 0008 halved what 12 spends,

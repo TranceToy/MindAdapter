@@ -2,7 +2,7 @@
 
 _The lit band is jade rather than white, so a pass is the step from black to
 jade rather than the frame's full step; see ADR 0011. The one arm, its dark band
-and the doubled turns still hold. `RATE_HIGH` is 24, not 12; see ADR 0012._
+and the doubled turns still hold. `RATE_HIGH` is 24, not 12; see ADR 0012. The one arm is three; see ADR 0013._
 
 The spiral was two arms of white line at the depth a script declared, and what
 it drew was a light band over whatever the photograph showed underneath. Two
