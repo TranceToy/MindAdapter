@@ -269,6 +269,13 @@ body {
    at a low one the photograph reads through both bands, and at 1 the spiral is
    the frame. Where two spirals turn, the upper one's dark band covers the lower
    at full depth — the pair is read at the depths a script gives them. */
+/* Round ends, so the arms meet at the centre as three rounded tips rather than
+   three squared-off ones. */
+.spiral__shade,
+.spiral__band {
+  stroke-linecap: round;
+}
+
 .spiral__shade {
   stroke: var(--ground);
 }

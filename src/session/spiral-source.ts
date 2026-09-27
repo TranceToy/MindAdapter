@@ -21,7 +21,7 @@ export function createSpiralArms(): SpiralArms {
   svg.setAttribute('viewBox', viewBox());
   svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
   svg.setAttribute('aria-hidden', 'true');
-  for (const path of armPaths()) drawing.append(...createArm(path));
+  drawing.append(...createArms(armPaths()));
   svg.append(drawing);
 
   // The attribute rather than the style, because an SVG rotate() is about the
@@ -34,13 +34,15 @@ export function createSpiralArms(): SpiralArms {
   return { element: svg, turn };
 }
 
-// Two bands on one path: the wide dark one first, then the lit one half its
-// width on top of it, so the arm carries its own gap and the step across it is
-// ground to light rather than photograph to light.
-function createArm(path: string): SVGElement[] {
-  const shade = createBand(path, 'spiral__shade', SHADE);
-  const band = createBand(path, 'spiral__band', STROKE);
-  return [shade, band];
+// Two bands on each path: the wide dark one, then the lit one half its width,
+// so every arm carries its own gap and the step across it is ground to light
+// rather than photograph to light. Every dark band goes down before any lit
+// one, since at the centre the arms meet and a later arm's dark band would
+// otherwise cut the lit band of the arm before it.
+function createArms(paths: string[]): SVGElement[] {
+  const shades = paths.map((path) => createBand(path, 'spiral__shade', SHADE));
+  const bands = paths.map((path) => createBand(path, 'spiral__band', STROKE));
+  return [...shades, ...bands];
 }
 
 function createBand(path: string, className: string, width: number): SVGElement {
