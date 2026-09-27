@@ -64,7 +64,7 @@ _Avoid_: flicker limit, strobe threshold, safety margin, photosensitivity warnin
 The turning geometry between the imagery and the words, drawn by the app rather
 than taken from the library: one arm winding in to the centre, a lit band on a
 dark one of twice its width, so what passes over a point is the whole step from
-ground to light. It is the only layer a session can run without: a
+ground to jade. It is the only layer a session can run without: a
 script that declares no rate for it shows none at all. A script may declare two,
 which turn at once and keep their own angles by the order they were written in;
 two whose rates have opposite signs turn against each other.
@@ -142,7 +142,7 @@ _Avoid_: text, transcript, session file, program
 
 **Mark**:
 What a script puts round a word, or a run of words, to have it shown in the
-marked colour rather than white, and snapped, for the beats it is on — a trigger
+marked colour rather than the word colour, and snapped, for the beats it is on — a trigger
 word set apart from the prose it sits in. The script says which words; the
 colour and the snap are the app's, and a mark changes nothing else about the
 word, neither its size nor its beat.

@@ -1,5 +1,9 @@
 # One arm, at the frame's full step
 
+_The lit band is jade rather than white, so a pass is the step from black to
+jade rather than the frame's full step; see ADR 0011. The one arm, its dark band
+and the doubled turns still hold._
+
 The spiral was two arms of white line at the depth a script declared, and what
 it drew was a light band over whatever the photograph showed underneath. Two
 things follow from that and both weaken the pull: the eye is given two bands

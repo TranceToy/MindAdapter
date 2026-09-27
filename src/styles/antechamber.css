@@ -7,11 +7,12 @@
 }
 
 :root {
-  --ground: #000;
-  --lit: #fff;
-  --marked: #ffb020;
-  --dim: #3a3a40;
-  --prose: #6e6e74;
+  --ground: #020806;
+  --lit: #e6fff3;
+  --jade: #1fd68a;
+  --marked: var(--jade);
+  --dim: #1f3a2e;
+  --prose: #5c8a74;
   --halo:
     0 0 0.05em #000,
     0 0 0.14em #000e,
@@ -263,8 +264,8 @@ body {
 }
 
 /* The arm is a lit band drawn on a wider dark one, so what passes over a point
-   is the whole step from ground to light rather than light over whatever the
-   photograph happens to show there. The depth is still the whole of the blend:
+   is the whole step from ground to jade rather than jade over whatever the
+   photograph happens to show there (ADR 0011). The depth is still the whole of the blend:
    at a low one the photograph reads through both bands, and at 1 the spiral is
    the frame. Where two spirals turn, the upper one's dark band covers the lower
    at full depth — the pair is read at the depths a script gives them. */
@@ -273,7 +274,7 @@ body {
 }
 
 .spiral__band {
-  stroke: var(--lit);
+  stroke: var(--jade);
 }
 
 /* Untouched and at full brightness: no dim, no scrim, no vignette. Legibility
@@ -307,8 +308,8 @@ body {
 
 /* A marked word takes a colour and nothing else: the same face at the same
    size on the same beat, so the reading is unbroken and only the hue says the
-   word was set apart. Amber holds its hue against a photograph where a paler
-   one would read as the white going dim. */
+   word was set apart. Jade holds its hue against a photograph where a paler
+   one would read as the word colour going dim. */
 .word--marked {
   color: var(--marked);
 }
@@ -332,7 +333,7 @@ body {
   text-align: center;
   padding: 6vh 6vw;
   overflow-y: auto;
-  background: #000a;
+  background: #020806aa;
 }
 
 .pause__content {

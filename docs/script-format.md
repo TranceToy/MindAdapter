@@ -73,7 +73,7 @@ including further blank lines and any line that happens to hold a colon.
 
 An asterisk in the prose marks the words after it, and the next asterisk stops
 marking them: `*heavy*` marks one word, `*down and further down*` marks four.
-Marked words are shown in the marked colour instead of white and struck with the
+Marked words are shown in the marked colour instead of the word colour and struck with the
 app's snap on the beat they land on — a trigger word the session should carry
 differently from the prose around it. The colour and the sound are the app's,
 not the script's: a mark says which words, and nothing about how they look or
@@ -144,7 +144,7 @@ declares it. The carrier is the left ear; the right ear carries the carrier plus
 the beat frequency.
 
 **Spiral.** A one-armed spiral turns between the photograph and the words — a
-lit band on a dark one, so a pass is the whole step from black to white — at
+lit band on a dark one, so a pass is the whole step from black to jade — at
 the rate in force where the session has got to, and takes the depth beside it —
 `0.15` where only a rate is declared, `1` for a spiral the photograph does not
 show through at all. A rate below zero turns it the other way; the bounds are on

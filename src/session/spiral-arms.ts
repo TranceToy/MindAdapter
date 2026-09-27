@@ -31,7 +31,8 @@ export const STROKE = SPACING / 2;
 
 // The dark band the lit one is drawn on, a whole spacing wide so it fills what
 // the lit band leaves: the arm passes ground over light instead of light over
-// photograph, and a pass is the frame's whole step rather than a fraction of it.
+// photograph, and a pass is the step from ground to jade rather than a fraction
+// of it (ADR 0011).
 export const SHADE = SPACING;
 
 // The radius covered in every direction, not just along the arm: the ray that

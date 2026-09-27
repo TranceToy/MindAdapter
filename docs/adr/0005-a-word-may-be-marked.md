@@ -1,5 +1,9 @@
 # A word may be marked
 
+_A marked word is shown in jade rather than amber, and the word it is set apart
+from is a green-cast white; see ADR 0011. Everything else about a mark still
+holds._
+
 The word layer has had one appearance since the first session: white, uppercase,
 one word to a beat, every word exactly like the one before it. That sameness is
 most of what the layer does — nothing about a word says it matters more than its
