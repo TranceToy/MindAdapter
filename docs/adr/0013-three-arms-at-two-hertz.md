@@ -1,5 +1,8 @@
 # Three arms at two hertz
 
+_The three arms are two, winding out logarithmically; see ADR 0014. At the
+same `RATE_HIGH` of 40 the spiral now spends 1.33 Hz of the 2 Hz ceiling._
+
 The spiral still read as slow at 24 turns a minute, and one wide arm left the
 frame sparse. More arms and more speed both spend the flash budget, and ADR
 0006's half-hertz ceiling had no room for either: three arms at 24 turns a

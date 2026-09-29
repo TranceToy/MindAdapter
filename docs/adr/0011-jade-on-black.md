@@ -1,5 +1,8 @@
 # Jade on black
 
+_The ground is pure black, the words are jade and the mark is the near white;
+the spiral's jade leans blue. See ADR 0014._
+
 The app's palette was black ground, white words, an amber mark, and a spiral
 whose lit band was white — chosen for contrast and for nothing else. The scripts
 the app now plays are written in one voice, and that voice has a look: black and

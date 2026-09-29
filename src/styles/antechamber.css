@@ -6,12 +6,20 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: 'Liberation Sans';
+  src: url('../assets/fonts/liberation-sans-bold-latin.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
-  --ground: #020806;
-  --lit: #e6fff3;
-  --jade: #3dffaa;
-  --marked: var(--jade);
-  --dim: #1f3a2e;
+  --ground: #000000;
+  --lit: #42f0b6;
+  --jade: #39fed2;
+  --marked: #e6fff3;
+  --dim: #106246;
   --prose: #5c8a74;
   --halo:
     0 0 0.05em #000,
@@ -67,10 +75,10 @@ body {
 .hero {
   margin: 0;
   color: var(--lit);
+  font-family: 'Liberation Sans';
   font-size: clamp(34px, 7.2vw, 84px);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.02;
-  letter-spacing: -0.015em;
   text-transform: uppercase;
 }
 
@@ -85,7 +93,6 @@ body {
   background: none;
   border: 0;
   padding: 0;
-  font-family: inherit;
   cursor: pointer;
 }
 
@@ -136,11 +143,10 @@ body {
   border: 0;
   padding: 0;
   color: var(--lit);
-  font-family: inherit;
+  font-family: 'Liberation Sans';
   font-size: clamp(20px, 3.4vw, 34px);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.05;
-  letter-spacing: -0.01em;
   text-align: center;
   text-transform: uppercase;
   cursor: pointer;
@@ -235,7 +241,7 @@ body {
 }
 
 /* Between the photograph and the word: the depth a script declares is the whole
-   of the blend, so a spiral is black and white geometry at that opacity and no
+   of the blend, so a spiral is ground and jade geometry at that opacity and no
    filter, scrim or blend mode of its own. The box holds still over the whole
    screen and the arms turn inside it, so the clip is the screen edge at every
    angle and nothing about the turn reflows the frame. Two spirals share the box
@@ -269,19 +275,28 @@ body {
    at a low one the photograph reads through both bands, and at 1 the spiral is
    the frame. Where two spirals turn, the upper one's dark band covers the lower
    at full depth — the pair is read at the depths a script gives them. */
-/* Round ends, so the arms meet at the centre as three rounded tips rather than
-   three squared-off ones. */
-.spiral__shade,
-.spiral__band {
-  stroke-linecap: round;
-}
-
+/* The glow is stepped bands of the same jade rather than a blur, so it is drawn
+   once with the arms and turns with them at no cost per frame. */
 .spiral__shade {
-  stroke: var(--ground);
+  fill: var(--ground);
+}
+
+.spiral__halo {
+  fill: var(--jade);
+  fill-opacity: 0.1;
+}
+
+.spiral__glow {
+  fill: var(--jade);
+  fill-opacity: 0.28;
 }
 
 .spiral__band {
-  stroke: var(--jade);
+  fill: var(--jade);
+}
+
+.spiral__hub-stop {
+  stop-color: var(--ground);
 }
 
 /* Untouched and at full brightness: no dim, no scrim, no vignette. Legibility
@@ -305,18 +320,18 @@ body {
 /* No transition, ever: a fading or blank word is a 3.67 Hz flicker. */
 .word {
   color: var(--lit);
-  font-weight: 800;
+  font-family: 'Liberation Sans';
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.01em;
   text-transform: uppercase;
   text-shadow: var(--halo);
   white-space: nowrap;
 }
 
 /* A marked word takes a colour and nothing else: the same face at the same
-   size on the same beat, so the reading is unbroken and only the hue says the
-   word was set apart. Jade holds its hue against a photograph where a paler
-   one would read as the word colour going dim. */
+   size on the same beat, so the reading is unbroken and only the colour says
+   the word was set apart. The words are already jade, so the mark is the one
+   near white, brighter than they are and never read as them going dim. */
 .word--marked {
   color: var(--marked);
 }
@@ -340,7 +355,7 @@ body {
   text-align: center;
   padding: 6vh 6vw;
   overflow-y: auto;
-  background: #020806aa;
+  background: #000000aa;
 }
 
 .pause__content {

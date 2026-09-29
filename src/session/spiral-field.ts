@@ -33,7 +33,7 @@ export function createSpiralField(): SpiralField {
 
 function armSets(): SpiralArms[] {
   const sets: SpiralArms[] = [];
-  for (let place = 0; place < SPIRALS_HIGH; place += 1) sets.push(createSpiralArms());
+  for (let place = 0; place < SPIRALS_HIGH; place += 1) sets.push(createSpiralArms(place));
   return sets;
 }
 
